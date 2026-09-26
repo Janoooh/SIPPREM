@@ -88,6 +88,8 @@ Estas proto-personas representan perfiles hipotéticos elaborados para guiar el 
 Nombre: Carlos Morales (42 años)
 Rol: Administrador
 Caracteristicas generales:
+Profesional ordenado, metódico y enfocado en la gestión eficiente de recursos municipales. Trabaja en horario de oficina desde la central de operaciones.
+Encargado de coordinar presupuestos, flota vehicular, equipamiento táctico y proyectos de patrullaje.
 
 Necesidades principales:
 * Disponer de una visión global estructurada de todos los proyectos y de sus respectivos patrullajes.
