@@ -4,6 +4,7 @@ import { IonReactRouter } from '@ionic/react-router';
 import { useState } from 'react';
 import Login from './pages/Login';
 import Inicio from './pages/Inicio';
+import AgregarProyecto from './pages/AgregarProyecto';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -52,10 +53,17 @@ const App: React.FC = () => {
     <IonReactRouter>
       <IonRouterOutlet>
         
+        {/*Ruta publica del login.*/}
         <Route path="/login" element={<Login setUsuario={setUsuario} />} />
+
+        {/*Rutas protegidas.*/}
 
         <Route path="/admin/inicio" element={usuario.nombre !== "NotData" 
               ? <Inicio nombreUsuario={usuario.nombre} rol={usuario.rol}/>
+              : <Navigate to="/login" replace />
+              } />
+        <Route path="/admin/agregar-proyecto" element={usuario.nombre !== "NotData" 
+              ? <AgregarProyecto nombreUsuario={usuario.nombre} rol={usuario.rol}/>
               : <Navigate to="/login" replace />
               } />
         <Route path="/supervisor/inicio" element={usuario.nombre !== "NotData"
@@ -63,7 +71,10 @@ const App: React.FC = () => {
               : <Navigate to="/login" replace />
               } />
 
+        {/*Ruta de seguridad, reedirige al login cuando tratan de acceder a la raiz.*/}
         <Route path="/" element={<Navigate to="/login" replace />} />
+
+        {/*Ruta de seguridad, reedirige al login cuando ingresan una ruta inexistente.*/}
         <Route path='*' element={<Navigate to="/login" replace />}></Route>
       </IonRouterOutlet>
     </IonReactRouter>

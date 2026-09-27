@@ -13,11 +13,11 @@ import { createOutline, trashOutline } from 'ionicons/icons';
 import { proyectoPatrullaje } from '../interfaces/proyectoPatrullaje';
 import './ProyectoPatrullajeCard.css';
 
-interface Props {
+interface ProyectoPatrullajeCardProps {
   proyecto: proyectoPatrullaje;
 }
 
-const ProyectoPatrullajeCard: React.FC<Props> = ({ proyecto }) => {
+const ProyectoPatrullajeCard: React.FC<ProyectoPatrullajeCardProps> = ({ proyecto }) => {
   return (
     <IonCard className="proyecto-card">
       <IonCardContent className="proyecto-card-content">

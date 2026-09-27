@@ -16,9 +16,11 @@ import {
   IonCardTitle,
   IonCardContent,
   IonChip,
-  IonLabel
+  IonLabel,
+  useIonRouter
 } from '@ionic/react';
 import ProyectoPatrullajeCard from '../components/ProyectoPatrullajeCard';
+import HeaderSistema from '../components/HeaderSistema';
 import { proyectoPatrullaje } from '../interfaces/proyectoPatrullaje';
 import './Inicio.css';
 
@@ -29,8 +31,7 @@ interface InicioProps {
 
 const Inicio: React.FC<InicioProps> = ({ nombreUsuario, rol }) => {
   
-  // Arreglo de proyectos mockeados, usando la interfaz proyectoPatrullaje
-  // Note: the interface expects id (number), nombre, fechaInicio, fechaTermino, presupuestoAsignado
+  // Creacion de proyectos de ejemplo para mostrarlos en el inicio.
   const proyectos: proyectoPatrullaje[] = [
     {
       id: 1,
@@ -62,42 +63,23 @@ const Inicio: React.FC<InicioProps> = ({ nombreUsuario, rol }) => {
     }
   ];
 
+  const router = useIonRouter();
+
   return (
     <IonPage>
-      {/* Cabecera con fondo oscuro */}
+
       <IonHeader className="ion-no-border">
-        <IonToolbar className="inicio-toolbar">
-          <IonButtons slot="start">
-            <IonImg src="/assets/logoSIPPREM.png" alt="SIPPREM Logo" className="header-logo" />
-          </IonButtons>
-          <IonText className="name-text">
-            SIPPREM
-          </IonText>
-          
-          <IonButtons slot="end" className="header-nav-buttons">
-            
-            {rol === 'ADMIN' && 
-              (
-              <IonButton fill="clear" className="nav-btn-clear" onClick={() => {}}>Usuarios</IonButton>
-            )}
-            {rol === 'ADMIN' && (
-              <IonButton fill="clear" className="nav-btn-clear" onClick={() => {}}>Historial de Proyectos</IonButton>
-            )}
-            <IonButton fill="clear" className="nav-btn-clear" onClick={() => {}}>Mi perfil</IonButton>
-            
-          </IonButtons>
-        </IonToolbar>
+        <HeaderSistema nombreUsuario={nombreUsuario} rol={rol}/>
       </IonHeader>
 
-      {/* Contenido principal con fondo azul oscuro */}
       <IonContent fullscreen style={{ '--background': '#3b5066' } as React.CSSProperties}>
         <IonGrid className="inicio-grid ion-padding">
           <IonRow>
             
-            {/* Columna Izquierda: Perfil y Lista de Proyectos */}
+
             <IonCol size="12" sizeMd="9" className="ion-padding-end">
               
-              {/* Fila de Bienvenida */}
+              {/* Mensajes de bienvenida.*/}
               <IonRow className="ion-align-items-center ion-margin-bottom">
                 <IonCol size="auto">
                   <IonImg src="/assets/fotoPerfil.png" alt="Profile" className="profile-picture" />
@@ -112,7 +94,7 @@ const Inicio: React.FC<InicioProps> = ({ nombreUsuario, rol }) => {
                 </IonCol>
               </IonRow>
 
-              {/* Lista de tarjetas de proyectos */}
+              {/*Lista de proyectos existentes.*/}
               <IonRow>
                 <IonCol size="12">
                   {proyectos.map((proyecto) => (
@@ -123,12 +105,13 @@ const Inicio: React.FC<InicioProps> = ({ nombreUsuario, rol }) => {
 
             </IonCol>
 
-            {/* Columna Derecha: Dashboard y botón de agregar */}
+            {/*Dashboard, y el boton para agregar proyectos.*/}
             <IonCol size="12" sizeMd="3">
               
+              {/*Dashboard de informacion y estadisticas*/}
               <IonCard className="dashboard-card">
                 <IonCardHeader className="ion-text-center">
-                  <IonCardTitle className="dashboard-title">DASHBOARD</IonCardTitle>
+                  <IonCardTitle className="dashboard-title">Estadisticas e informacion</IonCardTitle>
                 </IonCardHeader>
                 <IonCardContent className="dashboard-content">
                   <IonText className="dashboard-text">
@@ -145,15 +128,18 @@ const Inicio: React.FC<InicioProps> = ({ nombreUsuario, rol }) => {
                   </IonText>
                 </IonCardContent>
               </IonCard>
-
+              
+              {/*Boton para agregar mas proyectos.*/}
+              {rol === 'ADMIN' && (
               <IonButton 
                 expand="block" 
                 fill="outline" 
                 className="add-project-btn" 
-                onClick={() => {}}
+                onClick={() => {router.push("/admin/agregar-proyecto","forward")}}
               >
                 Agregar Proyecto
               </IonButton>
+              )}
 
             </IonCol>
 
