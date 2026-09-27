@@ -98,7 +98,7 @@ const Inicio: React.FC<InicioProps> = ({ nombreUsuario, rol }) => {
               <IonRow>
                 <IonCol size="12">
                   {proyectos.map((proyecto) => (
-                    <ProyectoPatrullajeCard key={proyecto.id} proyecto={proyecto} />
+                    <ProyectoPatrullajeCard key={proyecto.id} proyecto={proyecto} rolUsuario={rol}/>
                   ))}
                 </IonCol>
               </IonRow>

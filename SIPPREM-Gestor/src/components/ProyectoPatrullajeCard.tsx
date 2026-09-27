@@ -7,7 +7,8 @@ import {
   IonCol, 
   IonText, 
   IonButton, 
-  IonIcon 
+  IonIcon,
+  useIonRouter 
 } from '@ionic/react';
 import { createOutline, trashOutline } from 'ionicons/icons';
 import { proyectoPatrullaje } from '../interfaces/proyectoPatrullaje';
@@ -15,16 +16,20 @@ import './ProyectoPatrullajeCard.css';
 
 interface ProyectoPatrullajeCardProps {
   proyecto: proyectoPatrullaje;
+  rolUsuario : string;
 }
 
-const ProyectoPatrullajeCard: React.FC<ProyectoPatrullajeCardProps> = ({ proyecto }) => {
+const ProyectoPatrullajeCard: React.FC<ProyectoPatrullajeCardProps> = ({ proyecto , rolUsuario}) => {
+
+  const router = useIonRouter();
+
   return (
     <IonCard className="proyecto-card">
       <IonCardContent className="proyecto-card-content">
         <IonGrid className="ion-no-padding">
           <IonRow className="ion-align-items-center">
             
-            {/* Columna izquierda: Nombre del proyecto y fechas */}
+            {/* Nombre del proyecto, y sus fechas de duracion.*/}
             <IonCol size="8">
               <IonText className="proyecto-nombre">
                 <h3>{proyecto.nombre}</h3>
@@ -35,7 +40,7 @@ const ProyectoPatrullajeCard: React.FC<ProyectoPatrullajeCardProps> = ({ proyect
               </IonText>
             </IonCol>
 
-            {/* Columna derecha: Iconos y botón */}
+            {/*Botones para interactuar con el proyecto.*/}
             <IonCol size="4" className="ion-text-right proyecto-acciones">
               <IonRow className="ion-justify-content-end ion-align-items-center">
                 <IonButton fill="clear" className="icon-btn" onClick={() => {}}>
@@ -46,7 +51,7 @@ const ProyectoPatrullajeCard: React.FC<ProyectoPatrullajeCardProps> = ({ proyect
                 </IonButton>
               </IonRow>
               <IonRow className="ion-justify-content-end">
-                <IonButton className="ver-btn" onClick={() => {}}>
+                <IonButton className="ver-btn" onClick={() => {router.push(`/${rolUsuario.toLowerCase()}/proyecto/${proyecto.id}`)}}>
                   VER PROYECTO
                 </IonButton>
               </IonRow>

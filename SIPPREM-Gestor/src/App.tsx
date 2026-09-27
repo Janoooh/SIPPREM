@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Login from './pages/Login';
 import Inicio from './pages/Inicio';
 import AgregarProyecto from './pages/AgregarProyecto';
+import InicioProyecto from './pages/InicioProyecto';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -58,6 +59,7 @@ const App: React.FC = () => {
 
         {/*Rutas protegidas.*/}
 
+        {/*Rutas del administrador*/}
         <Route path="/admin/inicio" element={usuario.nombre !== "NotData" 
               ? <Inicio nombreUsuario={usuario.nombre} rol={usuario.rol}/>
               : <Navigate to="/login" replace />
@@ -66,8 +68,18 @@ const App: React.FC = () => {
               ? <AgregarProyecto nombreUsuario={usuario.nombre} rol={usuario.rol}/>
               : <Navigate to="/login" replace />
               } />
+        <Route path="/admin/proyecto/:id" element={usuario.nombre !== "NotData" 
+              ? <InicioProyecto nombreUsuario={usuario.nombre} rol={usuario.rol} />
+              : <Navigate to="/login" replace />
+              } />
+
+        {/*Rutas del supervisor*/}
         <Route path="/supervisor/inicio" element={usuario.nombre !== "NotData"
               ? <Inicio nombreUsuario={usuario.nombre} rol={usuario.rol}/>
+              : <Navigate to="/login" replace />
+              } />
+        <Route path="/supervisor/proyecto/:id" element={usuario.nombre !== "NotData" 
+              ? <InicioProyecto nombreUsuario={usuario.nombre} rol={usuario.rol} />
               : <Navigate to="/login" replace />
               } />
 
