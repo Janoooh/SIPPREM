@@ -3,7 +3,7 @@ import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { useState } from 'react';
 import Login from './pages/Login';
-import Home from './pages/Home';
+import Inicio from './pages/Inicio';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -34,6 +34,7 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import { navigate } from 'ionicons/icons';
 
 interface datosUsuario{
   nombre: string,
@@ -51,9 +52,10 @@ const App: React.FC = () => {
     <IonReactRouter>
       <IonRouterOutlet>
         <Route path="/login" element={<Login setUsuario={setUsuario} />} />
-        <Route path="/admin/home" element={<Home nombreUsuario={usuario.nombre} rol={usuario.rol}/>} />
-        <Route path="/supervisor/home" element={<Home nombreUsuario={usuario.nombre} rol={usuario.rol}/>} />
+        <Route path="/admin/inicio" element={<Inicio nombreUsuario={usuario.nombre} rol={usuario.rol}/>} />
+        <Route path="/supervisor/inicio" element={<Inicio nombreUsuario={usuario.nombre} rol={usuario.rol}/>} />
         <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path='*' element={<Navigate to="/login" replace />}></Route>
       </IonRouterOutlet>
     </IonReactRouter>
   </IonApp>

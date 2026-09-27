@@ -12,7 +12,8 @@ import {
   IonCardContent,
   IonImg,
   IonLabel,
-  useIonRouter
+  useIonRouter,
+  useIonAlert
 } from '@ionic/react';
 import React, { useState } from 'react';
 import './Login.css';
@@ -27,6 +28,8 @@ const Login: React.FC<loginProps> = ({setUsuario}) => {
   const [clave, setPassword] = useState<string>('');
   const router = useIonRouter();
 
+  const [mandarAlerta] = useIonAlert();
+
   // Función para manejar el inicio de sesión
   const handleLogin = () => {
     console.log('Intento de login:', { identificador, clave });
@@ -35,15 +38,20 @@ const Login: React.FC<loginProps> = ({setUsuario}) => {
             nombre: 'Usuario de administrador',
             rol: 'ADMIN'
         });
-        router.push("/admin/home","forward");
+        router.push("/admin/inicio","forward");
     }else if(identificador.trim() === 'supervisor'){
         setUsuario({
             nombre: 'Usuario de supervisor',
             rol: 'SUPERVISOR'
         });
-        router.push("/supervisor/home","forward");
+        router.push("/supervisor/inicio","forward");
     }else{
-        router.push("/","forward");
+        mandarAlerta({
+            header: 'Acceso Denegado',
+            subHeader: 'Credenciales de acceso incorrectas',
+            message: 'El RUT o la contraseña ingresada no son válidos. Por favor, intente nuevamente.',
+            buttons: ['Aceptar']
+      });
     }
   };
 
