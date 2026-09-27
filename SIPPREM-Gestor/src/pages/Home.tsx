@@ -2,12 +2,17 @@ import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/rea
 import ExploreContainer from '../components/ExploreContainer';
 import './Home.css';
 
-const Home: React.FC = () => {
+interface homeProps{
+    nombreUsuario: string,
+    rol: string
+};
+
+const Home: React.FC<homeProps> = ({nombreUsuario, rol}) => {
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Blank</IonTitle>
+          <IonTitle>SIPPRAM</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
@@ -16,6 +21,12 @@ const Home: React.FC = () => {
             <IonTitle size="large">Blank</IonTitle>
           </IonToolbar>
         </IonHeader>
+        {rol === 'ADMIN' && (
+          <h2>Bienvenido, {nombreUsuario}</h2>
+        )}
+        {rol === 'SUPERVISOR' && (
+          <h2>Bienvenido, {nombreUsuario}!!!</h2>
+        )}
         <ExploreContainer />
       </IonContent>
     </IonPage>

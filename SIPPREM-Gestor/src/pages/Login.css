@@ -1,0 +1,70 @@
+/* Estilos generales del grid, para que ocupe todo el alto */
+.login-grid, .login-row {
+  height: 100%;
+}
+
+/* Tarjeta oscura con bordes celestes */
+.login-card {
+  background-color: #121c27; /* Fondo de la tarjeta muy oscuro */
+  border: 1px solid #48D1E6; /* Borde celeste brillante */
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  margin: 0 auto;
+  max-width: 400px;
+  width: 90%;
+  padding-bottom: 20px;
+}
+
+/* Logo */
+.login-logo {
+  width: 100px;
+  margin: 0 auto 10px auto;
+  display: block;
+}
+
+/* Titulo de la tarjeta */
+.login-title {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-family: 'Montserrat', sans-serif;
+  margin-top: 15px;
+}
+
+/* Etiqueta de los inputs */
+.input-label {
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: block;
+  text-align: left;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Campos de entrada */
+.login-input {
+  --background: transparent;
+  --color: white;
+  --placeholder-color: #a0a0a0;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  border: 1px solid #48D1E6;
+  border-radius: 8px;
+  height: 40px;
+  margin-bottom: 20px;
+  text-align: left;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Boton Iniciar */
+.login-button {
+  --background: #48D1E6;
+  --color: white;
+  --border-radius: 20px;
+  margin-top: 10px;
+  width: 150px;
+  font-weight: 700;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 1px;
+}
