@@ -51,9 +51,18 @@ const App: React.FC = () => {
   <IonApp>
     <IonReactRouter>
       <IonRouterOutlet>
+        
         <Route path="/login" element={<Login setUsuario={setUsuario} />} />
-        <Route path="/admin/inicio" element={<Inicio nombreUsuario={usuario.nombre} rol={usuario.rol}/>} />
-        <Route path="/supervisor/inicio" element={<Inicio nombreUsuario={usuario.nombre} rol={usuario.rol}/>} />
+
+        <Route path="/admin/inicio" element={usuario.nombre !== "NotData" 
+              ? <Inicio nombreUsuario={usuario.nombre} rol={usuario.rol}/>
+              : <Navigate to="/login" replace />
+              } />
+        <Route path="/supervisor/inicio" element={usuario.nombre !== "NotData"
+              ? <Inicio nombreUsuario={usuario.nombre} rol={usuario.rol}/>
+              : <Navigate to="/login" replace />
+              } />
+
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path='*' element={<Navigate to="/login" replace />}></Route>
       </IonRouterOutlet>
