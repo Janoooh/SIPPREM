@@ -1,0 +1,91 @@
+.inicio-proyecto-grid {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.menu-lateral-col {
+  padding-right: 20px;
+}
+
+.menu-container {
+  background-color: #121c27;
+  border-left: 2px solid #48D1E6;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+  padding: 15px;
+}
+
+.menu-titulo {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  display: block;
+  text-align: left;
+}
+
+.menu-divider {
+  border-bottom: 2px solid white;
+  margin: 10px 0;
+  width: 100%;
+}
+
+.menu-btn {
+  --color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  text-transform: none;
+  font-size: 1rem;
+  margin: 5px 0;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  text-align: left;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.menu-btn-activo {
+  --background: #48D1E6;
+  --color: white;
+  --border-radius: 12px;
+}
+
+.info-proyecto-col {
+  padding-left: 20px;
+}
+
+.titulo-proyecto {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 2rem;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.detalle-row {
+  margin-bottom: 10px;
+}
+
+.detalle-label {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.titulo-actividades {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.actividades-list {
+  margin-top: 10px;
+}
