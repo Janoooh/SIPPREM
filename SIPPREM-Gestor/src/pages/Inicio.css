@@ -1,0 +1,70 @@
+.profile-picture {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.welcome-text h1 {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.8rem;
+  margin: 0;
+  padding-left: 15px;
+}
+
+.role-chip {
+  --background: #48D1E6; 
+  --color: #121c27;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  margin-left: 15px;
+  margin-top: 5px;
+  pointer-events: none; 
+}
+
+.dashboard-card {
+  background-color: #121c27;
+  border: 1px solid #48D1E6;
+  border-radius: 8px;
+  margin: 0 0 20px 0;
+  box-shadow: none;
+}
+
+.dashboard-title {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.dashboard-content {
+  padding-top: 0;
+}
+
+.dashboard-text p {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 15px 0;
+}
+
+.add-project-btn {
+  --background: #121c27;
+  --border-color: #48D1E6;
+  --border-width: 1px;
+  --border-radius: 8px;
+  --color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  text-transform: none;
+  height: 45px;
+  margin: 0;
+}
+
+.add-project-btn:hover {
+  --border-color: #0e383e;
+}

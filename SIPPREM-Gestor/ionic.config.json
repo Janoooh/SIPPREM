@@ -1,0 +1,7 @@
+{
+  "name": "SIPPREM-Gestor",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}

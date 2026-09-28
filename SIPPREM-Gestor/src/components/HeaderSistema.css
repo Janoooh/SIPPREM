@@ -1,0 +1,36 @@
+.inicio-toolbar {
+  --background: #121c27;
+  --min-height: 70px;
+  padding: 0 20px;
+}
+
+.header-logo {
+  height: 50px;
+  width: auto;
+}
+
+.name-text {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 1.8rem;
+}
+
+.header-nav-buttons .nav-btn {
+  --border-color: #3b5066; 
+  --border-radius: 8px;
+  --color: white;
+  --border-width: 1px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  text-transform: none;
+  margin: 0 5px;
+}
+
+.header-nav-buttons .nav-btn-clear {
+  --color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  text-transform: none;
+  margin: 0 5px;
+}

@@ -1,0 +1,7 @@
+{
+  "name": "SIPPREM-AppPatrullero",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
