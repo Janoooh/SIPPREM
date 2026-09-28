@@ -29,11 +29,11 @@
     - [Puntos críticos de interacción](#Puntos-críticos-de-interacción)
     - [Coherencia de experiencia entre dispositivos](#Coherencia-de-experiencia-entre-dispositivos)
     - [Justificación Técnica](#Justificación-Técnica)
-8. [Prototipo de UI/UX de la aplicación](#Prototipo-de-UI/UX-de-la-aplicación)
+8. [Prototipo de UI/UX de la aplicación](#Prototipo-de-UIUX-de-la-aplicación)
 9. [Librerías principales utilizadas](#Librerías-principales-utilizadas)
-10. [Como clonar el repositorio (EP1)](#Como-clonar-el-repositorio-(EP1))
-11. [Como acceder al sistema (EP1)](#Como-acceder-al-sistema-(EP1))
-12. [Distribucion de responsabilidades en el equipo (EP1)](#Distribucion-de-responsabilidades-en-el-equipo-(EP1))
+10. [Como clonar el repositorio (EP1)](#Como-clonar-el-repositorio-EP1)
+11. [Como acceder al sistema (EP1)](#Como-acceder-al-sistema-EP1)
+12. [Distribucion de responsabilidades en el equipo (EP1)](#Distribucion-de-responsabilidades-en-el-equipo-EP1)
 13. [Uso de herramientas de IA (EP1)](#Uso-de-herramientas-IA-EP1)
 
 ---
