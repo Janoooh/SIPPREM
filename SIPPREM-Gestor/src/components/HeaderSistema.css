@@ -14,6 +14,9 @@
   font-family: 'Montserrat', sans-serif;
   font-weight: 600;
   font-size: 1.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header-nav-buttons .nav-btn {
@@ -33,4 +36,27 @@
   font-weight: 600;
   text-transform: none;
   margin: 0 5px;
+}
+
+/* Ajuste del texto logo de la pagina para pantallas de telefono. */
+@media (max-width: 600px) {
+  .name-text {
+    font-size: 1.2rem;
+  }
+
+  .header-logo {
+    height: 35px;
+  }
+
+  .header-nav-buttons {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .header-nav-buttons .nav-btn-clear {
+    font-size: 0.75rem;
+    margin: 0 2px;
+    --padding-start: 4px;
+    --padding-end: 4px;
+  }
 }

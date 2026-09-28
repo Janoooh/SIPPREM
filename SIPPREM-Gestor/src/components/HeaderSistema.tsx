@@ -5,7 +5,7 @@ import {
     IonButton,
     IonImg,
     IonText,
-
+    IonTitle
 } from '@ionic/react';
 import './HeaderSistema.css';
 
@@ -21,9 +21,9 @@ const HeaderSistema: React.FC<HeaderSistemaProps> = ({nombreUsuario ,rol}) => {
           <IonButtons slot="start">
             <IonImg src="/assets/logoSIPPREM.png" alt="SIPPREM Logo" className="header-logo" />
           </IonButtons>
-          <IonText className="name-text">
+          <IonTitle className="name-text">
             SIPPREM
-          </IonText>
+          </IonTitle>
           
           {/*Botones del navegador del header.*/}
           <IonButtons slot="end" className="header-nav-buttons">
