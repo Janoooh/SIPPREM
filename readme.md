@@ -1,8 +1,3 @@
----
-title: readme
-
----
-
 # Sistema Integrado de Proyectos de Patrullajes Preventivos Municipales (SIPPREM)
 
 ### Integrantes:
@@ -19,9 +14,9 @@ title: readme
     - [Personal en terreno](#Personal-en-terreno)
 3. [Roles](#Roles)
 4. [Proto-personas](#Proto-personas)
-    - [Proto-persona 1: Administrador](#Proto-persona-1:-Administrador)
-    - [Proto-persona 2: Supervisor](#Proto-persona-2:-Supervisor)
-    - [Proto-persona 3: Patrullero](#Proto-persona-3:-Patrullero)
+    - [Proto-persona 1: Administrador](#Proto-persona-1-Administrador)
+    - [Proto-persona 2: Supervisor](#Proto-persona-2-Supervisor)
+    - [Proto-persona 3: Patrullero](#Proto-persona-3-Patrullero)
 5. [Especificacion de requerimientos](#Especificacion-de-requerimientos)
     - [Requerimientos funcionales (RF)](#Requerimientos-funcionales-(RF))
     - [Requerimientos no funcionales (RNF)](#Requerimientos-no-funcionales-(RNF))
