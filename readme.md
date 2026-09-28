@@ -31,6 +31,10 @@
     - [Justificación Técnica](#Justificación-Técnica)
 8. [Prototipo de UI/UX de la aplicación](#Prototipo-de-UI/UX-de-la-aplicación)
 9. [Librerías principales utilizadas](#Librerías-principales-utilizadas)
+10. [Como clonar el repositorio (EP1)](#Como-clonar-el-repositorio-(EP1))
+11. [Como acceder al sistema (EP1)](#Como-acceder-al-sistema-(EP1))
+12. [Distribucion de responsabilidades en el equipo (EP1)](#Distribucion-de-responsabilidades-en-el-equipo-(EP1))
+13. [Uso de herramientas de IA (EP1)](#Uso-de-herramientas-IA-EP1)
 
 ---
 ## **Justificación del problema**
@@ -732,3 +736,57 @@ La arquitectura de navegación se definió considerando criterios de usabilidad,
 | `ionicons` | Colección oficial de iconos utilizada por los componentes de Ionic.|
 |  `leaflet`     | Biblioteca motor para la renderización, manipulación e interacción con mapas interactivos de código abierto.|
 |  `react-leaflet` | Wrapper de React que expone los elementos de Leaflet como componentes declarativos.|
+
+## Como clonar el repositorio (EP1)
+
+Para clonar el repositorio se tienen que ejecutar los siguientes comandos por CMD:
+```
+git clone https://github.com/Janoooh/SIPPREM.git
+cd SIPPREM
+cd SIPPREM-Gestor
+npm install
+```
+
+Si no tiene instalado Ionic, entonces debe ejecutar:
+```
+npm install -g @ionic/cli
+```
+
+Tras todo esto, podremos ejecutar el proyecto con un servidor de desarrollo usando:
+```
+ionic serve
+```
+
+Si quisieramos obtener el dist y ejecutarlo, se puede usar:
+```
+ionic build
+npm run preview
+```
+
+## Como acceder al sistema (EP1)
+
+Actualmente, el sistema se encuentra en una fase de desarrollo, por lo que para navegar por las interfaces disponibles tenemos que acceder como admin, o supervisor.
+
+- Para acceder como admin, tendremos que colocar "admin" en el campo de correo o rut, y cualquier contraseña.
+
+- Para acceder como supervisor, tendremos que colocar "supervisor" en el campo de correo o rut, y cualquier contraseña.
+
+**IMPORTANTE**
+
+Actualmente la aplicacion no tiene el backend implementado, por lo que no estan operativas las funciones
+para agregar proyectos, u otros datos.
+
+## Distribucion de responsabilidades en el equipo (EP1)
+
+* Alejandro Orellana: Especificacion de requerimientos, y desarrollo de codigo.
+
+* Fernanda Barraza: Desarrollo de arquitectura de navegacion y experiencia de usuario.
+
+* Edgar De La Cruz: Diseño de prototipos en Figma, y desarrollo de codigo.
+
+* Jorge Ramirez: Reconocimiento del arquetipo de usuario.
+
+## Uso de herramientas de IA (EP1)
+
+Se utilizaron herramientas IA LLMs para generacion de codigo, el cual fue implementado en ciertas interfaces de SIPPREM-Gestor. Todo codigo implementado fue revisado a detalle, linea por linea, evitando posibles errores o detalles que pudiera tener el originado inicialmente.
+
