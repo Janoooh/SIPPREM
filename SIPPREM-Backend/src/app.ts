@@ -1,10 +1,11 @@
 import express from "express";
 import rutasAuth from "./routes/auth.routes.js";
+import dotenv from "dotenv";
 
 const app = express();
 app.use(express.json());
 
-const PORT = 3000;
+dotenv.config();
 
 app.get("/", (req, res) => {
   res.json({
@@ -20,6 +21,6 @@ app.use("/api/v1/auth",rutasAuth)
 
 */
 
-app.listen(PORT, () => {
-  console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
+app.listen(Number(process.env.BACKEND_PORT), () => {
+  console.log(`Servidor ejecutándose en http://localhost:${Number(process.env.BACKEND_PORT)}`);
 });
