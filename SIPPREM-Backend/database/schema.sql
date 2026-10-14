@@ -125,18 +125,16 @@ create table equipamiento_personal(
 	constraint fk_eq_persona_tipo_eq_personal foreign key (id_tipo_eq_personal) references tipo_equipamiento_personal(id_tipo_eq_personal)
 )inherits (articulo);
 
-
-create table patrullaje(
+--este se cambio
+create table planificacion_patrullaje(
 	id_patrullaje integer generated always as identity,
 	hora_inicio timestamp not null, -- un patrullaje puede empezar un dia y terminar otro
 	hora_termino timestamp not null,
 	zona geometry (Geometry, 4326) not null, 
 	id_proyecto integer not null,
-	id_vehiculo varchar(20) not null,
 
-	constraint pk_patrullaje primary key (id_patrullaje),
-	constraint fk_proyecto_patrullaje foreign key (id_proyecto) references proyecto_patrullaje(id_proyecto),
-	constraint fk_patrullaje_vehiculo foreign key (id_vehiculo) references vehiculo(id_item)
+	constraint pk_plan_patrullaje primary key (id_patrullaje),
+	constraint fk_proyecto_patrullaje foreign key (id_proyecto) references proyecto_patrullaje(id_proyecto)
 );
 
 create table realizacion_patrullaje(
@@ -145,7 +143,19 @@ create table realizacion_patrullaje(
 
 	constraint pk_realizacion_patrullaje primary key (rut, id_patrullaje),
 	constraint fk_realizacion_patrullaje_rut foreign key(rut) references usuario(rut),
-	constraint fk_realizacion_patrullaje_id_patrullaje foreign key(id_patrullaje) references patrullaje(id_patrullaje)
+	constraint fk_realizacion_patrullaje_plan_patrullaje foreign key(id_patrullaje) references planificacion_patrullaje(id_patrullaje)
+);
+
+--tiene que tener el mismo id que la planificacion_patrullaje
+create table ejecucion_patrullaje(
+	id_patrullaje integer not null,
+	hora_real_inicio timestamp,
+	hora_real_termino timestamp,
+	id_vehiculo varchar(20) not null,
+
+	constraint pk_eje_patrullaje primary key (id_patrullaje),
+	constraint fk_eje_patrullaje_plan_patrullaje foreign key (id_patrullaje) references planificacion_patrullaje(id_patrullaje),
+	constraint fk_eje_patrullaje_vehiculo foreign key (id_vehiculo) references vehiculo(id_item)
 );
 
 create table categoria_incidente(
@@ -165,7 +175,7 @@ create table incidente (
 	id_categoria_incidente integer not null,
 
 	constraint pk_incidente primary key (id_incidente),
-	constraint fk_patrullaje foreign key (id_patrullaje) references patrullaje(id_patrullaje),
+	constraint fk_incidente_eje_patrullaje foreign key (id_patrullaje) references ejecucion_patrullaje(id_patrullaje),
 	constraint fk_cat_incidente foreign key (id_categoria_incidente) references categoria_incidente(id_categoria_incidente),
 	constraint chk_nv_gravedad check (nivel_gravedad >= 1 and nivel_gravedad <= 5) 
 );
@@ -183,7 +193,8 @@ create table uso_eq_personal(
 	id_patrullaje integer not null,
 	id_eq_personal varchar(20) not null,
 
-	constraint fk_uso_eq_personal_patrullaje foreign key (id_patrullaje) references patrullaje(id_patrullaje),
+	constraint pk_uso_eq_personal primary key (id_patrullaje, id_eq_personal),
+	constraint fk_uso_eq_personal_patrullaje foreign key (id_patrullaje) references ejecucion_patrullaje(id_patrullaje),
 	constraint fk_uso_eq_personal_eq_personal foreign key (id_eq_personal) references equipamiento_personal(id_item)
 );
 
@@ -229,7 +240,7 @@ EXECUTE FUNCTION validar_fechas_patrullaje();
 
 /*
 Gatillo para se activa cuando un incidente queda fuera del horario del patrullaje
-*/
+
 CREATE OR REPLACE FUNCTION validar_horario_incidente()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -253,7 +264,7 @@ CREATE TRIGGER trg_validar_horario_incidente
 BEFORE INSERT OR UPDATE ON incidente
 FOR EACH ROW
 EXECUTE FUNCTION validar_horario_incidente();
-
+*/
 /*
 Este es un trigger para una actividad no se pueda hacer fuera de los plazos del proyecto
 */
