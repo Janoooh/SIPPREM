@@ -1,10 +1,12 @@
 import express from "express";
 import rutasAuth from "./routes/auth.routes.js";
 import dotenv from "dotenv";
+import cors from "cors";
 import rutasActividad from "./routes/actividad.routes.js";
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 dotenv.config();
 

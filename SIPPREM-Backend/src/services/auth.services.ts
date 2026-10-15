@@ -1,9 +1,9 @@
 import {poolDb} from "../config/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import type { respuestaServices } from "../interfaces/respuestaServices.js";
 
-
-export const iniciarSesion = async (idIngresado : string, claveIngresada: string) => {
+export const iniciarSesion = async (idIngresado : string, claveIngresada: string) : Promise<respuestaServices> => {
     const queryBuscarUser = `
         SELECT *
         FROM usuario us
@@ -15,7 +15,12 @@ export const iniciarSesion = async (idIngresado : string, claveIngresada: string
 
     // El usuario no se encontro.
     if (resConsulta.rows.length === 0){
-        return null;
+        return {
+            exito: false, 
+            codHTTP: 400,
+            explicacion : "Las credenciales de acceso son incorrectas.",
+            datos : null
+        };
     }
 
     const datosUsuario = resConsulta.rows[0];
@@ -24,7 +29,12 @@ export const iniciarSesion = async (idIngresado : string, claveIngresada: string
 
     // La clave ingresada no es la correcta clave del usuario ingresado.
     if (!comparacionClave){
-        return null;
+        return {
+            exito: false,
+            codHTTP: 401,
+            explicacion : "Las credenciales de acceso son incorrectas.",
+            datos : null
+            };
     }
 
     const generadorSecret = process.env.JWT_SECRET || "default";
@@ -39,8 +49,59 @@ export const iniciarSesion = async (idIngresado : string, claveIngresada: string
     );
 
     // Caso correcto, donde el usuario pudo iniciar sesion.
+
     return {
-        token,
-        datosUsuario
+        exito : true,
+        codHTTP: 200,
+        explicacion : "El inicio de sesion se realizo correctamente.",
+        datos: {token,datosUsuario}
+    };
+};
+
+export const cambiarClave = async (idIngresado: string, claveNueva : string) : Promise<respuestaServices> => {
+    const queryBuscarUser = `
+        SELECT *
+        FROM usuario us
+        INNER JOIN rol r USING (id_rol)
+        WHERE us.rut = $1 OR us.correo = $1
+    `;
+    const resConsultaBuscarUser = await poolDb.query(queryBuscarUser,[idIngresado]);
+    
+    // El usuario no se encontro.
+    if (resConsultaBuscarUser.rows.length === 0){
+        return {
+            exito: false,
+            codHTTP: 400, 
+            explicacion : "No se encontro el usuario con rut/correo ingresado.",
+            datos : null
+        };
+    }
+
+    const datosUsuario = resConsultaBuscarUser.rows[0];
+
+    if (datosUsuario.nuevo_user === false){
+        return {
+            exito: false, 
+            codHTTP: 400,
+            explicacion : "El usuario no es nuevo, ya cambio su clave por defecto 1 vez.",
+            datos: null
+        };
+    }
+
+    const hashNuevaClave = await bcrypt.hash(claveNueva,10);
+
+    const queryCambiarClave = `
+        UPDATE usuario
+        SET hash_contrasenia = $2, nuevo_user = false
+        WHERE rut = $1 OR correo = $1
+    `;
+
+    await poolDb.query(queryCambiarClave,[idIngresado,hashNuevaClave]);
+
+    return {
+        exito : true,
+        codHTTP: 200,
+        explicacion : "La clave se cambio correctamente.",
+        datos : null
     };
 };
