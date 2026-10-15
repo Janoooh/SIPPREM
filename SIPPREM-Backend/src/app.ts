@@ -16,6 +16,14 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/auth",rutasAuth)
 app.use("/api/v1/actividades", rutasActividad);
+/*
+ 
+  NO PONGAN NINGUNA RUTA ACA WN DESPUES LO UNIFICAMOS ENTRE TODOS 
+    ES EL UNICO ARCHIVO QUE COMPARTIMOS ENTRE TODOS ASI QUE PUEDE
+      QUEDAR LA CAGA PORFA NO PONGAN WEAS AQUI
+        USELO PARA PROBAR PERO DESPUES BORREN LAS COSAS
+ 
+ */
 /* ZONA DE PRUEBAS
 
 
