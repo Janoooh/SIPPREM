@@ -15,7 +15,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/auth",rutasAuth)
-app.use("/api/v1/actividades", rutasActividad);
+
 /*
  
   NO PONGAN NINGUNA RUTA ACA WN DESPUES LO UNIFICAMOS ENTRE TODOS 
@@ -25,7 +25,7 @@ app.use("/api/v1/actividades", rutasActividad);
  
  */
 /* ZONA DE PRUEBAS
-
+app.use("/api/v1/actividades", rutasActividad); No borrar!
 
 
 */

@@ -10,3 +10,15 @@ export const obtenerActividadesPorProyecto = async (id_proyecto: number )=> {
     const resultado = await poolDb.query(query,[id_proyecto])
     return resultado.rows;
 }
+
+// Crear una nueva activadad 
+export const crearActividad = async(titulo: string, fecha: string, descripcion: string, id_proyecto : number)=> {
+    const query = `
+    INSERT INTO actividad(titulo, fecha, descripcion, id_proyecto)
+    VALUES($1, $2,$3 , $4 )
+    RETURNING *; 
+    `;
+    const resultado = await poolDb.query(query,[titulo, fecha, descripcion, id_proyecto]);
+    return resultado.rows[0];
+
+}
