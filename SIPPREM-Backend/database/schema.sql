@@ -354,6 +354,6 @@ INSERT INTO categoria_incidente (categoria) VALUES
 ('Daño a infraestructura pública');
 
 INSERT INTO usuario (rut, nombre, correo, telefono, hash_contrasenia, nuevo_user, id_rol) VALUES 
-('12345678-9', 'Lil edo de la crux', 'lil.crux@procasting.cl', '+56912345678', '$2a$12$e8...hashficticio1', false, 1),
-('98765432-1', 'Fernanda Garrafa', 'Fer.garra@procasting.cl', '+56987654321', '$2a$12$e8...hashficticio2', false, 2),
-('11223344-5', 'Ale x under Avellana', 'jano.ohh@procasting.cl', '+56911223344', '$2a$12$e8...hashficticio3', true, 3);
+('12345678-9', 'Lil edo de la crux', 'lil.crux@procasting.cl', '+56912345678', '$2b$10$WU5N9TLYVwNLuvl/TXcp7eWJXLCN2F2VI/1bpUum95WNVf3/inow6', false, 1),
+('98765432-1', 'Fernanda Garrafa', 'Fer.garra@procasting.cl', '+56987654321', '$2b$10$2NfPAyuUYxjrEpxBTIvCsuPIuVbp6x.S4W71lFbP/BdAI1qk1588e', false, 2),
+('11223344-5', 'Ale x under Avellana', 'jano.ohh@procasting.cl', '+56911223344', '$2b$10$llTLLOaAWqjjx.IONcwHeex9BkdHLiVV3MYfAQ/R3M14d./GIRwiW', true, 3);
