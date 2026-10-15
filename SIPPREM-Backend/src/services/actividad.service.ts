@@ -22,3 +22,31 @@ export const crearActividad = async(titulo: string, fecha: string, descripcion: 
     return resultado.rows[0];
 
 }
+
+// Actualizar una actividad existente
+export const actualizarActividad = async (
+    titulo: string,
+    fecha: string,
+    descripcion: string,
+    id_actividad: number
+) => {
+    const query = `
+    UPDATE actividad 
+    SET titulo = $1, fecha = $2, descripcion = $3
+    WHERE id_actividad = $4
+    RETURNING *;
+    `; 
+    const resultado = await poolDb.query(query, [titulo, fecha, descripcion, id_actividad]);
+    return resultado.rows[0];
+};
+
+// Eliminar una actividad que ya existe 
+export const eliminarActividad = async(id_actividad : number) =>{
+    const query =`
+    DELETE FROM actividad
+    WHERE id_actividad = $1
+    RETURNING *;
+    `;
+    const resultado = await poolDb.query(query, [id_actividad]);
+    return resultado.rows[0];
+};
