@@ -2,7 +2,8 @@ import express from "express";
 import rutasAuth from "./routes/auth.routes.js";
 import dotenv from "dotenv";
 import cors from "cors";
-import rutasActividad from "./routes/actividad.routes.js";
+
+
 
 const app = express();
 app.use(express.json());
@@ -18,6 +19,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/auth",rutasAuth)
 
+
 /*
  
   NO PONGAN NINGUNA RUTA ACA WN DESPUES LO UNIFICAMOS ENTRE TODOS 
@@ -27,7 +29,12 @@ app.use("/api/v1/auth",rutasAuth)
  
  */
 /* ZONA DE PRUEBAS
+son imports: 
+import rutasActividad from "./routes/actividad.routes.js";
+import rutastrabajadores from "./routes/trabajadores.routes.js";
+son rutas:
 app.use("/api/v1/actividades", rutasActividad); No borrar!
+app.use("/api/v1/trabajadores", rutastrabajadores);
 
 
 */
