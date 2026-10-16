@@ -18,6 +18,7 @@ create table usuario(
 	hash_contrasenia varchar(255) not null,
 	nuevo_user bool default true not null,
 	fecha_registro timestamp default current_timestamp not null, -- esto lo saque de los mockups. Es para que guarde cuando se creo
+	eliminado bool default false not null,
 	id_rol integer not null,
 
 	constraint pk_usuario primary key (rut),
@@ -32,7 +33,8 @@ create table proyecto_patrullaje(
 	fecha_inicio date not null,
 	fecha_termino date not null,
 	zona_seleccionada geometry (Geometry, 4326) not null, -- este es el tipo de dato que se maneja en postgis segun el geminais
-	activo bool default true not null, -- este es para el estado de un proyecto
+	activo bool default true not null, -- este es para el estado de un proyecto (activo o cerrado).
+	eliminado bool default false not null, --este es para ver si fue eliminado. 
 	
 	constraint pk_proyecto_patrullaje primary key (id_proyecto)
 	/* No se si es necesario hacer check o si me manejaran en el frontend
@@ -57,6 +59,7 @@ create table actividad(
 	titulo varchar (100) not null,
 	fecha date not null, -- en los mockups aparece hora tambien, pero no se si agregarlo
 	descripcion varchar(255) not null,
+	eliminado bool default false not null, -- este es para marcarlos como eliminado
 	id_proyecto integer not null,
 
 	constraint pk_actividad primary key (id_actividad),
@@ -66,6 +69,7 @@ create table actividad(
 create table item(
 	id_item varchar(20),
 	id_proyecto integer,
+	eliminado bool default false not null,
 	
 	constraint pk_item primary key (id_item),
 	constraint fk_item_proyecto foreign key (id_proyecto) references proyecto_patrullaje(id_proyecto)
@@ -100,7 +104,7 @@ create table tipo_equipamiento_vehicular(
 );
 
 create table equipamiento_vehicular(
-	id_vehiculo varchar(20),
+	id_vehiculo varchar(20) default null,
 	id_tipo_eq_vehicular integer not null,
 
 	constraint pk_equipamiento_vehicular primary key (id_item),
@@ -237,34 +241,6 @@ BEFORE INSERT OR UPDATE ON patrullaje
 FOR EACH ROW
 EXECUTE FUNCTION validar_fechas_patrullaje();
 
-
-/*
-Gatillo para se activa cuando un incidente queda fuera del horario del patrullaje
-
-CREATE OR REPLACE FUNCTION validar_horario_incidente()
-RETURNS TRIGGER AS $$
-DECLARE
-    date_inicio TIMESTAMP;
-    date_termino TIMESTAMP;
-BEGIN
-    SELECT hora_inicio, hora_termino
-    INTO date_inicio, date_termino
-    FROM patrullaje
-    WHERE id_patrullaje = NEW.id_patrullaje;
-
-    IF NEW.fecha_hora < date_inicio OR NEW.fecha_hora > date_termino THEN
-        RAISE EXCEPTION 'La fecha y hora del incidente estan fuera del rango del patrullaje';
-    END IF;
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_validar_horario_incidente
-BEFORE INSERT OR UPDATE ON incidente
-FOR EACH ROW
-EXECUTE FUNCTION validar_horario_incidente();
-*/
 /*
 Este es un trigger para una actividad no se pueda hacer fuera de los plazos del proyecto
 */
