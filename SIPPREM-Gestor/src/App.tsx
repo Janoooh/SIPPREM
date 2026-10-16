@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Inicio from './pages/Inicio';
 import AgregarProyecto from './pages/AgregarProyecto';
 import InicioProyecto from './pages/InicioProyecto';
+import CambiarClaveInicial from './pages/CambiarClaveInicial';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -56,6 +57,9 @@ const App: React.FC = () => {
         
         {/*Ruta publica del login.*/}
         <Route path="/login" element={<Login setUsuario={setUsuario} />} />
+
+        {/*Ruta publica para cambio de clave inicial.*/}
+        <Route path="/cambiar-clave-inicial" element={<CambiarClaveInicial />} />
 
         {/*Rutas protegidas.*/}
 
