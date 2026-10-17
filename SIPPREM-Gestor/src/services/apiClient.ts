@@ -1,8 +1,5 @@
 import axios from "axios";
 import { Preferences } from "@capacitor/preferences";
-import { useIonAlert } from "@ionic/react";
-
-const [mandarAviso] = useIonAlert();
 
 export const apiClient = axios.create({
     baseURL: "http://localhost:3000/api/v1",
