@@ -1,6 +1,4 @@
 import type {Request, Response} from "express";
-import {poolDb} from "../config/db.js";
-import { Query } from "pg";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 import * as authServices from "../services/auth.services.js";
 

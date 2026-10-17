@@ -1,5 +1,6 @@
 import express from "express";
 import rutasAuth from "./routes/auth.routes.js";
+import rutasUsuario from "./routes/usuario.routes.js";
 import dotenv from "dotenv";
 import cors from "cors";
 
@@ -17,7 +18,8 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/api/v1/auth",rutasAuth)
+app.use("/api/v1/auth",rutasAuth);
+app.use("/api/v1/usuarios", rutasUsuario);
 
 
 /*
