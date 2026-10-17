@@ -282,7 +282,7 @@ DEJARON EN EL GIT
 
 
 INSERT INTO rol (id_rol, tipo_rol) VALUES 
-(1, 'Administrador'),
+(1, 'Admin'),
 (2, 'Supervisor'),
 (3, 'Patrullero');
 
