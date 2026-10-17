@@ -1,10 +1,15 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 
-dotenv.config();
+export interface RequestConUsuario extends Request{
+    usuario? : {
+        rutUsuario : string,
+        correoUsuario : string,
+        rol : string
+    };
+};
 
-export const verificarTokenJWT = (req: Request, res : Response, next: NextFunction): void => {
+export const verificarTokenJWT = (req: RequestConUsuario, res : Response, next: NextFunction): void => {
     const authHeader = req.headers.authorization;
 
     if(!authHeader){
@@ -29,8 +34,9 @@ export const verificarTokenJWT = (req: Request, res : Response, next: NextFuncti
 
     try{
         const claveSecretaJWT = process.env.JWT_SECRET as string;
-        jwt.verify(token, claveSecretaJWT);
+        const datosUsuarioJWT = jwt.verify(token, claveSecretaJWT) as any;
 
+        req.usuario = datosUsuarioJWT;
         next();
     }catch{
         res.status(401).json({
