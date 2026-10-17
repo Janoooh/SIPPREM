@@ -1,5 +1,8 @@
 import axios from "axios";
 import { Preferences } from "@capacitor/preferences";
+import { useIonAlert } from "@ionic/react";
+
+const [mandarAviso] = useIonAlert();
 
 export const apiClient = axios.create({
     baseURL: "http://localhost:3000/api/v1",
@@ -21,14 +24,17 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
     (res) => res,
     async (error) => {
-        if (error.response?.status === 401){
-            const rutaActual = window.location.pathname;
-            if (rutaActual !== "/login"){
-                await Preferences.remove({key: "token"});
-                await Preferences.remove({key: "usuario"});
-                window.location.href = "/login";
-            }
-        }
+        const codigo = error.response?.status;
+        const rutaActual = window.location.pathname;
+        if (codigo === 401 && rutaActual !== "/login"){
+            await Preferences.remove({key: "token"});
+            await Preferences.remove({key: "usuario"});
+            window.location.href = "/login";
+        };
+
+        if(codigo === 403 && rutaActual !== "/login"){
+            window.history.back();
+        };
         return Promise.reject(error);
     }
 );
