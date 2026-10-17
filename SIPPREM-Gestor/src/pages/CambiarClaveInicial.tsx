@@ -17,7 +17,14 @@ import {
   useIonAlert
 } from '@ionic/react';
 import './CambiarClaveInicial.css';
-import axios from 'axios';
+import { apiClient } from '../services/apiClient';
+import { Preferences } from '@capacitor/preferences';
+import type { dataUsuario } from '../interfaces/dataUsuario';
+import { useUsuario } from '../services/obtenerUsuario';
+
+/*interface propsCambiarClaveUsuario {
+    usuario : dataUsuario
+};*/
 
 const CambiarClaveInicial: React.FC = () => {
   // Estados para capturar la nueva contraseña y su confirmación
@@ -27,8 +34,10 @@ const CambiarClaveInicial: React.FC = () => {
   const router = useIonRouter();
   const [mandarAlerta] = useIonAlert();
 
+  const {usuario} = useUsuario();
+
   // Función para manejar el proceso y validación del cambio de clave
-  const handleCambiarClave = () => {
+  const handleCambiarClave = async () => {
     // Validación de coincidencia de contraseñas
     if (nuevaClave !== confirmarClave) {
       mandarAlerta({
@@ -40,21 +49,36 @@ const CambiarClaveInicial: React.FC = () => {
       return;
     }
 
-    // Mensaje de éxito al actualizar la contraseña
-    mandarAlerta({
-      header: 'Clave Modificada',
-      subHeader: 'Operación exitosa',
-      message: 'Su contraseña ha sido cambiada correctamente. Ahora puede iniciar sesión.',
-      buttons: [
-        {
-          text: 'Aceptar',
-          handler: () => {
-            // Redirige al login tras completar el cambio exitoso
-            router.push('/login', 'root');
+    try{
+
+      const datosPeticion = {idIngresado: usuario.rut ,claveNuevaIng: nuevaClave};
+      const resCambiarClave = await apiClient.patch("/auth",datosPeticion);
+
+      // Mensaje de éxito al actualizar la contraseña
+      mandarAlerta({
+        header: 'Clave Modificada',
+        subHeader: 'Operación exitosa',
+        message: 'Su contraseña ha sido cambiada correctamente. Ahora puede iniciar sesión.',
+        buttons: [
+          {
+            text: 'Aceptar',
+            handler: () => {
+              // Redirige al login tras completar el cambio exitoso
+              router.push('/login', 'forward');
+            }
           }
-        }
-      ]
-    });
+        ]
+        });
+    }catch(error: any){
+      mandarAlerta({
+        header: "Error.",
+        subHeader: "Error en peticion al servidor.",
+        message: error.response?.data?.message,
+        buttons: ["Aceptar"]
+      });
+    };
+    
+    
   };
 
   return (

@@ -23,14 +23,18 @@ import ProyectoPatrullajeCard from '../components/ProyectoPatrullajeCard';
 import HeaderSistema from '../components/HeaderSistema';
 import { proyectoPatrullaje } from '../interfaces/proyectoPatrullaje';
 import './Inicio.css';
+import { useUsuario } from '../services/obtenerUsuario';
 
-interface InicioProps {
+/*interface InicioProps {
   nombreUsuario: string;
   rol: string;
-}
+}*/
 
-const Inicio: React.FC<InicioProps> = ({ nombreUsuario, rol }) => {
+const Inicio: React.FC = () => {
   
+  const {usuario} = useUsuario();
+  const nombreUsuario = usuario.nombre;
+  const rol = usuario.tipo_rol;
   // Creacion de proyectos de ejemplo para mostrarlos en el inicio.
   const proyectos: proyectoPatrullaje[] = [
     {

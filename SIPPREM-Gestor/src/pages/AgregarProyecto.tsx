@@ -23,11 +23,12 @@ import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './AgregarProyecto.css';
 import HeaderSistema from '../components/HeaderSistema';
+import { useUsuario } from '../services/obtenerUsuario';
 
-interface AgregarProyectoProps{
+/*interface AgregarProyectoProps{
     nombreUsuario: string,
     rol: string
-};
+};*/
 
 // Componente hijo para forzar la recarga del mapa ante cualquier cambio de tamaño
 const MapResizer: React.FC = () => {
@@ -63,7 +64,11 @@ const MapResizer: React.FC = () => {
   return null;
 };
 
-const AgregarProyecto: React.FC<AgregarProyectoProps> = ({nombreUsuario,rol}) => {
+const AgregarProyecto: React.FC = () => {
+
+  const {usuario} = useUsuario();
+  const nombreUsuario = usuario.nombre;
+  const rol = usuario.tipo_rol;
 
   // Estados para los campos del formulario de agregacion
   const [nombre, setNombre] = useState<string>('');

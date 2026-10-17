@@ -13,13 +13,14 @@ import HeaderSistema from '../components/HeaderSistema';
 import ActividadFuturaCard from '../components/ActividadFuturaCard';
 import { ActividadFutura } from '../interfaces/actividadFutura';
 import './InicioProyecto.css';
+import { useUsuario } from '../services/obtenerUsuario';
 
-interface InicioProyectoProps {
+/*interface InicioProyectoProps {
   nombreUsuario: string;
   rol: string;
-}
+}*/
 
-const InicioProyecto: React.FC<InicioProyectoProps> = ({ nombreUsuario, rol }) => {
+const InicioProyecto: React.FC = () => {
   // Datos de ejemplo de actividades futuras para el proyecto.
   const actividades: ActividadFutura[] = [
     { id: 1, tipoActividad: 'Patrullaje', fechaHoraInicio: new Date(2023, 9, 15, 14, 30) },
@@ -28,6 +29,10 @@ const InicioProyecto: React.FC<InicioProyectoProps> = ({ nombreUsuario, rol }) =
     { id: 4, tipoActividad: 'Patrullaje', fechaHoraInicio: new Date(2023, 9, 21, 16, 45) },
     { id: 5, tipoActividad: 'Patrullaje', fechaHoraInicio: new Date(2023, 9, 22, 16, 45) }
   ];
+
+  const {usuario} = useUsuario();
+  const nombreUsuario = usuario.nombre;
+  const rol = usuario.tipo_rol;
 
   return (
     <IonPage>

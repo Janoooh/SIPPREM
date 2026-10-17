@@ -20,12 +20,13 @@ import './Login.css';
 import { apiClient } from '../services/apiClient';
 import type { respuestaApi } from '../interfaces/respuestaApi';
 import { Preferences } from '@capacitor/preferences';
+import type { dataUsuario } from '../interfaces/dataUsuario';
 
-interface loginProps{
+/*interface loginProps{
     setUsuario: (datos: any) => void;
-};
+};*/
 
-const Login: React.FC<loginProps> = ({setUsuario}) => {
+const Login: React.FC= () => {
 
   const [identificador, setIdentificador] = useState<string>('');
   const [clave, setPassword] = useState<string>('');
@@ -34,63 +35,54 @@ const Login: React.FC<loginProps> = ({setUsuario}) => {
   const [mandarAlerta] = useIonAlert();
 
   // Función para manejar el inicio de sesión
-  /*const handleLogin = () => {
-    console.log('Intento de login:', { identificador, clave });
-    if (identificador.trim() === 'admin'){
-        setUsuario({
-            nombre: 'Usuario de administrador',
-            rol: 'ADMIN'
-        });
-        router.push("/admin/inicio","forward");
-    }else if(identificador.trim() === 'supervisor'){
-        setUsuario({
-            nombre: 'Usuario de supervisor',
-            rol: 'SUPERVISOR'
-        });
-        router.push("/supervisor/inicio","forward");
-    }else{
-        mandarAlerta({
-            header: 'Acceso Denegado',
-            subHeader: 'Credenciales de acceso incorrectas',
-            message: 'El RUT o la contraseña ingresada no son válidos. Por favor, intente nuevamente.',
-            buttons: ['Aceptar']
-      });
-    }
-  };*/
-
   const handleLogin = async () => {
 
     try{
-      console.log(identificador,clave);
+
       setIdentificador(identificador.trim());
       setPassword(clave.trim());
-      const resLogin = await apiClient.post("/auth",{identificador, clave});
-      const {token,datosUser} = resLogin.data;
-      console.log(datosUser);
+
+      const datosPeticion = {idIngresado: identificador, claveIngresada: clave};
+
+      const resLogin = await apiClient.post("/auth",datosPeticion);
+      const {token,datosUsuario: datosUsuario} = resLogin.data.data;
+
+      const datosUsuarioLower : dataUsuario = {
+        rut: datosUsuario.rut.toLowerCase(),
+        nombre: datosUsuario.nombre.toLowerCase(),
+        correo: datosUsuario.correo.toLowerCase(),
+        nuevo_user: datosUsuario.nuevo_user,
+        id_rol: datosUsuario.id_rol,
+        tipo_rol: datosUsuario.tipo_rol.toLowerCase()
+      };
+
+      //await Preferences.remove({key:"token"});
+      //await Preferences.remove({key:"usuario"});
+
       await Preferences.set({key:"token", value: token});
-      await Preferences.set({key:"usuario", value: JSON.stringify(datosUser)});
+      await Preferences.set({key:"usuario", value: JSON.stringify(datosUsuarioLower)});
 
-      setUsuario({
-              nombre: datosUser.nombre,
-              rol: datosUser.tipo_rol.toLowerCase()
-      });
+      //setUsuario(datosUsuarioLower);
 
-      if (datosUser.nuevo_user == true){
-        router.push("/cambiar-clave-inicial","forward");
-      }else{
-        if (datosUser.tipo_rol.toLowerCase() === "admin" || datosUser.tipo_rol.toLowerCase() === "supervisor"){
-            router.push(`/${datosUser.tipo_rol.toLowerCase()}/inicio`,"forward");
-        }else{
 
-          await mandarAlerta({
+      if (datosUsuario.tipo_rol.toLowerCase() === "patrullero"){
+        mandarAlerta({
             header: "Acceso denegado.",
             subHeader: "No tienes acceso al sistema.",
             message: "Este sistema es exclusivo para administradores y supervisores, no para patrulleros.",
             buttons: ["Aceptar"]
-          })
-          router.push("/login"); 
-        }
-      }
+          });
+        router.push("/login","forward");
+        return;
+      };
+
+      if (datosUsuario.nuevo_user == true){
+        router.push("/cambiar-clave-inicial","forward");
+      }else{
+        if (datosUsuario.tipo_rol.toLowerCase() === "admin" || datosUsuario.tipo_rol.toLowerCase() === "supervisor"){
+            router.push(`/${datosUsuario.tipo_rol.toLowerCase()}/inicio`,"forward");
+        };
+      };
 
     }catch(error: any){
       mandarAlerta({

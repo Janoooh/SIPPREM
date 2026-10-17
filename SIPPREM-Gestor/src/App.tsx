@@ -1,7 +1,7 @@
 import { Navigate, Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Login from './pages/Login';
 import Inicio from './pages/Inicio';
 import AgregarProyecto from './pages/AgregarProyecto';
@@ -38,6 +38,9 @@ import '@ionic/react/css/palettes/dark.system.css';
 /* Theme variables */
 import './theme/variables.css';
 import { navigate } from 'ionicons/icons';
+import { Preferences } from '@capacitor/preferences';
+import type { dataUsuario } from './interfaces/dataUsuario';
+import { RutaProtegida } from './routes/rutaProtegida';
 
 interface datosUsuario{
   nombre: string,
@@ -48,53 +51,103 @@ setupIonicReact();
 
 const App: React.FC = () => {
 
-  const [usuario, setUsuario] = useState<datosUsuario>({'nombre':'NotData', 'rol':'NotData'});
+  //const [usuario, setUsuario] = useState<datosUsuario>({'nombre':'NotData', 'rol':'NotData'});
+
+  /*const sinUserString: dataUsuario = {
+    rut: "NotData",
+    nombre: "NotData",
+    correo: "NotData",
+    nuevo_user: false,
+    id_rol: -1,
+    tipo_rol: "NotData"
+  };
+
+  const [usuario, setUsuario] = useState<dataUsuario>(sinUserString);
+  const [cargando, setCargando] = useState<boolean>(true);
+
+  //const {value} = await Preferences.get({key: "usuario"});
+  //const usuario : dataUsuario = await JSON.parse(value || sinUserString);
+
+  useEffect(() => {
+    const cargarUsuario = async () => {
+      try{
+        const {value} = await Preferences.get({key : "usuario"});
+        if(value){
+          setUsuario(JSON.parse(value));
+        };
+      }catch(error){
+        console.log("ERROR AL LEER CON PREFERENCES");
+      }finally{
+        setCargando(false);
+      };
+    };
+
+    cargarUsuario();
+  },[]);
+
+  if(cargando){
+    return null;
+  }*/
 
   return (
-  <IonApp>
-    <IonReactRouter>
-      <IonRouterOutlet>
-        
-        {/*Ruta publica del login.*/}
-        <Route path="/login" element={<Login setUsuario={setUsuario} />} />
+    <IonApp>
+      <IonReactRouter>
+        <IonRouterOutlet>
+          
+          {/*Ruta publica del login.*/}
+          <Route path="/login" element={<Login />} />
 
-        {/*Ruta publica para cambio de clave inicial.*/}
-        <Route path="/cambiar-clave-inicial" element={<CambiarClaveInicial />} />
+          {/*Ruta publica para cambio de clave inicial.*/}
 
-        {/*Rutas protegidas.*/}
+          {/*Rutas protegidas.*/}
 
-        {/*Rutas del administrador*/}
-        <Route path="/admin/inicio" element={usuario.rol === "admin" 
-              ? <Inicio nombreUsuario={usuario.nombre} rol={usuario.rol}/>
-              : <Navigate to="/login" replace />
-              } />
-        <Route path="/admin/agregar-proyecto" element={usuario.rol === "admin" 
-              ? <AgregarProyecto nombreUsuario={usuario.nombre} rol={usuario.rol}/>
-              : <Navigate to="/login" replace />
-              } />
-        <Route path="/admin/proyecto/:id" element={usuario.rol === "admin" 
-              ? <InicioProyecto nombreUsuario={usuario.nombre} rol={usuario.rol} />
-              : <Navigate to="/login" replace />
-              } />
+          <Route path="/cambiar-clave-inicial" element={
+            <RutaProtegida rolesPermitidos={["admin","supervisor"]}>
+              <CambiarClaveInicial />
+            </RutaProtegida>
+          } />
 
-        {/*Rutas del supervisor*/}
-        <Route path="/supervisor/inicio" element={usuario.rol === "supervisor"
-              ? <Inicio nombreUsuario={usuario.nombre} rol={usuario.rol}/>
-              : <Navigate to="/login" replace />
-              } />
-        <Route path="/supervisor/proyecto/:id" element={usuario.rol === "supervisor" 
-              ? <InicioProyecto nombreUsuario={usuario.nombre} rol={usuario.rol} />
-              : <Navigate to="/login" replace />
-              } />
+          <Route path="/admin/inicio" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+              <Inicio />
+            </RutaProtegida>
+          } />
 
-        {/*Ruta de seguridad, reedirige al login cuando tratan de acceder a la raiz.*/}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/admin/agregar-proyecto" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <AgregarProyecto />
+            </RutaProtegida>
+          } />
 
-        {/*Ruta de seguridad, reedirige al login cuando ingresan una ruta inexistente.*/}
-        <Route path='*' element={<Navigate to="/login" replace />}></Route>
-      </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
+          <Route path="/admin/proyecto/:id" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <InicioProyecto />
+            </RutaProtegida>
+          } />
+
+
+          <Route path="/supervisor/inicio" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <Inicio />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <InicioProyecto />
+            </RutaProtegida>
+          } />
+
+          
+
+          {/*Ruta de seguridad, reedirige al login cuando tratan de acceder a la raiz.*/}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+
+          {/*Ruta de seguridad, reedirige al login cuando ingresan una ruta inexistente.*/}
+          <Route path='*' element={<Navigate to="/login" replace />}></Route>
+        </IonRouterOutlet>
+      </IonReactRouter>
+    </IonApp>
 )};
 
 export default App;
