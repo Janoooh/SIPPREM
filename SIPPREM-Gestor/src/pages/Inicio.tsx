@@ -115,22 +115,22 @@ const Inicio: React.FC<InicioProps> = ({ nombreUsuario, rol }) => {
                 </IonCardHeader>
                 <IonCardContent className="dashboard-content">
                   <IonText className="dashboard-text">
-                    {rol === 'ADMIN' && (<p>Proyectos activos: 1</p>)}
-                    {rol === 'SUPERVISOR' && (<p>Proyectos asignados: 1</p>)}
+                    {rol === 'admin' && (<p>Proyectos activos: 1</p>)}
+                    {rol === 'supervisor' && (<p>Proyectos asignados: 1</p>)}
                   </IonText>
                   <IonText className="dashboard-text">
-                    {rol === 'ADMIN' && (<p>Proyectos cerrados: 0</p>)}
+                    {rol === 'admin' && (<p>Proyectos cerrados: 0</p>)}
                     
                   </IonText>
                   <IonText className="dashboard-text">
                     
-                    {rol === 'ADMIN' && (<p>Usuarios registrados: 2</p>)}
+                    {rol === 'admin' && (<p>Usuarios registrados: 2</p>)}
                   </IonText>
                 </IonCardContent>
               </IonCard>
               
               {/*Boton para agregar mas proyectos.*/}
-              {rol === 'ADMIN' && (
+              {rol === 'admin' && (
               <IonButton 
                 expand="block" 
                 fill="outline" 

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Preferences } from "@capacitor/preferences";
 
 export const apiClient = axios.create({
     baseURL: "http://localhost:3000/api/v1",
@@ -7,8 +8,8 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem("token");
+    async (config) => {
+        const {value: token} = await Preferences.get({key: "token"});
         if (token && config.headers){
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -19,12 +20,12 @@ apiClient.interceptors.request.use(
 
 apiClient.interceptors.response.use(
     (res) => res,
-    (error) => {
+    async (error) => {
         if (error.response?.status === 401){
             const rutaActual = window.location.pathname;
             if (rutaActual !== "/login"){
-                localStorage.removeItem("token");
-                localStorage.removeItem("usuario");
+                await Preferences.remove({key: "token"});
+                await Preferences.remove({key: "usuario"});
                 window.location.href = "/login";
             }
         }

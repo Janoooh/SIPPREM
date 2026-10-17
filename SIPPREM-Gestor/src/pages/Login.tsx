@@ -17,6 +17,9 @@ import {
 } from '@ionic/react';
 import React, { useState } from 'react';
 import './Login.css';
+import { apiClient } from '../services/apiClient';
+import type { respuestaApi } from '../interfaces/respuestaApi';
+import { Preferences } from '@capacitor/preferences';
 
 interface loginProps{
     setUsuario: (datos: any) => void;
@@ -24,14 +27,14 @@ interface loginProps{
 
 const Login: React.FC<loginProps> = ({setUsuario}) => {
 
-  const [identificador, setIdentifier] = useState<string>('');
+  const [identificador, setIdentificador] = useState<string>('');
   const [clave, setPassword] = useState<string>('');
   const router = useIonRouter();
 
   const [mandarAlerta] = useIonAlert();
 
   // Función para manejar el inicio de sesión
-  const handleLogin = () => {
+  /*const handleLogin = () => {
     console.log('Intento de login:', { identificador, clave });
     if (identificador.trim() === 'admin'){
         setUsuario({
@@ -53,6 +56,50 @@ const Login: React.FC<loginProps> = ({setUsuario}) => {
             buttons: ['Aceptar']
       });
     }
+  };*/
+
+  const handleLogin = async () => {
+
+    try{
+      console.log(identificador,clave);
+      setIdentificador(identificador.trim());
+      setPassword(clave.trim());
+      const resLogin = await apiClient.post("/auth",{identificador, clave});
+      const {token,datosUser} = resLogin.data;
+      console.log(datosUser);
+      await Preferences.set({key:"token", value: token});
+      await Preferences.set({key:"usuario", value: JSON.stringify(datosUser)});
+
+      setUsuario({
+              nombre: datosUser.nombre,
+              rol: datosUser.tipo_rol.toLowerCase()
+      });
+
+      if (datosUser.nuevo_user == true){
+        router.push("/cambiar-clave-inicial","forward");
+      }else{
+        if (datosUser.tipo_rol.toLowerCase() === "admin" || datosUser.tipo_rol.toLowerCase() === "supervisor"){
+            router.push(`/${datosUser.tipo_rol.toLowerCase()}/inicio`,"forward");
+        }else{
+
+          await mandarAlerta({
+            header: "Acceso denegado.",
+            subHeader: "No tienes acceso al sistema.",
+            message: "Este sistema es exclusivo para administradores y supervisores, no para patrulleros.",
+            buttons: ["Aceptar"]
+          })
+          router.push("/login"); 
+        }
+      }
+
+    }catch(error: any){
+      mandarAlerta({
+          header: "Acceso denegado.",
+          subHeader: "Error de autenticacion.",
+          message: error.response?.data?.message,
+          buttons: ["Aceptar"]
+      });
+    };
   };
 
   return (
@@ -77,7 +124,7 @@ const Login: React.FC<loginProps> = ({setUsuario}) => {
                     className="login-input"
                     type="text"
                     value={identificador}
-                    onIonInput={(e: any) => setIdentifier(e.detail.value!)}
+                    onIonInput={(e: any) => setIdentificador(e.detail.value!)}
                   />
 
                   <IonLabel className="input-label">Ingrese su clave:</IonLabel>

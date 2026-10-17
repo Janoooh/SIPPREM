@@ -28,11 +28,11 @@ const HeaderSistema: React.FC<HeaderSistemaProps> = ({nombreUsuario ,rol}) => {
           {/*Botones del navegador del header.*/}
           <IonButtons slot="end" className="header-nav-buttons">
             
-            {rol === 'ADMIN' && 
+            {rol === 'admin' && 
               (
               <IonButton fill="clear" className="nav-btn-clear" onClick={() => {}}>Usuarios</IonButton>
             )}
-            {rol === 'ADMIN' && (
+            {rol === 'admin' && (
               <IonButton fill="clear" className="nav-btn-clear" onClick={() => {}}>Historial de Proyectos</IonButton>
             )}
             <IonButton fill="clear" className="nav-btn-clear" onClick={() => {}}>Mi perfil</IonButton>

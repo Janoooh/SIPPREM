@@ -64,25 +64,25 @@ const App: React.FC = () => {
         {/*Rutas protegidas.*/}
 
         {/*Rutas del administrador*/}
-        <Route path="/admin/inicio" element={usuario.nombre !== "NotData" 
+        <Route path="/admin/inicio" element={usuario.rol === "admin" 
               ? <Inicio nombreUsuario={usuario.nombre} rol={usuario.rol}/>
               : <Navigate to="/login" replace />
               } />
-        <Route path="/admin/agregar-proyecto" element={usuario.nombre !== "NotData" 
+        <Route path="/admin/agregar-proyecto" element={usuario.rol === "admin" 
               ? <AgregarProyecto nombreUsuario={usuario.nombre} rol={usuario.rol}/>
               : <Navigate to="/login" replace />
               } />
-        <Route path="/admin/proyecto/:id" element={usuario.nombre !== "NotData" 
+        <Route path="/admin/proyecto/:id" element={usuario.rol === "admin" 
               ? <InicioProyecto nombreUsuario={usuario.nombre} rol={usuario.rol} />
               : <Navigate to="/login" replace />
               } />
 
         {/*Rutas del supervisor*/}
-        <Route path="/supervisor/inicio" element={usuario.nombre !== "NotData"
+        <Route path="/supervisor/inicio" element={usuario.rol === "supervisor"
               ? <Inicio nombreUsuario={usuario.nombre} rol={usuario.rol}/>
               : <Navigate to="/login" replace />
               } />
-        <Route path="/supervisor/proyecto/:id" element={usuario.nombre !== "NotData" 
+        <Route path="/supervisor/proyecto/:id" element={usuario.rol === "supervisor" 
               ? <InicioProyecto nombreUsuario={usuario.nombre} rol={usuario.rol} />
               : <Navigate to="/login" replace />
               } />
