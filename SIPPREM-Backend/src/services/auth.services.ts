@@ -24,8 +24,9 @@ export const iniciarSesion = async (idIngresado : string, claveIngresada: string
     }
 
     const datosUsuario = resConsulta.rows[0];
+    const hashGuardado = await (await poolDb.query("SELECT hash_contrasenia FROM usuario WHERE rut = $1 OR correo = $1",[idIngresado])).rows[0];
 
-    const comparacionClave = await bcrypt.compare(claveIngresada, datosUsuario.hash_contrasenia);
+    const comparacionClave = await bcrypt.compare(claveIngresada, hashGuardado.hash_contrasenia);
 
     // La clave ingresada no es la correcta clave del usuario ingresado.
     if (!comparacionClave){
