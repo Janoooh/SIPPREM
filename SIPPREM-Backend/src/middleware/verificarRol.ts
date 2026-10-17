@@ -6,7 +6,7 @@ la lista de roles permitidos para la peticion de endpoint especifica. */
 export const verificarRol = (rolesPermitidos: string[]) => {
 
     return (req : RequestConUsuario, res : Response, next : NextFunction): void => {
-        const rolUsuario = req.usuario?.rol
+        const rolUsuario = req.usuario?.rol.toLowerCase();
 
         if (!rolUsuario || !rolesPermitidos.includes(rolUsuario)){
             res.status(403).json({
