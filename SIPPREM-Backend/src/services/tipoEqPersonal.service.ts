@@ -1,0 +1,29 @@
+import { poolDb } from "../config/db.js";
+import type { respuestaServices } from "../interfaces/respuestaServices.js";
+
+export const mostrarTiposEqPersonales= async (): Promise <respuestaServices> =>{
+
+    const query = `
+                    select tipo_eq_personal
+                    from tipo_equipamiento_personal;
+    `;
+    
+    const resultado = await poolDb.query(query);
+
+    if(resultado.rows.length === 0){
+        return{
+            exito: false,
+            codHTTP: 404,
+            explicacion: "No hay tipos de equipamientos personales para mostrar.",
+            datos: null
+        };
+    }
+    
+    return {
+        exito: true,
+        codHTTP: 200,
+        explicacion: "Estos son los tipos de equipamientos personales registrados.",
+        datos: resultado.rows
+    };
+};
+
