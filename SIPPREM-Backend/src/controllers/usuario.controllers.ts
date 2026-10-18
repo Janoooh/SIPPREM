@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 import * as usuarioServices from "../services/usuario.services.js"
-import * as validadores from "../utils/validadores.js";
+import * as validadores from "../utils/validadores.utils.js";
 
 export const obtenerUsuarios = async (req: Request, res: Response): Promise<void> =>{
     try{

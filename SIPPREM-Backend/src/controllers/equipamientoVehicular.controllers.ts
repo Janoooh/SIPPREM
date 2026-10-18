@@ -1,7 +1,7 @@
 import type {Request, Response} from "express";
 import * as EquipamientoVehiculoServices from "../services/equipamientoVehicular.service.js";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
-import { identificarErrorDB } from "../services/tool.errorDB.js";
+import { identificarErrorDB } from "../utils/errorDB.utils.js";
 
 
 export const mostrarEquipamientosVehicularesControlador = async (req : Request, res: Response) =>{

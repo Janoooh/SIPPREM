@@ -1,7 +1,7 @@
 import type {Request, Response} from "express";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 import * as authServices from "../services/auth.services.js";
-import { esClaveValida } from "../utils/validadores.js";
+import { esClaveValida } from "../utils/validadores.utils.js";
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     try{
