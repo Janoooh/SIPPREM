@@ -10,6 +10,6 @@ const router = Router();
 router.get("/proyecto/:id_proyecto", tenerActividadProyecto);
 router.post("/", crearActividadControlador);
 router.put("/:id_actividad", actualizarActividadControlador);
-router.delete("/:id_actividad",eliminarActividadControlador);
+router.delete("/:id_actividad", eliminarActividadControlador);
 
 export default router;
