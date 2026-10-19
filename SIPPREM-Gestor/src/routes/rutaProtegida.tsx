@@ -26,29 +26,6 @@ export const RutaProtegida: React.FC<PropsRutaProtegida> = ({ children, rolesPer
     verificarSesion();
   },[]);
 
-  /*useEffect(() => {
-    const verificar = async () => {
-      
-      const { value } = await Preferences.get({ key: "usuario" });
-
-      if (!value) {
-        setAutorizado(false);
-        return;
-      }
-
-      const datosUser: dataUsuario = JSON.parse(value);
-
-      if (rolesPermitidos.includes(datosUser.tipo_rol)) {
-        setUsuario(datosUser);
-        setAutorizado(true);
-      }else{
-        setAutorizado(false);
-      }
-    };
-
-    verificar();
-  }, [location.key, rolesPermitidos.join(",")]);*/
-
   if (cargando) return <IonSpinner/>; // Espera a que termine de leer Preferences
 
   if (!usuario){
@@ -60,5 +37,4 @@ export const RutaProtegida: React.FC<PropsRutaProtegida> = ({ children, rolesPer
   };
 
   return <>{children}</>;
-  //return autorizado && usuario ? <>{children(usuario)}</> : <Navigate to="/login" replace />;
 };

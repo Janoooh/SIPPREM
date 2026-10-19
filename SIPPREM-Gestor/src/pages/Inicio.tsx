@@ -25,11 +25,6 @@ import { proyectoPatrullaje } from '../interfaces/proyectoPatrullaje';
 import './Inicio.css';
 import { useUsuario } from '../services/obtenerUsuario';
 
-/*interface InicioProps {
-  nombreUsuario: string;
-  rol: string;
-}*/
-
 const Inicio: React.FC = () => {
   
   const {usuario} = useUsuario();

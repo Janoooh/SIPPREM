@@ -22,10 +22,6 @@ import type { respuestaApi } from '../interfaces/respuestaApi';
 import { Preferences } from '@capacitor/preferences';
 import type { dataUsuario } from '../interfaces/dataUsuario';
 
-/*interface loginProps{
-    setUsuario: (datos: any) => void;
-};*/
-
 const Login: React.FC= () => {
 
   const [identificador, setIdentificador] = useState<string>('');
@@ -56,13 +52,8 @@ const Login: React.FC= () => {
         tipo_rol: datosUsuario.tipo_rol.toLowerCase()
       };
 
-      //await Preferences.remove({key:"token"});
-      //await Preferences.remove({key:"usuario"});
-
       await Preferences.set({key:"token", value: token});
       await Preferences.set({key:"usuario", value: JSON.stringify(datosUsuarioLower)});
-
-      //setUsuario(datosUsuarioLower);
 
 
       if (datosUsuario.tipo_rol.toLowerCase() === "patrullero"){

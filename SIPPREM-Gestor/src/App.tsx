@@ -2,6 +2,9 @@ import { Navigate, Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { useState, useEffect } from 'react';
+import { Preferences } from '@capacitor/preferences';
+import type { dataUsuario } from './interfaces/dataUsuario';
+import { RutaProtegida } from './routes/rutaProtegida';
 import Login from './pages/Login';
 import Inicio from './pages/Inicio';
 import AgregarProyecto from './pages/AgregarProyecto';
@@ -24,23 +27,12 @@ import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-
-/* import '@ionic/react/css/palettes/dark.always.css'; */
-/* import '@ionic/react/css/palettes/dark.class.css'; */
 import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
 import { navigate } from 'ionicons/icons';
-import { Preferences } from '@capacitor/preferences';
-import type { dataUsuario } from './interfaces/dataUsuario';
-import { RutaProtegida } from './routes/rutaProtegida';
+
 
 interface datosUsuario{
   nombre: string,
@@ -50,44 +42,6 @@ interface datosUsuario{
 setupIonicReact();
 
 const App: React.FC = () => {
-
-  //const [usuario, setUsuario] = useState<datosUsuario>({'nombre':'NotData', 'rol':'NotData'});
-
-  /*const sinUserString: dataUsuario = {
-    rut: "NotData",
-    nombre: "NotData",
-    correo: "NotData",
-    nuevo_user: false,
-    id_rol: -1,
-    tipo_rol: "NotData"
-  };
-
-  const [usuario, setUsuario] = useState<dataUsuario>(sinUserString);
-  const [cargando, setCargando] = useState<boolean>(true);
-
-  //const {value} = await Preferences.get({key: "usuario"});
-  //const usuario : dataUsuario = await JSON.parse(value || sinUserString);
-
-  useEffect(() => {
-    const cargarUsuario = async () => {
-      try{
-        const {value} = await Preferences.get({key : "usuario"});
-        if(value){
-          setUsuario(JSON.parse(value));
-        };
-      }catch(error){
-        console.log("ERROR AL LEER CON PREFERENCES");
-      }finally{
-        setCargando(false);
-      };
-    };
-
-    cargarUsuario();
-  },[]);
-
-  if(cargando){
-    return null;
-  }*/
 
   return (
     <IonApp>
