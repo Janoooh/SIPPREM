@@ -5,10 +5,10 @@ import type { respuestaServices } from "../interfaces/respuestaServices.js";
 
 export const iniciarSesion = async (idIngresado : string, claveIngresada: string) : Promise<respuestaServices> => {
     const queryBuscarUser = `
-        SELECT *
+        SELECT us.rut, us.nombre, us.correo, us.nuevo_user, us.id_rol, r.tipo_rol
         FROM usuario us
         INNER JOIN rol r USING (id_rol)
-        WHERE us.rut = $1 OR us.correo = $1
+        WHERE (us.rut = $1 OR us.correo = $1) AND us.eliminado = false
     `;
 
     const resConsulta = await poolDb.query(queryBuscarUser,[idIngresado]);
@@ -24,8 +24,9 @@ export const iniciarSesion = async (idIngresado : string, claveIngresada: string
     }
 
     const datosUsuario = resConsulta.rows[0];
+    const hashGuardado = await (await poolDb.query("SELECT hash_contrasenia FROM usuario WHERE rut = $1 OR correo = $1",[idIngresado])).rows[0];
 
-    const comparacionClave = await bcrypt.compare(claveIngresada, datosUsuario.hash_contrasenia);
+    const comparacionClave = await bcrypt.compare(claveIngresada, hashGuardado.hash_contrasenia);
 
     // La clave ingresada no es la correcta clave del usuario ingresado.
     if (!comparacionClave){
@@ -45,7 +46,7 @@ export const iniciarSesion = async (idIngresado : string, claveIngresada: string
             rol : datosUsuario.tipo_rol
         },
         generadorSecret,
-        { expiresIn : "4h"}
+        { expiresIn : "12h"}
     );
 
     // Caso correcto, donde el usuario pudo iniciar sesion.
@@ -63,7 +64,7 @@ export const cambiarClave = async (idIngresado: string, claveNueva : string) : P
         SELECT *
         FROM usuario us
         INNER JOIN rol r USING (id_rol)
-        WHERE us.rut = $1 OR us.correo = $1
+        WHERE (us.rut = $1 OR us.correo = $1) AND us.eliminado = false
     `;
     const resConsultaBuscarUser = await poolDb.query(queryBuscarUser,[idIngresado]);
     

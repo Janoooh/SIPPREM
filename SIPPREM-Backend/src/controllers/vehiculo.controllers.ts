@@ -1,14 +1,24 @@
 import type {Request, Response} from "express";
-import {poolDb} from "../config/db.js";
-import { Query } from "pg";
 import * as vehiculoServices from "../services/vehiculo.services.js";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
+import { identificarErrorDB } from "../utils/errorDB.utils.js";
 
 //para mostrar todos los vehiculos en la base de datos
-export const mostrarVehiculos = async (req: Request, res: Response) => {
+export const mostrarVehiculosControlador = async (req: Request, res: Response) => {
     try {
-        const vehiculos : respuestaServices = await vehiculoServices.verVehiculos();
-        
+        const {id_proyecto} = req.params;
+
+        if(!id_proyecto || isNaN(Number(id_proyecto))){
+            res.status(400).json({
+                ok: false,
+                message: "El id debe ser valido para completar la accion",
+                data : null
+            });
+            return;
+        }
+
+        const vehiculos : respuestaServices = await vehiculoServices.mostrarVehiculos(Number(id_proyecto));
+    
         res.status(vehiculos.codHTTP).json({
             ok: vehiculos.exito,
             message: vehiculos.explicacion,
@@ -19,59 +29,17 @@ export const mostrarVehiculos = async (req: Request, res: Response) => {
 
     } catch (error: any) {
         console.error("Error en controlador vehiculo (mostrarVehiculo): ",error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor al procesar la consulta",
-            data : null
-        });
-        return;
-    }
-};
-
-//para mostrar un vehiculo dado una patente
-export const buscarVehiculo = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        
-        //esto se supone que se ve en el frontend
-        if (!id){
-            res.status(400).json({
-                ok: false,
-                message: "Faltan datos para completar la accion",
-                data : null
-            });
-            return;
-        }
-
-        const vehiculo: respuestaServices = await vehiculoServices.verVehiculoID(String(id));
-
-        res.status(vehiculo.codHTTP).json({
-            ok: vehiculo.exito,
-            message: vehiculo.explicacion,
-            data: vehiculo.datos
-        });
-        
-        return;
-
-
-    } catch (error: any) {
-        console.error("Error en controlador vehiculo (buscarVehiculo): ",error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor al procesar la consulta",
-            data : null
-        });
-        return;
+        return identificarErrorDB(error, res);
     }
 };
 
 //para agregar un vehiculo
-export const addVehiculo = async (req: Request, res: Response) => {
+export const agregarVehiculoControlador = async (req: Request, res: Response) => {
     try {
         const {id_item, id_proyecto, nombre_vehiculo, id_tipo_vehiculo} = req.body;
 
         //si alguno de los campos viene vacio
-        if (!id_item || !id_proyecto || !nombre_vehiculo|| !id_tipo_vehiculo){
+        if (!id_item || !id_proyecto || isNaN(Number(id_proyecto)) || !nombre_vehiculo|| !id_tipo_vehiculo || isNaN(Number(id_tipo_vehiculo))){
             res.status(400).json({
                 ok: false,
                 message: "Faltan datos para poder completar la accion",
@@ -80,7 +48,7 @@ export const addVehiculo = async (req: Request, res: Response) => {
             return;
         }
 
-        const nuevoVehiculo: respuestaServices = await vehiculoServices.agregarVehiculo(id_item, id_proyecto, nombre_vehiculo, id_tipo_vehiculo);
+        const nuevoVehiculo: respuestaServices = await vehiculoServices.agregarVehiculo(String(id_item), Number(id_proyecto), String(nombre_vehiculo), Number(id_tipo_vehiculo));
 
         res.status(nuevoVehiculo.codHTTP).json({
             ok: nuevoVehiculo.exito,
@@ -90,23 +58,18 @@ export const addVehiculo = async (req: Request, res: Response) => {
         return;
 
     } catch (error: any) {
-        console.error("Error en controlador vehiculo (addVehiculo): ",error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor al procesar la consulta",
-            data : null
-        });
-        return;
+        console.error("Error en controlador vehiculo (agregarVehiculo): ",error);
+        return identificarErrorDB(error, res);
     }
 };
 
 
 //para eliminar un vehiculo
-export const eliminarVehiculo = async (req: Request, res: Response) => {
+export const eliminarVehiculoControlador = async (req: Request, res: Response) => {
     try {
-        const { id } = req.params;
+        const { id_vehiculo } = req.params;
 
-        if (!id){
+        if (!id_vehiculo){
             res.status(400).json({
                 ok: false,
                 message: "Faltan datos para completar la accion",
@@ -115,7 +78,7 @@ export const eliminarVehiculo = async (req: Request, res: Response) => {
             return;
         }
 
-        const eliminado:respuestaServices = await vehiculoServices.borrarVehiculo(String(id));
+        const eliminado:respuestaServices = await vehiculoServices.eliminarVehiculo(String(id_vehiculo));
 
         res.status(eliminado.codHTTP).json({
             ok: eliminado.exito,
@@ -126,11 +89,6 @@ export const eliminarVehiculo = async (req: Request, res: Response) => {
     
     } catch (error: any) {
         console.error("Error en controlador vehiculo (eliminarVehiculo): ",error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor al procesar la consulta",
-            data : null
-        });
-        return;
+        return identificarErrorDB(error, res);
     }
 };
