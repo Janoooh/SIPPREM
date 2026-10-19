@@ -12,9 +12,9 @@ import {
 const router = Router();
 
 router.get("/", verificarTokenJWT, verificarRol(["admin", "supervisor"]), obtenerProyectosControlador);
-router.post("/", verificarTokenJWT, verificarRol(["admin", "supervisor"]), crearProyectoControlador);
+router.post("/", verificarTokenJWT, verificarRol(["admin"]), crearProyectoControlador);
 router.get("/:id_proyecto", verificarTokenJWT, verificarRol(["admin", "supervisor"]), obtenerProyectoPorIdControlador);
-router.put("/:id_proyecto", verificarTokenJWT, verificarRol(["admin", "supervisor"]), actualizarProyectoControlador);
-router.delete("/:id_proyecto", verificarTokenJWT, verificarRol(["admin", "supervisor"]), eliminarProyectoControlador);
+router.put("/:id_proyecto", verificarTokenJWT, verificarRol(["admin"]), actualizarProyectoControlador);
+router.delete("/:id_proyecto", verificarTokenJWT, verificarRol(["admin"]), eliminarProyectoControlador);
 
 export default router;
