@@ -11,7 +11,7 @@ export const iniciarSesion = async (idIngresado : string, claveIngresada: string
         WHERE (us.rut = $1 OR us.correo = $1) AND us.eliminado = false
     `;
 
-    const resConsulta = await poolDb.query(queryBuscarUser,[idIngresado]);
+    const resConsulta = await poolDb.query(queryBuscarUser,[idIngresado.toLowerCase()]);
 
     // El usuario no se encontro.
     if (resConsulta.rows.length === 0){
@@ -24,7 +24,7 @@ export const iniciarSesion = async (idIngresado : string, claveIngresada: string
     }
 
     const datosUsuario = resConsulta.rows[0];
-    const hashGuardado = await (await poolDb.query("SELECT hash_contrasenia FROM usuario WHERE rut = $1 OR correo = $1",[idIngresado])).rows[0];
+    const hashGuardado = await (await poolDb.query("SELECT hash_contrasenia FROM usuario WHERE rut = $1 OR correo = $1",[idIngresado.toLowerCase()])).rows[0];
 
     const comparacionClave = await bcrypt.compare(claveIngresada, hashGuardado.hash_contrasenia);
 
@@ -66,7 +66,7 @@ export const cambiarClave = async (idIngresado: string, claveNueva : string) : P
         INNER JOIN rol r USING (id_rol)
         WHERE (us.rut = $1 OR us.correo = $1) AND us.eliminado = false
     `;
-    const resConsultaBuscarUser = await poolDb.query(queryBuscarUser,[idIngresado]);
+    const resConsultaBuscarUser = await poolDb.query(queryBuscarUser,[idIngresado.toLowerCase()]);
     
     // El usuario no se encontro.
     if (resConsultaBuscarUser.rows.length === 0){
@@ -97,7 +97,7 @@ export const cambiarClave = async (idIngresado: string, claveNueva : string) : P
         WHERE rut = $1 OR correo = $1
     `;
 
-    await poolDb.query(queryCambiarClave,[idIngresado,hashNuevaClave]);
+    await poolDb.query(queryCambiarClave,[idIngresado.toLowerCase(),hashNuevaClave]);
 
     return {
         exito : true,

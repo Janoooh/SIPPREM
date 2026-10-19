@@ -47,7 +47,6 @@ create table proyecto_patrullaje(
 create table acceso_proyecto(
 	rut varchar(12) not null,
 	id_proyecto integer not null,
-	es_encargado bool not null,
 
 	constraint pk_acceso_proyecto primary key (rut, id_proyecto),
 	constraint fk_acceso_proyecto_rut foreign key (rut) references usuario(rut),
@@ -331,5 +330,36 @@ INSERT INTO categoria_incidente (categoria) VALUES
 
 INSERT INTO usuario (rut, nombre, correo, telefono, hash_contrasenia, nuevo_user, id_rol) VALUES 
 ('12345678-9', 'Lil edo de la crux', 'lil.crux@procasting.cl', '+56912345678', '$2b$10$WU5N9TLYVwNLuvl/TXcp7eWJXLCN2F2VI/1bpUum95WNVf3/inow6', false, 1),
-('98765432-1', 'Fernanda Garrafa', 'Fer.garra@procasting.cl', '+56987654321', '$2b$10$2NfPAyuUYxjrEpxBTIvCsuPIuVbp6x.S4W71lFbP/BdAI1qk1588e', false, 2),
+('98765432-1', 'Fernanda Garrafa', 'fer.garra@procasting.cl', '+56987654321', '$2b$10$2NfPAyuUYxjrEpxBTIvCsuPIuVbp6x.S4W71lFbP/BdAI1qk1588e', false, 2),
 ('11223344-5', 'Ale x under Avellana', 'jano.ohh@procasting.cl', '+56911223344', '$2b$10$llTLLOaAWqjjx.IONcwHeex9BkdHLiVV3MYfAQ/R3M14d./GIRwiW', true, 3);
+
+INSERT INTO proyecto_patrullaje (nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, zona_seleccionada, activo, eliminado) VALUES 
+(
+    'Patrullaje SAFE ver. 2026', 
+    'Sector de la moneda de 100', 
+    15000000, 
+    '2026-10-10', 
+    '2026-12-31', 
+    ST_GeomFromText('POLYGON((-70.66 -33.44, -70.65 -33.44, -70.65 -33.45, -70.66 -33.45, -70.66 -33.44))', 4326), -- es una zona
+    true,
+	false
+);
+
+INSERT INTO acceso_proyecto (rut, id_proyecto, es_encargado) VALUES 
+('98765432-1', 1),
+('11223344-5', 1);
+
+INSERT INTO proyecto_patrullaje (nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, zona_seleccionada, activo, eliminado) VALUES 
+(
+    'Patrullaje Narnia', 
+    'Detras del closet', 
+    35000000, 
+    '2026-12-10', 
+    '2027-04-30', 
+    ST_GeomFromText('POLYGON((-70.66 -33.44, -70.65 -33.44, -70.65 -33.45, -70.66 -33.45, -70.66 -33.44))', 4326), -- es una zona
+    true,
+	false
+);
+
+INSERT INTO acceso_proyecto (rut, id_proyecto, es_encargado) VALUES 
+('98765432-1', 2);

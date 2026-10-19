@@ -2,6 +2,8 @@ import type { Request, Response } from "express";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 import * as usuarioServices from "../services/usuario.services.js"
 import * as validadores from "../utils/validadores.utils.js";
+import { identificarErrorDB } from "../utils/errorDB.utils.js";
+import type { RequestConUsuario } from "../middleware/verificarTokenJWT.js";
 
 export const obtenerUsuarios = async (req: Request, res: Response): Promise<void> =>{
     try{
@@ -17,13 +19,10 @@ export const obtenerUsuarios = async (req: Request, res: Response): Promise<void
 
     }catch(error){
         console.error("Error en controlador obtenerUsuarios, de usuario.controllers.ts : ",error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al procesar los usuarios.",
-            data : null
-        });
+
+        identificarErrorDB(error,res);
         return;
-    }
+    };
 };
 
 export const obtenerUsuario = async (req: Request, res: Response): Promise<void> => {
@@ -40,11 +39,28 @@ export const obtenerUsuario = async (req: Request, res: Response): Promise<void>
 
     }catch(error){
         console.error("Error en controlador obtenerUsuario, de usuario.controllers.ts : ",error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al procesar el usuarios.",
-            data : null
+
+        identificarErrorDB(error,res);
+        return;
+    };
+};
+
+export const obtenerMiPerfil = async (req: RequestConUsuario, res: Response): Promise<void> => {
+    try{
+        const id_personal = req.usuario?.rutUsuario.toLowerCase() as string;
+
+        const resObtenerMiPerfil = await usuarioServices.obtenerUsuario(id_personal);
+
+        res.status(resObtenerMiPerfil.codHTTP).json({
+            ok: resObtenerMiPerfil.exito,
+            message: resObtenerMiPerfil.explicacion,
+            data: resObtenerMiPerfil.datos
         });
+
+    }catch(error){
+        console.error("Error en controlador obtenerMiPerfil, de usuario.controllers.ts : ",error);
+
+        identificarErrorDB(error,res);
         return;
     };
 };
@@ -65,7 +81,7 @@ export const crearUsuario = async (req: Request, res: Response): Promise<void> =
         if (!validadores.esRutValido(rut)){
             res.status(400).json({
                 ok: false,
-                message: "El rut ingresado no es valido.",
+                message: "El formato de rut ingresado no es valido.",
                 data: null
             });
             return;
@@ -74,7 +90,7 @@ export const crearUsuario = async (req: Request, res: Response): Promise<void> =
         if (!validadores.esCorreoValido(correo)){
             res.status(400).json({
                 ok: false,
-                message: "El correo ingresado no es valido.",
+                message: "El formato de correo ingresado no es valido.",
                 data: null
             });
             return;
@@ -101,13 +117,10 @@ export const crearUsuario = async (req: Request, res: Response): Promise<void> =
 
     }catch(error){
         console.error("Error en controlador crearUsuario, de usuario.controllers.ts : ",error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al crear el usuario.",
-            data : null
-        });
+
+        identificarErrorDB(error,res);
         return;
-    }
+    };
 };
 
 export const eliminarUsuario = async (req: Request, res: Response) : Promise<void> => {
@@ -124,11 +137,98 @@ export const eliminarUsuario = async (req: Request, res: Response) : Promise<voi
 
     }catch(error){
         console.error("Error en controlador eliminarUsuario, de usuario.controllers.ts : ",error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al eliminar el usuario.",
-            data : null
-        });
+
+        identificarErrorDB(error,res);
         return;
-    }
+    };
+};
+
+export const actualizarUsuario = async (req: Request, res: Response): Promise<void> => {
+    try{
+        const id_user = req.params?.id_user as string;
+        const {nombre,correo,telefono,foto,id_rol} = req.body;
+
+        if (!nombre || !correo || !id_rol){
+            res.status(400).json({
+                ok: false,
+                message: "Los campos de nombre, correo y rol no pueden quedar vacios.",
+                data: null
+            });
+            return;
+        };
+
+        if (!validadores.esCorreoValido(correo)){
+            res.status(400).json({
+                ok: false,
+                message: "El formato de correo ingresado no es valido.",
+                data: null
+            });
+            return;
+        };
+
+        if (!validadores.esRolValido(Number(id_rol))){
+            res.status(400).json({
+                ok: false,
+                message: "El rol ingresado no es valido.",
+                data: null
+            });
+            return;
+        };
+
+        const userModificado = {rut: id_user,nombre,correo,telefono,foto,id_rol};
+
+        const resActualizarUsuario : respuestaServices = await usuarioServices.actualizarUsuario(userModificado);
+
+        res.status(resActualizarUsuario.codHTTP).json({
+            ok: resActualizarUsuario.exito,
+            message: resActualizarUsuario.explicacion,
+            data: resActualizarUsuario.datos
+        });
+
+    }catch(error){
+        console.error("Error en controlador actualizarUsuario, de usuario.controllers.ts : ",error);
+
+        identificarErrorDB(error,res);
+        return;
+    };
+};
+
+export const reestablecerClave = async (req: Request, res: Response): Promise<void> => {
+    try{
+        const id_user =  req.params?.id_user as string;
+
+        const resReestablecerClave : respuestaServices = await usuarioServices.reestablecerClave(id_user);
+
+        res.status(resReestablecerClave.codHTTP).json({
+            ok: resReestablecerClave.exito,
+            message: resReestablecerClave.explicacion,
+            data: resReestablecerClave.datos
+        });
+
+    }catch(error){
+        console.error("Error en controlador reestablecerClave, de usuario.controllers.ts : ",error);
+
+        identificarErrorDB(error,res);
+        return;
+    };
+};
+
+export const restaurarUsuario = async (req: Request, res: Response) : Promise<void> => {
+    try{
+        const id_user = req.params?.id_user as string;
+
+        const resRestaurarUsuario : respuestaServices = await usuarioServices.restaurarUsuario(id_user);
+
+        res.status(resRestaurarUsuario.codHTTP).json({
+            ok: resRestaurarUsuario.exito,
+            message: resRestaurarUsuario.explicacion,
+            data: resRestaurarUsuario.datos
+        });
+
+    }catch(error){
+        console.error("Error en controlador restaurarUsuario, de usuario.controllers.ts : ",error);
+
+        identificarErrorDB(error,res);
+        return;
+    };
 };

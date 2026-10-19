@@ -2,6 +2,7 @@ import type {Request, Response} from "express";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 import * as authServices from "../services/auth.services.js";
 import { esClaveValida } from "../utils/validadores.utils.js";
+import { identificarErrorDB } from "../utils/errorDB.utils.js";
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     try{
@@ -30,13 +31,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     }catch (error){
         console.error("Error en controlador login, de auth.controllers.ts : ",error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al procesar el inicio de sesion del usuario.",
-            data : null
-        });
+
+        identificarErrorDB(error, res);
         return;
-    }
+    };
 };
 
 export const cambiarClave = async (req : Request, res : Response) : Promise<void> => {
@@ -51,7 +49,7 @@ export const cambiarClave = async (req : Request, res : Response) : Promise<void
                 data : null
             });
             return;
-        }
+        };
 
         if(!esClaveValida(claveNuevaIng)){
             res.status(400).json({
@@ -60,9 +58,9 @@ export const cambiarClave = async (req : Request, res : Response) : Promise<void
                 data : null
             });
             return;
-        }
+        };
 
-        const resultadoCambioClave = await authServices.cambiarClave(idIngresado,claveNuevaIng);
+        const resultadoCambioClave : respuestaServices = await authServices.cambiarClave(idIngresado,claveNuevaIng);
 
         res.status(resultadoCambioClave.codHTTP).json({
             ok: resultadoCambioClave.exito,
@@ -73,11 +71,8 @@ export const cambiarClave = async (req : Request, res : Response) : Promise<void
 
     }catch(error){
         console.error("Error en controlador cambiarClave, de auth.controllers.ts : ",error);
-        res.status(500).json({
-            ok : false,
-            message : "Error del servidor interno al procesar el cambio de clave del usuario.",
-            data : null
-        });
+
+        identificarErrorDB(error,res);
         return;
-    }
+    };
 };
