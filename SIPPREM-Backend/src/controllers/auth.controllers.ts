@@ -1,6 +1,7 @@
 import type {Request, Response} from "express";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 import * as authServices from "../services/auth.services.js";
+import { esClaveValida } from "../utils/validadores.utils.js";
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     try{
@@ -47,6 +48,15 @@ export const cambiarClave = async (req : Request, res : Response) : Promise<void
             res.status(400).json({
                 ok: false,
                 message: "Faltan datos para realizar el cambio de clave, por favor ingrese todo lo solicitado.",
+                data : null
+            });
+            return;
+        }
+
+        if(!esClaveValida(claveNuevaIng)){
+            res.status(400).json({
+                ok: false,
+                message: "La clave no es valida, debe tener al menos 8 caracteres.",
                 data : null
             });
             return;

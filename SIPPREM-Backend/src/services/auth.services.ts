@@ -46,7 +46,7 @@ export const iniciarSesion = async (idIngresado : string, claveIngresada: string
             rol : datosUsuario.tipo_rol
         },
         generadorSecret,
-        { expiresIn : "4h"}
+        { expiresIn : "12h"}
     );
 
     // Caso correcto, donde el usuario pudo iniciar sesion.
