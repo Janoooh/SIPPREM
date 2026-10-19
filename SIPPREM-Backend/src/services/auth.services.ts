@@ -5,7 +5,7 @@ import type { respuestaServices } from "../interfaces/respuestaServices.js";
 
 export const iniciarSesion = async (idIngresado : string, claveIngresada: string) : Promise<respuestaServices> => {
     const queryBuscarUser = `
-        SELECT us.rut, us.nombre, us.correo, us.nuevo_user, us.id_rol, r.tipo_rol
+        SELECT us.rut, us.nombre, us.correo, us.foto, us.nuevo_user, us.id_rol, r.tipo_rol
         FROM usuario us
         INNER JOIN rol r USING (id_rol)
         WHERE (us.rut = $1 OR us.correo = $1) AND us.eliminado = false
@@ -23,7 +23,15 @@ export const iniciarSesion = async (idIngresado : string, claveIngresada: string
         };
     }
 
-    const datosUsuario = resConsulta.rows[0];
+    const filaUsuario = resConsulta.rows[0];
+
+    const datosUsuario = {
+        ...filaUsuario,
+        foto: filaUsuario.foto
+            ? `data:image/jpeg;base64,${Buffer.from(filaUsuario.foto).toString("base64")}`
+            : null
+    };
+
     const hashGuardado = await (await poolDb.query("SELECT hash_contrasenia FROM usuario WHERE rut = $1 OR correo = $1",[idIngresado.toLowerCase()])).rows[0];
 
     const comparacionClave = await bcrypt.compare(claveIngresada, hashGuardado.hash_contrasenia);
