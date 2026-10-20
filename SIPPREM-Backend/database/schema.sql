@@ -328,10 +328,11 @@ INSERT INTO categoria_incidente (categoria) VALUES
 ('Emergencia médica menor'),
 ('Daño a infraestructura pública');
 
-INSERT INTO usuario (rut, nombre, correo, telefono, hash_contrasenia, nuevo_user, id_rol) VALUES 
-('12345678-9', 'Lil edo de la crux', 'lil.crux@procasting.cl', '+56912345678', '$2b$10$WU5N9TLYVwNLuvl/TXcp7eWJXLCN2F2VI/1bpUum95WNVf3/inow6', false, 1),
-('98765432-1', 'Fernanda Garrafa', 'fer.garra@procasting.cl', '+56987654321', '$2b$10$2NfPAyuUYxjrEpxBTIvCsuPIuVbp6x.S4W71lFbP/BdAI1qk1588e', false, 2),
-('11223344-5', 'Ale x under Avellana', 'jano.ohh@procasting.cl', '+56911223344', '$2b$10$llTLLOaAWqjjx.IONcwHeex9BkdHLiVV3MYfAQ/R3M14d./GIRwiW', true, 3);
+INSERT INTO usuario (rut, nombre, correo, telefono, hash_contrasenia, nuevo_user, fecha_registro, eliminado, id_rol) VALUES 
+('00000000-0','Administrador root','admin@sipprem.com',null,'$2a$10$sG6X2ZW52kws8YOS7vZfousnSaZiClk5S/wpdk8GlkrHEAh5OkIK6',true,CURRENT_TIMESTAMP,false,1),
+('12345678-9', 'Edgar De La Cruz', 'lil.crux@procasting.cl', '+56912345678', '$2b$10$WU5N9TLYVwNLuvl/TXcp7eWJXLCN2F2VI/1bpUum95WNVf3/inow6', true,CURRENT_TIMESTAMP,false, 1),
+('98765432-1', 'Fernanda Barraza', 'fer.barra@procasting.cl', '+56987654321', '$2b$10$2NfPAyuUYxjrEpxBTIvCsuPIuVbp6x.S4W71lFbP/BdAI1qk1588e', true,CURRENT_TIMESTAMP,false, 2),
+('11223344-5', 'Alejandro Orellana', 'jano.ohh@procasting.cl', '+56911223344', '$2b$10$llTLLOaAWqjjx.IONcwHeex9BkdHLiVV3MYfAQ/R3M14d./GIRwiW', true,CURRENT_TIMESTAMP,false, 3);
 
 INSERT INTO proyecto_patrullaje (nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, zona_seleccionada, activo, eliminado) VALUES 
 (

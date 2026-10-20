@@ -123,9 +123,27 @@ export const crearUsuario = async (req: Request, res: Response): Promise<void> =
     };
 };
 
-export const eliminarUsuario = async (req: Request, res: Response) : Promise<void> => {
+export const eliminarUsuario = async (req: RequestConUsuario, res: Response) : Promise<void> => {
     try{
         const id_user = req.params.id_user as string;
+        const mi_rut = req.usuario?.rutUsuario as string;
+        const mi_correo = req.usuario?.correoUsuario as string;
+
+        if (id_user === mi_rut || id_user === mi_correo){
+            res.status(400).json({
+                ok: false,
+                message: "No puedes eliminar tu propia cuenta de usuario.",
+                data: null
+            });
+        };
+
+        if (id_user === "00000000-0" || id_user === "admin@sipprem.com"){
+            res.status(400).json({
+                ok: false,
+                message: "No puedes eliminar al administrador root.",
+                data: null
+            });
+        };
 
         const resEliminarUsuario : respuestaServices = await usuarioServices.eliminarUsuario(id_user);
 
