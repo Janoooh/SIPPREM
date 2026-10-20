@@ -3,9 +3,8 @@ import * as equipamientoPersonalServices from "../services/equipamientoPersonal.
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 import { identificarErrorDB } from "../utils/errorDB.utils.js";
 
-
-
-export const mostrarEquipamientosPersonalesControlador= async (req: Request, res: Response) =>{
+// Funcion que devuelve todos los equipamientos personales de un proyecto
+export const mostrarEquipamientosPersonalesControlador= async (req: Request, res: Response): Promise <void> =>{
     try {
         const {id_proyecto} = req.params;
 
@@ -31,16 +30,50 @@ export const mostrarEquipamientosPersonalesControlador= async (req: Request, res
     
     } catch (error: any) {
             console.error("Error en controlador equipamientoPersonal (mostrar): ",error);
-            return identificarErrorDB(error, res);
+            identificarErrorDB(error, res);
+            return;
+    }
+};
+
+// funcion para mostrar un solo equipamiento personal dado su identificador y el proyecto al que pertenece
+export const mostrarUNequipamientoPersonalControlador = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id_eq_personal } = req.params;
+        const { id_proyecto } = req.params;
+
+        if (!id_eq_personal || String(id_eq_personal).trim() === "") {
+            res.status(400).json({
+                ok: false,
+                message: "El identificador del equipamiento no es válido.",
+                data: null
+            });
+            return;
+        }
+
+        const resultado: respuestaServices = await equipamientoPersonalServices.mostrarUNequipamientoPersonal(String(id_eq_personal).toUpperCase(), Number(id_proyecto));
+
+        res.status(resultado.codHTTP).json({
+            ok: resultado.exito,
+            message: resultado.explicacion,
+            data: resultado.datos
+        });
+        return;
+
+    } catch (error: any) {
+        console.error("Error en controlador equipamientoPersonal (mostrar uno): ", error);
+        identificarErrorDB(error, res);
+        return;
     }
 };
 
 
-export const agregarEquipamientoPersonalControlador = async (req: Request, res: Response) => {
+// Funcion para agregar un equipamiento personal a un proyecto
+export const agregarEquipamientoPersonalControlador = async (req: Request, res: Response) : Promise <void> => {
     try {
-        const { id_item, id_proyecto, id_tipo, talla } = req.body;
+        const { id_proyecto } = req.params;
+        const { id_item, id_tipo, talla } = req.body;
 
-        if (!id_item || !id_proyecto || isNaN(Number(id_proyecto)) || !id_tipo || isNaN(Number(id_tipo))) {
+        if (!id_item || String(id_item).trim() === ""|| !id_proyecto || isNaN(Number(id_proyecto)) || !id_tipo || isNaN(Number(id_tipo))) {
             res.status(400).json({
                 ok: false,
                 message: "Faltan datos para poder completar la accion o los datos no tiene el formato correcto.",
@@ -49,7 +82,7 @@ export const agregarEquipamientoPersonalControlador = async (req: Request, res: 
             return;
         }
 
-        const nuevoEquipamiento: respuestaServices = await equipamientoPersonalServices.agregarEquipamientoPersonal(String(id_item), Number(id_proyecto), Number(id_tipo), talla || null);
+        const nuevoEquipamiento: respuestaServices = await equipamientoPersonalServices.agregarEquipamientoPersonal((String(id_item)).toUpperCase(), Number(id_proyecto), Number(id_tipo), talla || null);
 
         res.status(nuevoEquipamiento.codHTTP).json({
             ok: nuevoEquipamiento.exito,
@@ -60,18 +93,69 @@ export const agregarEquipamientoPersonalControlador = async (req: Request, res: 
 
     } catch (error: any) {
         console.error("Error en controlador equipamientoPersonal (agregar): ",error);
-        return identificarErrorDB(error, res);
+        identificarErrorDB(error, res);
+        return;
     }
 };
 
 
-
-
-export const eliminarEquipamientoPersonalControlador = async (req : Request, res: Response) => {
+// Para actualizar los datos lógicos de un equipamiento personal (talla o tipo)
+export const actualizarEquipamientoPersonalControlador = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id_eq_personal } = req.params;
+        const { id_proyecto } = req.params;
+        const { id_tipo, talla } = req.body;
+
+        if (!id_eq_personal || String(id_eq_personal).trim() === "" || !id_proyecto || isNaN(Number(id_proyecto))) {
+            res.status(400).json({
+                ok: false,
+                message: "Los datos no son validos.",
+                data: null
+            });
+            return;
+        }
+
+        // Asegurar que al menos se envíe un campo para actualizar
+        if (id_tipo === undefined && talla === undefined) {
+            res.status(400).json({
+                ok: false,
+                message: "Debe proporcionar al menos un campo para actualizar (tipo o talla).",
+                data: null
+            });
+            return;
+        }
+
+        const tipoFinal = (id_tipo !== undefined && id_tipo !== null && id_tipo !== "") 
+            ? Number(id_tipo) 
+            : null;
+
+        const tallaFinal = (talla !== undefined && talla !== null && String(talla).trim() !== "") 
+            ? String(talla).trim() 
+            : null;
+        
+        const resultado: respuestaServices = await equipamientoPersonalServices.actualizarEquipamientoPersonal(String(id_eq_personal).toUpperCase(),tipoFinal, tallaFinal, Number(id_proyecto));
+
+        res.status(resultado.codHTTP).json({
+            ok: resultado.exito,
+            message: resultado.explicacion,
+            data: resultado.datos
+        });
+        return;
+
+    } catch (error: any) {
+        console.error("Error en controlador equipamientoPersonal (actualizar): ", error);
+        identificarErrorDB(error, res);
+        return;
+    }
+};
+
+// Para eliminar un equipamiento personal de un proyecto
+export const eliminarEquipamientoPersonalControlador = async (req : Request, res: Response): Promise <void> => {
+    try {
+        const { id_eq_personal } = req.params;
+        const { id_proyecto } = req.params;
     
-        if (!id_eq_personal){
+        if (!id_eq_personal || !id_proyecto){
            res.status(400).json({
                 ok: false,
                 message: "Faltan datos para completar la accion",
@@ -80,7 +164,7 @@ export const eliminarEquipamientoPersonalControlador = async (req : Request, res
             return;
         }
     
-        const eliminado:respuestaServices = await equipamientoPersonalServices.eliminarEquipamientoPersonal(String(id_eq_personal));
+        const eliminado:respuestaServices = await equipamientoPersonalServices.eliminarEquipamientoPersonal((String(id_eq_personal)).toUpperCase(), Number(id_proyecto));
     
         res.status(eliminado.codHTTP).json({
             ok: eliminado.exito,
@@ -91,7 +175,8 @@ export const eliminarEquipamientoPersonalControlador = async (req : Request, res
         
         } catch (error: any) {
             console.error("Error en controlador equipamientoPersonal (eliminar) : ",error);
-            return identificarErrorDB(error, res);
+            identificarErrorDB(error, res);
+            return;
         }
 };
 

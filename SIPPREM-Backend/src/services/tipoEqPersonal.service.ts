@@ -1,6 +1,7 @@
 import { poolDb } from "../config/db.js";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 
+// Funcion que hace la consulta a la base de datos para obtener los tipos de equipamientos personales del sistema
 export const mostrarTiposEqPersonales= async (): Promise <respuestaServices> =>{
 
     const query = `

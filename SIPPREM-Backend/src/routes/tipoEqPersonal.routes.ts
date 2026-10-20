@@ -1,8 +1,11 @@
 import { Router } from "express";
 import { mostrarTiposEqPersonalControlador } from "../controllers/tipoEqPersonal.controller.js";
+import { verificarTokenJWT } from "../middleware/verificarTokenJWT.js";
+import { verificarRol } from "../middleware/verificarRol.js";
 
 const router = Router();
 
-router.get('/', mostrarTiposEqPersonalControlador);
+// solo tiene el get, ya que solo es necesario ver estos datos
+router.get('/' , mostrarTiposEqPersonalControlador);
 
 export default router;

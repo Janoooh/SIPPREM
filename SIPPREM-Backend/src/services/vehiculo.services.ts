@@ -1,16 +1,18 @@
 import {poolDb} from "../config/db.js";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 
-//Lo voy a escribir asi porque lo entiendo mejor que usando la funcion flecha
+// Funcion que muestra los vehiculos relacionado a un proyecto
 export const mostrarVehiculos= async (id: number): Promise<respuestaServices> => {
+    // Se hace la consulta para ver si existe el proyecto dado
     const queryProyecto = `
-                                select * 
+                                select id_proyecto 
                                 from proyecto_patrullaje
                                 where id_proyecto = $1 and eliminado = false;
     `;
 
     const proyecto = await poolDb.query(queryProyecto, [id]);
     
+    // verifica si la consulta anterior retorno algun dato, en este si tiene almenos una fila
     if (proyecto.rows.length === 0){
         return{
             exito: false, 
@@ -20,6 +22,8 @@ export const mostrarVehiculos= async (id: number): Promise<respuestaServices> =>
         };
     }
 
+
+    // Consulta para ver los vehiculos relacionados a un proyecto el formato que devuelve es el siguiente:
     //    patente, marca y tipo
     //ej: 123-ACV, Honda civic, automovil
     const query= `
@@ -43,6 +47,7 @@ export const mostrarVehiculos= async (id: number): Promise<respuestaServices> =>
 
     }
 
+    // En otro caso retorna los resultados.  Si hay algun error con la BD lo captura el catch del controlador
     return {
         exito: true, 
         codHTTP: 200,
@@ -51,9 +56,40 @@ export const mostrarVehiculos= async (id: number): Promise<respuestaServices> =>
     };
 };
 
+//funcion para ver un vehiculo dado un proyecto
+export const mostrarUNvehiculo = async (id_item: string, id_proyecto: number): Promise<respuestaServices> => {
+    const query = `
+        select id_item, nombre_vehiculo, tipo_vehiculo
+                from vehiculo 
+                inner join tipo_vehiculo 
+                    on vehiculo.id_tipo_vehiculo= tipo_vehiculo.id_tipo_vehiculo
+                where eliminado = false and id_proyecto = $1 and id_item = $2;
+    `;
 
+    const resultado = await poolDb.query(query, [id_proyecto, id_item]);
+
+    if (resultado.rows.length === 0) {
+        return {
+            exito: false,
+            codHTTP: 404,
+            explicacion: "vehiculo no encontrado.",
+            datos: null
+        };
+    }
+
+    return {
+        exito: true,
+        codHTTP: 200,
+        explicacion: "vehiculo encontrado correctamente.",
+        datos: resultado.rows[0]
+    };
+};
+
+
+// Funcion para agregar un vehiculo dado los datos necesarios
 export const agregarVehiculo = async(id_item: string, id_proyecto: number, nombre_vehiculo: string, id_tipo_vehiculo: number) :Promise<respuestaServices> => {
-    const queryProyecto =`select * from proyecto_patrullaje where id_proyecto = $1 and eliminado= false;`;
+    //query para ver si el proyecto existe
+    const queryProyecto =`select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado= false;`;
     const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
     
     if (proyecto.rows.length === 0){
@@ -65,7 +101,8 @@ export const agregarVehiculo = async(id_item: string, id_proyecto: number, nombr
         };
     }
 
-    const queryTipoVehiculo = `select * from tipo_vehiculo where id_tipo_vehiculo = $1;`
+    //query para ver si el tipo de vehiculo ingresado existe
+    const queryTipoVehiculo = `select id_tipo_vehiculo from tipo_vehiculo where id_tipo_vehiculo = $1;`
     const vehiculo = await poolDb.query(queryTipoVehiculo, [id_tipo_vehiculo]);
 
     if (vehiculo.rows.length === 0){
@@ -77,6 +114,7 @@ export const agregarVehiculo = async(id_item: string, id_proyecto: number, nombr
         };
     }
 
+    // Se agrega el vehiculo con los datos ya validados
     const query = `
                     insert into vehiculo (id_item, id_proyecto, nombre_vehiculo, id_tipo_vehiculo)
                     values ($1, $2, $3, $4)
@@ -93,17 +131,50 @@ export const agregarVehiculo = async(id_item: string, id_proyecto: number, nombr
     };
 };
 
+// Funcion para modificar un vehiculo
+export const actualizarVehiculo = async (id_item: string, nombre_vehiculo: string | null, id_tipo_vehiculo: number | null, id_proyecto: number | null): Promise<respuestaServices> => {
+    // Usamos COALESCE para que si el valor es null, se mantenga el valor existente
+    const query = `
+        update vehiculo
+        set 
+            nombre_vehiculo = coalesce($1, nombre_vehiculo),
+            id_tipo_vehiculo = coalesce($2, id_tipo_vehiculo),
+            id_proyecto = coalesce($3, id_proyecto)
+        where id_item = $4 and eliminado = false
+        returning id_item, nombre_vehiculo, id_tipo_vehiculo, id_proyecto;
+    `;
+
+    const resultado = await poolDb.query(query, [nombre_vehiculo, id_tipo_vehiculo, id_proyecto, id_item]);
+
+    if (resultado.rows.length === 0) {
+        return {
+            exito: false,
+            codHTTP: 404,
+            explicacion: "Vehiculo no encontrado o se encuentra eliminado.",
+            datos: null
+        };
+    }
+
+    return {
+        exito: true,
+        codHTTP: 200,
+        explicacion: "Vehiculo actualizado correctamente.",
+        datos: resultado.rows[0]
+    };
+};
 
 
-export const eliminarVehiculo =  async (id: string):Promise<respuestaServices> => {
+// Para eliminar un vehiculo
+export const eliminarVehiculo =  async (id: string, id_proyecto : number):Promise<respuestaServices> => {
+    // Como la eliminacion es logica no se utiliza un delete solo se actualiza el campo "eliminado"
     const query = `
                     update vehiculo 
                     set eliminado = true
-                    where id_item = $1 and eliminado = false
+                    where id_item = $1 and eliminado = false and id_proyecto $2
                     returning *;
     `;
 
-    const resultado = await poolDb.query(query, [id]);
+    const resultado = await poolDb.query(query, [id, id_proyecto]);
 
     if(!resultado.rows[0]){
         return{

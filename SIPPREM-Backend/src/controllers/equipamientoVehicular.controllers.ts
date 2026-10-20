@@ -3,8 +3,8 @@ import * as EquipamientoVehiculoServices from "../services/equipamientoVehicular
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 import { identificarErrorDB } from "../utils/errorDB.utils.js";
 
-
-export const mostrarEquipamientosVehicularesControlador = async (req : Request, res: Response) =>{
+// PAra mostrar todos los equipamientos vehiculares de un proyecto
+export const mostrarEquipamientosVehicularesControlador = async (req : Request, res: Response) : Promise <void> =>{
     try{
         const {id_proyecto} = req.params;
 
@@ -27,14 +27,50 @@ export const mostrarEquipamientosVehicularesControlador = async (req : Request, 
 
     } catch (error: any) {
         console.error("Error en controlador equipamientoVehicular (mostrar) : ",error);
-        return identificarErrorDB(error, res);  
+        identificarErrorDB(error, res);
+        return;
     }
 };
 
 
-export const agregarEquipamientoVehicularControlador = async (req : Request, res: Response)=>{
+// Para consultar un único equipamiento vehicular por su id
+export const mostrarUNequipamientoVehicularControlador = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id_eq_vehicular } = req.params;
+        const { id_proyecto } = req.params;
+
+        if (!id_eq_vehicular || String(id_eq_vehicular).trim() === "" || !id_proyecto || isNaN(Number(id_proyecto))) {
+            res.status(400).json({
+                ok: false,
+                message: "Datos no validos.",
+                data: null
+            });
+            return;
+        }
+
+        const resultado: respuestaServices = await EquipamientoVehiculoServices.mostrarUNequipamientoVehicular(String(id_eq_vehicular).toUpperCase(), Number(id_proyecto));
+
+        res.status(resultado.codHTTP).json({
+            ok: resultado.exito,
+            message: resultado.explicacion,
+            data: resultado.datos
+        });
+        return;
+
+    } catch (error: any) {
+        console.error("Error en controlador equipamientoVehicular (mostrar uno): ", error);
+        identificarErrorDB(error, res);
+        return;
+    }
+};
+
+
+
+// Para agregar un equipamiento vehicular a un proyecto
+export const agregarEquipamientoVehicularControlador = async (req : Request, res: Response): Promise <void> => {
     try{
-        const {id_item, id_proyecto, id_tipo} = req.body;
+        const {id_proyecto} = req.params;
+        const {id_item, id_tipo} = req.body;
 
         if (!id_item || !id_proyecto || isNaN(Number(id_proyecto)) || !id_tipo || isNaN(Number(id_tipo))){
             res.status(400).json({
@@ -45,7 +81,7 @@ export const agregarEquipamientoVehicularControlador = async (req : Request, res
             return;
         }
     
-        const nuevoArticuloVehicular : respuestaServices = await EquipamientoVehiculoServices.agregarEquipamientoVehicular(String(id_item), Number(id_proyecto), Number(id_tipo));
+        const nuevoArticuloVehicular : respuestaServices = await EquipamientoVehiculoServices.agregarEquipamientoVehicular((String(id_item)).toUpperCase(), Number(id_proyecto), Number(id_tipo));
     
         res.status(nuevoArticuloVehicular.codHTTP).json({
             ok: nuevoArticuloVehicular.exito,
@@ -56,17 +92,95 @@ export const agregarEquipamientoVehicularControlador = async (req : Request, res
     
     } catch (error: any) {
         console.error("Error en controlador equipamientoVehicular (agregar): ",error);
-        return identificarErrorDB(error, res);        
+        identificarErrorDB(error, res);        
+        return;
     }
    
 };
 
 
-export const eliminarEquipamientoVehicularControlador = async (req : Request, res: Response) => {
+// Para actualizar los datos de un equipamiento vehicular (ej. actualizar tipo de equipamiento o reasignar vehículo/proyecto si aplica)
+export const actualizarEquipamientoVehicularControlador = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id_proyecto } = req.params;
+        const { id_eq_vehicular } = req.params;
+        const { id_tipo} = req.body;
+
+        if (!id_eq_vehicular || String(id_eq_vehicular).trim() === "") {
+            res.status(400).json({
+                ok: false,
+                message: "El identificador del equipamiento vehicular no es válido.",
+                data: null
+            });
+            return;
+        }
+
+        // NORMALIZACIÓN: Aseguramos que nunca sea undefined hacia el servicio.
+        // Si no se envía o viene vacío/inválido, se convierte explícitamente en null.
+        const idTipoFinal = (id_tipo !== undefined && id_tipo !== null && id_tipo !== "") 
+            ? Number(id_tipo) 
+            : null;
+
+        const idProyectoFinal = (id_proyecto !== undefined && id_proyecto !== null && id_proyecto !== "") 
+            ? Number(id_proyecto) 
+            : null;
+
+        // Validación: Debe proporcionarse al menos un campo a actualizar
+        if (idTipoFinal === null && idProyectoFinal === null) {
+            res.status(400).json({
+                ok: false,
+                message: "Debe proporcionar al menos un campo válido para actualizar (id_tipo o id_proyecto).",
+                data: null
+            });
+            return;
+        }
+
+        // Validación de formatos numéricos si fueron provistos
+        if (idTipoFinal !== null && (isNaN(idTipoFinal) || idTipoFinal <= 0)) {
+            res.status(400).json({
+                ok: false,
+                message: "El formato del ID del tipo de equipamiento no es válido.",
+                data: null
+            });
+            return;
+        }
+
+        if (idProyectoFinal !== null && (isNaN(idProyectoFinal) || idProyectoFinal <= 0)) {
+            res.status(400).json({
+                ok: false,
+                message: "El formato del ID de proyecto no es válido.",
+                data: null
+            });
+            return;
+        }
+
+        const resultado: respuestaServices = await EquipamientoVehiculoServices.actualizarEquipamientoVehicular(
+            String(id_eq_vehicular).toUpperCase(),
+            idTipoFinal,
+            idProyectoFinal
+        );
+
+        res.status(resultado.codHTTP).json({
+            ok: resultado.exito,
+            message: resultado.explicacion,
+            data: resultado.datos
+        });
+        return;
+
+    } catch (error: any) {
+        console.error("Error en controlador equipamientoVehicular (actualizar): ", error);
+        identificarErrorDB(error, res);
+        return;
+    }
+};
+
+//para eliminar un equipamiento vehicular de un proyecto
+export const eliminarEquipamientoVehicularControlador = async (req : Request, res: Response): Promise <void> => {
     try {
         const { id_eq_vehicular } = req.params;
+        const { id_proyecto } = req.params;
         
-        if (!id_eq_vehicular){
+        if (!id_eq_vehicular || !id_proyecto){
             res.status(400).json({
                 ok: false,
                 message: "Faltan datos para completar la accion",
@@ -75,7 +189,7 @@ export const eliminarEquipamientoVehicularControlador = async (req : Request, re
             return;
         }
 
-        const eliminado : respuestaServices = await EquipamientoVehiculoServices.eliminarEquipamientoVehicular(String(id_eq_vehicular));
+        const eliminado : respuestaServices = await EquipamientoVehiculoServices.eliminarEquipamientoVehicular((String(id_eq_vehicular)).toUpperCase(), Number(id_proyecto));
         
         res.status(eliminado.codHTTP).json({
             ok: eliminado.exito,
@@ -86,83 +200,8 @@ export const eliminarEquipamientoVehicularControlador = async (req : Request, re
     
     } catch (error: any) {
         console.error("Error en controlador equipamientoVehicular (eliminar) : ",error);
-        return identificarErrorDB(error, res);
-    }
-};
-
-
-
-/*
-export const mostrarArticuloVehicular = async (req : Request, res: Response) =>{
-    try{
-        const { id } = req.params;
-        
-        if (!id){
-            res.status(400).json({
-                ok: false,
-                message: "Faltan datos para completar la accion",
-                data : null
-            });
-            return;
-        }
-
-        const articuloVehicular : respuestaServices = await articuloVehiculoServices.verArticuloVehicular(String(id));
-    
-        res.status(articuloVehicular.codHTTP).json({
-            ok: articuloVehicular.exito,
-            message: articuloVehicular.explicacion,
-            data : articuloVehicular.datos
-        });
-        return;
-    
-        } catch (error: any) {
-            console.error("Error en controlador articuloVehicular (mostrarArticuloVehicular)",error);
-            res.status(500).json({
-                ok: false,
-                message: "Error del servidor al procesar la consulta",
-                data : null
-            });
-            return;
-        }
-   
-};
-*/
-
-/*
-export const actualizarEquipamientoVehicularControlador = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const { id_tipo, id_vehiculo } = req.body;
-
-        if (!id || !id_tipo) {
-            res.status(400).json({
-                ok: false,
-                message: "Faltan datos obligatorios para poder completar la accion",
-                data: null
-            });
-            return;
-        }
-
-        // Si id_vehiculo viene vacio se deja como null
-        const vehiculoAsignado = id_vehiculo || null;
-
-        const articuloActualizado: respuestaServices = await articuloVehiculoServices.editarArticuloVehicular(String(id), Number(id_tipo), vehiculoAsignado);
-
-        res.status(articuloActualizado.codHTTP).json({
-            ok: articuloActualizado.exito,
-            message: articuloActualizado.explicacion,
-            data: articuloActualizado.datos
-        });
-        return;
-
-    } catch (error: any) {
-        console.error("Error en controlador articuloVehicular (updateArticuloVehicular): ", error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor al procesar la consulta",
-            data: null
-        });
+        identificarErrorDB(error, res);
         return;
     }
 };
-*/
+

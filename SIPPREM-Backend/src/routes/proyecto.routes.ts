@@ -8,6 +8,9 @@ import {
   actualizarProyectoControlador,
   eliminarProyectoControlador
 } from "../controllers/proyecto.controllers.js";
+import vehiculosRutas from "./vehiculo.routes.js"
+import eqPersonalRutas from "./equipamientoPersonal.routes.js"
+import eqVehicularRutas from "./equipamientoVehicular.routes.js"
 
 const router = Router();
 
@@ -16,5 +19,9 @@ router.post("/", verificarTokenJWT, verificarRol(["admin"]), crearProyectoContro
 router.get("/:id_proyecto", verificarTokenJWT, verificarRol(["admin", "supervisor"]), obtenerProyectoPorIdControlador);
 router.put("/:id_proyecto", verificarTokenJWT, verificarRol(["admin"]), actualizarProyectoControlador);
 router.delete("/:id_proyecto", verificarTokenJWT, verificarRol(["admin"]), eliminarProyectoControlador);
+
+router.use("/:id_proyecto/vehiculos", vehiculosRutas);
+router.use("/:id_proyecto/eq_personal", eqPersonalRutas);
+router.use("/:id_proyecto/eq_vehicular", eqVehicularRutas);
 
 export default router;

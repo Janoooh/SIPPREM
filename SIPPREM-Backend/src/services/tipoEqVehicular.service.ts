@@ -1,6 +1,7 @@
 import { poolDb } from "../config/db.js";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 
+// Consulta a la base de datos por todos los tipos de equipamientos vehiculares que hay en el sistema
 export const mostrarTiposEqVehiculares= async (): Promise <respuestaServices> =>{
 
     const query = `

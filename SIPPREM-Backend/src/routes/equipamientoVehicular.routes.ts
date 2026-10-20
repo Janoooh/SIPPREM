@@ -1,13 +1,20 @@
 import { Router } from "express";
 import {mostrarEquipamientosVehicularesControlador, agregarEquipamientoVehicularControlador,eliminarEquipamientoVehicularControlador} from "../controllers/equipamientoVehicular.controllers.js"
+import {mostrarUNequipamientoVehicularControlador, actualizarEquipamientoVehicularControlador } from "../controllers/equipamientoVehicular.controllers.js"
+import { verificarTokenJWT } from "../middleware/verificarTokenJWT.js";
+import { verificarRol } from "../middleware/verificarRol.js";
+import tipoEqVehicularRutas from "./tipoEqVehicular.routes.js"
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
-router.get('/proyectos/:id_proyecto', mostrarEquipamientosVehicularesControlador);
-router.post('/', agregarEquipamientoVehicularControlador);
+// get para toda la coleccion, post y delete 
+router.get('/' , mostrarEquipamientosVehicularesControlador);
+router.get('/:id_eq_vehicular', mostrarUNequipamientoVehicularControlador);
+router.post('/' , agregarEquipamientoVehicularControlador);
+router.patch('/:id_eq_vehicular', actualizarEquipamientoVehicularControlador);
 router.delete('/:id_eq_vehicular', eliminarEquipamientoVehicularControlador);
 
-//router.put('/:id, mostrarEquipamientoVehicular);
-//router.put('/:id_eq_vehicular', actualizarEquipamientoVehicularControlador);
+//redirige a los tipos de equipamientos vehiculares
+router.use('/tipos', tipoEqVehicularRutas);
 
 export default router;
