@@ -135,6 +135,7 @@ export const eliminarUsuario = async (req: RequestConUsuario, res: Response) : P
                 message: "No puedes eliminar tu propia cuenta de usuario.",
                 data: null
             });
+            return;
         };
 
         if (id_user === "00000000-0" || id_user === "admin@sipprem.com"){
@@ -143,6 +144,7 @@ export const eliminarUsuario = async (req: RequestConUsuario, res: Response) : P
                 message: "No puedes eliminar al administrador root.",
                 data: null
             });
+            return;
         };
 
         const resEliminarUsuario : respuestaServices = await usuarioServices.eliminarUsuario(id_user);
