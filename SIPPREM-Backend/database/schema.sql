@@ -201,16 +201,9 @@ create table uso_eq_personal(
 	constraint fk_uso_eq_personal_eq_personal foreign key (id_eq_personal) references equipamiento_personal(id_item)
 );
 
-/*--------------------------------------------------------------------------------
+/*------------------------------------------------------------------------------
 
-
-AQUI PUSE UNOS TRIGGER PERO NO SE QUÉ SE VAN A VER EN EL FRONT END Y LO QUE SE
-VA A VER EN LA BASE DE DATOS.
-
-IGUAL EL GEMINI ME MANDA UNA FORMA PARA VERIFICAR QUE EL TEMAS DE LAS ZONAS, PERO NO SE
-
-
-
+TRIGGERS
 
 ---------------------------------------------------------------------------*/
 /*
@@ -236,7 +229,7 @@ end;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trg_validar_fechas_patrullaje
-BEFORE INSERT OR UPDATE ON patrullaje
+BEFORE INSERT OR UPDATE ON planificacion_patrullaje
 FOR EACH ROW
 EXECUTE FUNCTION validar_fechas_patrullaje();
 
@@ -268,7 +261,61 @@ FOR EACH ROW
 EXECUTE FUNCTION validar_horario_actividad();
 
 
+/*
+Trigger para validar que un patrullaje esté dentro de la zona delimitada por el proyecto
+*/
+CREATE OR REPLACE FUNCTION validar_zona_patrullaje()
+RETURNS TRIGGER AS $$
+DECLARE
+    zona_proyecto geometry;
+BEGIN
+    SELECT zona_seleccionada INTO zona_proyecto
+    FROM proyecto_patrullaje
+    WHERE id_proyecto = NEW.id_proyecto;
 
+    IF NOT ST_Within(NEW.zona, zona_proyecto) THEN
+        RAISE EXCEPTION 'La zona del patrullaje está fuera de la zona seleccionada.';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_verificar_zona_patrullaje
+BEFORE INSERT OR UPDATE ON planificacion_patrullaje
+FOR EACH ROW
+EXECUTE FUNCTION validar_zona_patrullaje();
+
+/*
+Trigger para que un incidente no pueda estar fuera del area de patrullaje.
+
+ESTE NO SE SI PONERLO PORQUE PUEDE OCURRIR QUE UN INCIDENTE ESTE FUERA DEL AREA POR UN PAR DE CUADRAS POR EJEMPLO
+*/
+CREATE OR REPLACE FUNCTION validar_ubicacion_incidente()
+RETURNS TRIGGER AS $$
+DECLARE
+    zona_patrullaje geometry;
+BEGIN
+    SELECT planificacion_patrullaje.zona INTO zona_patrullaje
+    FROM planificacion_patrullaje
+    JOIN ejecucion_patrullaje ON planificacion_patrullaje.id_patrullaje = ejecucion_patrullaje.id_patrullaje
+    WHERE ejecucion_patrullaje.id_patrullaje = NEW.id_patrullaje;
+
+	/* El numero al final de la funcion indica la tolerancia, es decir que tanto se puede pasar
+	 del area designada.
+	*/
+    IF NOT ST_DWithin(NEW.ubicacion::geography, zona_patrullaje::geography, 100) THEN
+        RAISE EXCEPTION 'La ubicación del incidente está muy lejos de la zona de patrullaje.';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_validar_ubicacion_incidente
+BEFORE INSERT OR UPDATE ON incidente
+FOR EACH ROW
+EXECUTE FUNCTION validar_ubicacion_incidente();
 
 /*-----------------------------------------------------------
 
@@ -334,33 +381,93 @@ INSERT INTO usuario (rut, nombre, correo, telefono, hash_contrasenia, nuevo_user
 ('98765432-1', 'Fernanda Barraza', 'fer.barra@procasting.cl', '+56987654321', '$2b$10$2NfPAyuUYxjrEpxBTIvCsuPIuVbp6x.S4W71lFbP/BdAI1qk1588e', true,CURRENT_TIMESTAMP,false, 2),
 ('11223344-5', 'Alejandro Orellana', 'jano.ohh@procasting.cl', '+56911223344', '$2b$10$llTLLOaAWqjjx.IONcwHeex9BkdHLiVV3MYfAQ/R3M14d./GIRwiW', true,CURRENT_TIMESTAMP,false, 3);
 
-INSERT INTO proyecto_patrullaje (nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, zona_seleccionada, activo, eliminado) VALUES 
+INSERT INTO proyecto_patrullaje (nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, zona_seleccionada) VALUES 
 (
     'Patrullaje SAFE ver. 2026', 
     'Sector de la moneda de 100', 
     15000000, 
     '2026-10-10', 
     '2026-12-31', 
-    ST_GeomFromText('POLYGON((-70.66 -33.44, -70.65 -33.44, -70.65 -33.45, -70.66 -33.45, -70.66 -33.44))', 4326), -- es una zona
-    true,
-	false
-);
-
-INSERT INTO acceso_proyecto (rut, id_proyecto, es_encargado) VALUES 
-('98765432-1', 1),
-('11223344-5', 1);
-
-INSERT INTO proyecto_patrullaje (nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, zona_seleccionada, activo, eliminado) VALUES 
+    ST_GeomFromText('POLYGON((-70.66 -33.44, -70.65 -33.44, -70.65 -33.45, -70.66 -33.45, -70.66 -33.44))', 4326)
+),
 (
-    'Patrullaje Narnia', 
+	'Patrullaje Narnia', 
     'Detras del closet', 
     35000000, 
     '2026-12-10', 
     '2027-04-30', 
-    ST_GeomFromText('POLYGON((-70.66 -33.44, -70.65 -33.44, -70.65 -33.45, -70.66 -33.45, -70.66 -33.44))', 4326), -- es una zona
-    true,
-	false
+    ST_GeomFromText('POLYGON((-70.6700 -33.4300, -70.6400 -33.4300, -70.6400 -33.4600, -70.6700 -33.4600, -70.6700 -33.4300))', 4326)
 );
 
-INSERT INTO acceso_proyecto (rut, id_proyecto, es_encargado) VALUES 
-('98765432-1', 2);
+INSERT INTO acceso_proyecto (rut, id_proyecto) VALUES 
+('98765432-1', 1),
+('98765432-1', 2),
+('11223344-5', 1),
+('11223344-5', 2),
+('12345678-9', 1);
+
+INSERT INTO actividad (titulo, fecha, descripcion, id_proyecto) VALUES 
+('Reunion', '2026-10-11', 'Hay que hacer la tarea', 1),
+('FUNA', '2026-12-20', 'Vamos a funar al --', 2);
+
+INSERT INTO vehiculo (id_item, id_proyecto, nombre_vehiculo, id_tipo_vehiculo) VALUES 
+('VEH-01', 1, 'Nissan v-16 tuneao', 1),
+('VEH-02', 1, 'Toyota HILUX', 2),
+('VEH-03', 2, 'YAMAHA 360cc', 3);
+
+INSERT INTO equipamiento_vehicular (id_item, id_proyecto, id_vehiculo, id_tipo_eq_vehicular) VALUES 
+('EQV-01', 1, 'VEH-01', 1),
+('EQV-02', 2, 'VEH-03', 1),
+('EQV-03', 1, 'VEH-02', 2);
+
+INSERT INTO equipamiento_personal (id_item, id_proyecto, talla, id_tipo_eq_personal) VALUES 
+('EQP-01', 1, 'L', 1),
+('EQP-02', 1, null, 5),
+('EQP-03', 2, 'XL', 1),
+('EQP-04', 2, null, 7);
+
+INSERT INTO planificacion_patrullaje (hora_inicio, hora_termino, zona, id_proyecto) VALUES 
+(
+    '2026-10-11 08:00:00', 
+    '2026-10-11 16:00:00', 
+    ST_GeomFromText('POLYGON((-70.6600 -33.4400, -70.6500 -33.4400, -70.6500 -33.4500, -70.6600 -33.4500, -70.6600 -33.4400))', 4326), -- esta es una linea
+    1
+),
+(
+	'2026-10-20 08:00:00',
+    '2026-10-20 16:00:00',
+	ST_GeomFromText('POLYGON((-70.6600 -33.4400, -70.6500 -33.4400, -70.6500 -33.4500, -70.6600 -33.4500, -70.6600 -33.4400))', 4326),
+	1
+);
+
+insert into ejecucion_patrullaje(id_patrullaje, hora_real_inicio, hora_real_termino, id_vehiculo) values
+(1, '2026-10-11 08:05:32', '2026-10-11 15:58:43', 'VEH-01'),
+(2, '2026-10-20 08:05:00', '2026-10-20 15:55:00', 'VEH-03');
+
+INSERT INTO realizacion_patrullaje (rut, id_patrullaje) VALUES 
+('11223344-5', 1),
+('11223344-5', 2);
+
+INSERT INTO uso_eq_personal (id_patrullaje, id_eq_personal) VALUES 
+(1, 'EQP-01');
+
+INSERT INTO incidente (observaciones, fecha_hora, ubicacion, nivel_gravedad, id_patrullaje, id_categoria_incidente) VALUES 
+(
+    'El edgar se saco la chucha xd', 
+    '2026-10-11 10:30:00', 
+    ST_GeomFromText('POINT(-70.6565 -33.4435)', 4326),--- este es un punto 
+    2, 
+    1, 
+    2
+),
+(
+	'Avistamiento de actividad sospechosa',
+    '2026-10-20 10:30:00',
+    ST_GeomFromText('POINT(-70.6550 -33.4450)', 4326),
+    3,
+    2,
+    1
+);
+
+INSERT INTO foto_incidente (foto, id_incidente) VALUES 
+('\x89504E470D0A1A0A0000000D49484452', 1);

@@ -3,7 +3,8 @@ import * as tipoVehiculoService from "../services/tipoVehiculo.service.js";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 import { identificarErrorDB } from "../utils/errorDB.utils.js";
 
-export const mostrarTipoVehiculoControlador = async (req: Request, res: Response) => {
+// Funcion para mostrar los tipos de vehiculos que tiene el sistema
+export const mostrarTipoVehiculoControlador = async (req: Request, res: Response): Promise <void> => {
     try {
         const tipos : respuestaServices = await tipoVehiculoService.mostrarTipoVehiculo();
     
@@ -17,6 +18,7 @@ export const mostrarTipoVehiculoControlador = async (req: Request, res: Response
 
     } catch (error: any) {
         console.error("Error en controlador tipoVehiculo: ", error);
-        return identificarErrorDB(error, res);
+        identificarErrorDB(error, res);
+        return;
     }
 };

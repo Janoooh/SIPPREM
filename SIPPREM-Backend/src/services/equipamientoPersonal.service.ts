@@ -1,11 +1,11 @@
 import { poolDb } from "../config/db.js";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 
-
+// Funcion que hace la consulta a la base de datos para mostrar los equipamientos personales de un proyecto
 export const mostrarEquipamientosPersonales= async (id_proyecto : number): Promise <respuestaServices> =>{
 
     const queryProyecto = `
-                                select * 
+                                select id_proyecto 
                                 from proyecto_patrullaje
                                 where id_proyecto = $1 and eliminado = false;
     `;
@@ -27,10 +27,10 @@ export const mostrarEquipamientosPersonales= async (id_proyecto : number): Promi
                     from equipamiento_personal
                     inner join tipo_equipamiento_personal 
                         on equipamiento_personal.id_tipo_eq_personal = tipo_equipamiento_personal.id_tipo_eq_personal
-                    where eliminado = false;
+                    where eliminado = false and id_proyecto = $1;
     `;
     
-    const resultado = await poolDb.query(query);
+    const resultado = await poolDb.query(query, [id_proyecto]);
 
     if(resultado.rows.length === 0){
         return{
@@ -50,7 +50,37 @@ export const mostrarEquipamientosPersonales= async (id_proyecto : number): Promi
 };
 
 
+// Funcion para consultar un equipamiento personal
+export const mostrarUNequipamientoPersonal = async (id_item: string, id_proyecto: number): Promise<respuestaServices> => {
+    const query = `
+        select id_item,tipo_eq_personal, talla
+        from equipamiento_personal
+        inner join tipo_equipamiento_personal 
+            on equipamiento_personal.id_tipo_eq_personal = tipo_equipamiento_personal.id_tipo_eq_personal
+        where id_item = $1 and eliminado = false and id_proyecto = $2;
+    `;
+    
+    const resultado = await poolDb.query(query, [id_item, id_proyecto]);
 
+    if (resultado.rows.length === 0) {
+        return {
+            exito: false,
+            codHTTP: 404,
+            explicacion: "Equipamiento personal no encontrado.",
+            datos: null
+        };
+    }
+
+    return {
+        exito: true,
+        codHTTP: 200,
+        explicacion: "Equipamiento personal encontrado exitosamente.",
+        datos: resultado.rows[0]
+    };
+};
+
+
+// Agrega un equipamiento personal a la base de datos
 export const agregarEquipamientoPersonal = async (id_item: string, id_proyecto: number, id_tipo: number, talla : string | null = null): Promise <respuestaServices> =>{
     const queryProyecto =`select * from proyecto_patrullaje where id_proyecto = $1 and eliminado= false;`;
     const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
@@ -94,17 +124,48 @@ export const agregarEquipamientoPersonal = async (id_item: string, id_proyecto: 
     };
 };
 
+// Funcion para actualizar un equipamiento personal usando COALESCE
+export const actualizarEquipamientoPersonal = async (id_item: string, id_tipo_eq_personal: number | null, talla: string | null, id_proyecto:number): Promise<respuestaServices> => {
+
+    const query = `
+        update equipamiento_personal
+        set 
+            id_tipo_eq_personal = coalesce($1, id_tipo_eq_personal),
+            talla = coalesce($2, talla)
+        where id_item = $3 and eliminado = false and id_proyecto = $4
+        returning id_item, id_proyecto, id_tipo_eq_personal, talla;
+    `;
+
+    const resultado = await poolDb.query(query, [id_tipo_eq_personal, talla, id_item, id_proyecto]);
+
+    if (resultado.rows.length === 0) {
+        return {
+            exito: false,
+            codHTTP: 404,
+            explicacion: "Equipamiento personal no encontrado o se encuentra eliminado.",
+            datos: null
+        };
+    }
+
+    return {
+        exito: true,
+        codHTTP: 200,
+        explicacion: "Equipamiento personal actualizado correctamente.",
+        datos: resultado.rows[0]
+    };
+};
 
 
-export const eliminarEquipamientoPersonal = async (id: string): Promise <respuestaServices>  => {
+// Elimina un equipamiento personal de la base de datos
+export const eliminarEquipamientoPersonal = async (id: string, id_proyecto: number): Promise <respuestaServices>  => {
     const query = `
                     update equipamiento_personal
                     set eliminado = true
-                    where id_item = $1 and eliminado = false
+                    where id_item = $1 and eliminado = false and id_proyecto = $2
                     returning *;
     `;
 
-    const resultado = await poolDb.query(query, [id]);
+    const resultado = await poolDb.query(query, [id, id_proyecto]);
     
     if(!resultado.rows[0]){
         return{
