@@ -1,9 +1,7 @@
 import React from 'react';
 import { 
   IonPage, 
-  IonHeader, 
-  IonToolbar, 
-  IonButtons, 
+  IonHeader,
   IonImg, 
   IonButton, 
   IonContent, 
@@ -17,19 +15,21 @@ import {
   IonCardContent,
   IonChip,
   IonLabel,
+  IonAvatar,
   useIonRouter
 } from '@ionic/react';
 import ProyectoPatrullajeCard from '../components/ProyectoPatrullajeCard';
 import HeaderSistema from '../components/HeaderSistema';
 import { proyectoPatrullaje } from '../interfaces/proyectoPatrullaje';
 import './Inicio.css';
-import { useUsuario } from '../services/obtenerUsuario';
+import { useUsuario } from '../hooks/obtenerUsuario';
 
 const Inicio: React.FC = () => {
   
   const {usuario} = useUsuario();
   const nombreUsuario = usuario.nombre;
   const rol = usuario.tipo_rol;
+  const foto = usuario.foto;
   // Creacion de proyectos de ejemplo para mostrarlos en el inicio.
   const proyectos: proyectoPatrullaje[] = [
     {
@@ -81,14 +81,16 @@ const Inicio: React.FC = () => {
               {/* Mensajes de bienvenida.*/}
               <IonRow className="ion-align-items-center ion-margin-bottom">
                 <IonCol size="auto">
-                  <IonImg src="/assets/fotoPerfil.png" alt="Profile" className="profile-picture" />
+                  <IonAvatar className="profile-avatar">
+                    <IonImg src={foto || "/assets/fotoPerfil.png"} alt="Profile" className="profile-picture" />
+                  </IonAvatar>
                 </IonCol>
                 <IonCol>
                   <IonText className="welcome-text">
                     <h1>BIENVENIDO {nombreUsuario !== 'NotData' && nombreUsuario ? nombreUsuario.toUpperCase() : 'USUARIO'}</h1>
                   </IonText>
                   <IonChip className="role-chip">
-                    <IonLabel>{rol !== 'NotData' && rol ? rol : 'SIN ROL'}</IonLabel>
+                    <IonLabel>{rol !== 'NotData' && rol ? rol.toUpperCase() : 'SIN ROL'}</IonLabel>
                   </IonChip>
                 </IonCol>
               </IonRow>

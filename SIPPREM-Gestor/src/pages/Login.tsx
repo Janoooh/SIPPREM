@@ -17,12 +17,9 @@ import {
 } from '@ionic/react';
 import React, { useState } from 'react';
 import './Login.css';
-import { apiClient } from '../services/apiClient';
-import type { respuestaApi } from '../interfaces/respuestaApi';
-import { Preferences } from '@capacitor/preferences';
-import type { dataUsuario } from '../interfaces/dataUsuario';
+import { authService } from '../services/authService';
 
-const Login: React.FC= () => {
+const Login: React.FC = () => {
 
   const [identificador, setIdentificador] = useState<string>('');
   const [clave, setPassword] = useState<string>('');
@@ -30,59 +27,47 @@ const Login: React.FC= () => {
 
   const [mandarAlerta] = useIonAlert();
 
-  // Función para manejar el inicio de sesión
+  // Funcion handleLogin: Encargada de manejar el inicio de sesion al presionar el boton de iniciar
   const handleLogin = async () => {
 
-    try{
-
-      setIdentificador(identificador.trim());
-      setPassword(clave.trim());
-
-      const datosPeticion = {idIngresado: identificador, claveIngresada: clave};
-
-      const resLogin = await apiClient.post("/auth",datosPeticion);
-      const {token,datosUsuario: datosUsuario} = resLogin.data.data;
-
-      const datosUsuarioLower : dataUsuario = {
-        rut: datosUsuario.rut.toLowerCase(),
-        nombre: datosUsuario.nombre.toLowerCase(),
-        correo: datosUsuario.correo.toLowerCase(),
-        nuevo_user: datosUsuario.nuevo_user,
-        id_rol: datosUsuario.id_rol,
-        tipo_rol: datosUsuario.tipo_rol.toLowerCase()
-      };
-
-      await Preferences.set({key:"token", value: token});
-      await Preferences.set({key:"usuario", value: JSON.stringify(datosUsuarioLower)});
-
-
-      if (datosUsuario.tipo_rol.toLowerCase() === "patrullero"){
-        mandarAlerta({
-            header: "Acceso denegado.",
-            subHeader: "No tienes acceso al sistema.",
-            message: "Este sistema es exclusivo para administradores y supervisores, no para patrulleros.",
-            buttons: ["Aceptar"]
-          });
-        router.push("/login","forward");
-        return;
-      };
-
-      if (datosUsuario.nuevo_user == true){
-        router.push("/cambiar-clave-inicial","forward");
-      }else{
-        if (datosUsuario.tipo_rol.toLowerCase() === "admin" || datosUsuario.tipo_rol.toLowerCase() === "supervisor"){
-            router.push(`/${datosUsuario.tipo_rol.toLowerCase()}/inicio`,"forward");
-        };
-      };
-
-    }catch(error: any){
-      mandarAlerta({
-          header: "Acceso denegado.",
-          subHeader: "Error de autenticacion.",
-          message: error.response?.data?.message,
-          buttons: ["Aceptar"]
+    try {
+      
+      const { datosUsuario } = await authService.iniciarSesion({
+        identificador,
+        clave
       });
-    };
+
+      // Si el usuario es un patrullero no puede acceder al gestor SIPPREM.
+      if (datosUsuario.tipo_rol === "patrullero") {
+        mandarAlerta({
+          header: "Acceso denegado.",
+          subHeader: "No tienes acceso al sistema.",
+          message: "Este sistema es exclusivo para administradores y supervisores, no para patrulleros.",
+          buttons: ["Aceptar"]
+        });
+        router.push("/login", "forward");
+        return;
+      }
+
+      if (datosUsuario.nuevo_user === true) {
+        // Redirige al cambio obligatorio de clave si es usuario nuevo
+        router.push("/cambiar-clave-inicial", "forward");
+      } else {
+        // Redirige al panel correspondiente (admin o supervisor)
+        if (datosUsuario.tipo_rol === "admin" || datosUsuario.tipo_rol === "supervisor") {
+          router.push(`/${datosUsuario.tipo_rol}/inicio`, "forward");
+        }
+      }
+
+    } catch (error: any) {
+      
+      mandarAlerta({
+        header: "Acceso denegado.",
+        subHeader: "Error de autenticacion.",
+        message: error.response?.data?.message || "No fue posible conectar con el servidor.",
+        buttons: ["Aceptar"]
+      });
+    }
   };
 
   return (

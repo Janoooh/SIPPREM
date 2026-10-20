@@ -1,0 +1,219 @@
+.usuarios-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 24px;
+}
+
+.usuarios-top-row {
+  margin-bottom: 24px;
+}
+
+.usuarios-left-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.usuarios-titulo {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.8rem;
+  display: block;
+  letter-spacing: 0.5px;
+}
+
+.btn-agregar-usuario {
+  --background: #121c27;
+  --color: white;
+  --border-color: #48D1E6;
+  --border-width: 1.5px;
+  --border-style: solid;
+  --border-radius: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: none;
+  height: 40px;
+  margin: 4px 0 0 0;
+  transition: transform 0.2s ease, --border-color 0.2s ease;
+}
+
+.btn-agregar-usuario:hover {
+  transform: translateY(-1px);
+  --border-color: white;
+}
+
+.usuarios-search-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.busqueda-wrapper {
+  width: 100%;
+}
+
+.switch-wrapper {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.switch-col {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.switch-label {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+}
+
+.custom-toggle {
+  --track-background: #121c27;
+  --track-background-checked: #48D1E6;
+  --handle-background: #d9d9d9;
+  --handle-background-checked: #121c27;
+  --handle-spacing: 3px;
+  border: 1.5px solid #121c27;
+  border-radius: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.custom-toggle.toggle-checked {
+  border-color: #48D1E6;
+}
+
+.buscar-usuario-label {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-right: 8px;
+  display: block;
+}
+
+.busqueda-item {
+  --background: #d9d9d9;
+  --border-radius: 20px;
+  border-radius: 20px;
+  border: 1.5px solid #121c27;
+  --min-height: 40px;
+  height: 40px;
+  min-width: 260px;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  --padding-top: 0px;
+  --padding-bottom: 0px;
+  --inner-padding-top: 0px;
+  --inner-padding-bottom: 0px;
+  --inner-padding-start: 0px;
+  --inner-padding-end: 0px;
+  --highlight-height: 0px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+}
+
+.busqueda-item::part(native) {
+  min-height: 40px;
+  height: 40px;
+  padding-top: 0;
+  padding-bottom: 0;
+  display: flex;
+  align-items: center;
+}
+
+.busqueda-icono {
+  color: #121c27;
+  font-size: 1.25rem;
+  margin: 0 8px 0 0 !important;
+  align-self: center !important;
+}
+
+.busqueda-input {
+  --color: #121c27;
+  --placeholder-color: #555555;
+  --placeholder-opacity: 0.8;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  --padding-top: 0px;
+  --padding-bottom: 0px;
+  --padding-start: 0px;
+  --padding-end: 0px;
+  min-height: 40px;
+  height: 40px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.busqueda-input::part(native),
+.busqueda-input input {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  height: 100% !important;
+  display: flex;
+  align-items: center;
+}
+
+.usuarios-lista-row {
+  margin-top: 10px;
+}
+
+.sin-usuarios-box {
+  background-color: #121c27;
+  border: 1px solid #48D1E6;
+  border-radius: 8px;
+  padding: 30px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.sin-usuarios-texto {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: block;
+}
+
+/* Adaptación responsive */
+@media (max-width: 768px) {
+  .usuarios-left-header {
+    margin-bottom: 20px;
+  }
+
+  .usuarios-search-col {
+    align-items: flex-start;
+  }
+
+  .busqueda-wrapper {
+    justify-content: flex-start !important;
+  }
+
+  .switch-wrapper {
+    justify-content: flex-start !important;
+  }
+
+  .switch-col {
+    justify-content: flex-start;
+  }
+
+  .busqueda-item {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .usuarios-titulo {
+    font-size: 1.5rem;
+  }
+}

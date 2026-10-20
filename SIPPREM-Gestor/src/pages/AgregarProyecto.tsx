@@ -23,7 +23,7 @@ import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './AgregarProyecto.css';
 import HeaderSistema from '../components/HeaderSistema';
-import { useUsuario } from '../services/obtenerUsuario';
+import { useUsuario } from '../hooks/obtenerUsuario';
 
 /*interface AgregarProyectoProps{
     nombreUsuario: string,

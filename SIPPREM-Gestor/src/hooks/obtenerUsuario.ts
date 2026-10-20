@@ -7,6 +7,7 @@ const sinUser: dataUsuario = {
   rut: "NotData",
   nombre: "NotData",
   correo: "NotData",
+  foto: null,
   nuevo_user: false,
   id_rol: -1,
   tipo_rol: "NotData"

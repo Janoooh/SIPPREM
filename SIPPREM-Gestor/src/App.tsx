@@ -1,15 +1,13 @@
 import { Navigate, Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { useState, useEffect } from 'react';
-import { Preferences } from '@capacitor/preferences';
-import type { dataUsuario } from './interfaces/dataUsuario';
 import { RutaProtegida } from './routes/rutaProtegida';
 import Login from './pages/Login';
 import Inicio from './pages/Inicio';
 import AgregarProyecto from './pages/AgregarProyecto';
 import InicioProyecto from './pages/InicioProyecto';
 import CambiarClaveInicial from './pages/CambiarClaveInicial';
+import Usuarios from './pages/Usuarios';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -31,7 +29,7 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import { navigate } from 'ionicons/icons';
+
 
 
 interface datosUsuario{
@@ -51,15 +49,16 @@ const App: React.FC = () => {
           {/*Ruta publica del login.*/}
           <Route path="/login" element={<Login />} />
 
-          {/*Ruta publica para cambio de clave inicial.*/}
-
           {/*Rutas protegidas.*/}
 
+          {/*Ruta de cambio de clave*/}
           <Route path="/cambiar-clave-inicial" element={
             <RutaProtegida rolesPermitidos={["admin","supervisor"]}>
               <CambiarClaveInicial />
             </RutaProtegida>
           } />
+
+          {/*Rutas de administrador*/}
 
           <Route path="/admin/inicio" element={
             <RutaProtegida rolesPermitidos={["admin"]}>
@@ -79,6 +78,14 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
+          <Route path="/admin/usuarios" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <Usuarios />
+            </RutaProtegida>
+          } />
+
+
+          {/*Rutas de supervisor*/}
 
           <Route path="/supervisor/inicio" element={
             <RutaProtegida rolesPermitidos={["supervisor"]}>

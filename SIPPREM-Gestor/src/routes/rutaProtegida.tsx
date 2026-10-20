@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { Preferences } from '@capacitor/preferences';
 import type { dataUsuario } from '../interfaces/dataUsuario';
-import { obtenerUsuarioActual } from '../services/obtenerUsuario';
+import { obtenerUsuarioActual } from '../hooks/obtenerUsuario';
 import { IonSpinner } from '@ionic/react';
 
 interface PropsRutaProtegida {

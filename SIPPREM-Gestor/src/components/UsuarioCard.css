@@ -1,0 +1,125 @@
+.usuario-card {
+  background-color: #a9c3dd;
+  border: 1px solid rgba(18, 28, 39, 0.3);
+  border-radius: 6px;
+  margin: 0 0 16px 0;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.usuario-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.usuario-card-content {
+  padding: 16px 20px;
+}
+
+.usuario-avatar-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-right: 20px;
+}
+
+.usuario-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2.5px solid #121c27;
+  background-color: #121c27;
+}
+
+.usuario-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.usuario-avatar-img::part(image) {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.usuario-info-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.usuario-nombre-rol {
+  color: #121c27;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.usuario-correo {
+  color: #26384a;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: block;
+}
+
+.usuario-acciones-col {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+.usuario-btn-accion {
+  --color: #121c27;
+  --padding-start: 6px;
+  --padding-end: 6px;
+  height: 36px;
+  margin: 0 2px;
+  font-size: 1.3rem;
+  transition: opacity 0.2s ease;
+}
+
+.usuario-btn-accion:hover {
+  opacity: 0.75;
+}
+
+.usuario-btn-eliminar:hover {
+  --color: #b71c1c;
+}
+
+.usuario-btn-restaurar:hover {
+  --color: #2e7d32;
+}
+
+.usuario-btn-editar:hover {
+  --color: #0b5394;
+}
+
+/* Adaptación responsive */
+@media (max-width: 600px) {
+  .usuario-card-content {
+    padding: 12px;
+  }
+
+  .usuario-avatar {
+    width: 65px;
+    height: 65px;
+  }
+
+  .usuario-nombre-rol {
+    font-size: 1.05rem;
+  }
+
+  .usuario-correo {
+    font-size: 0.85rem;
+  }
+
+  .usuario-btn-accion {
+    height: 30px;
+    font-size: 1.15rem;
+  }
+}

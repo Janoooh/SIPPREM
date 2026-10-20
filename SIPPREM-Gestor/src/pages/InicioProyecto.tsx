@@ -13,7 +13,7 @@ import HeaderSistema from '../components/HeaderSistema';
 import ActividadFuturaCard from '../components/ActividadFuturaCard';
 import { ActividadFutura } from '../interfaces/actividadFutura';
 import './InicioProyecto.css';
-import { useUsuario } from '../services/obtenerUsuario';
+import { useUsuario } from '../hooks/obtenerUsuario';
 
 /*interface InicioProyectoProps {
   nombreUsuario: string;

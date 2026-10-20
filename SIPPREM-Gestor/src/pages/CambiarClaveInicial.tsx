@@ -17,28 +17,24 @@ import {
   useIonAlert
 } from '@ionic/react';
 import './CambiarClaveInicial.css';
-import { apiClient } from '../services/apiClient';
-import { Preferences } from '@capacitor/preferences';
-import type { dataUsuario } from '../interfaces/dataUsuario';
-import { useUsuario } from '../services/obtenerUsuario';
-
-/*interface propsCambiarClaveUsuario {
-    usuario : dataUsuario
-};*/
+import { useUsuario } from '../hooks/obtenerUsuario';
+import { authService } from '../services/authService';
 
 const CambiarClaveInicial: React.FC = () => {
-  // Estados para capturar la nueva contraseña y su confirmación
+  // Estados para obtener la nueva contraseña ingresada y su confirmacion
   const [nuevaClave, setNuevaClave] = useState<string>('');
   const [confirmarClave, setConfirmarClave] = useState<string>('');
 
   const router = useIonRouter();
   const [mandarAlerta] = useIonAlert();
 
+  // Cargamos los datos guardados del usuario.
   const {usuario} = useUsuario();
 
-  // Función para manejar el proceso y validación del cambio de clave
+  // Funcion handleCambiarClave: Encargada de modificar la clave del usuario al presionar el boton de cambiar clave.
+  // Para lo anterior usa el authService.
   const handleCambiarClave = async () => {
-    // Validación de coincidencia de contraseñas
+    // Validamos si la clave ingresada y el confirmar clave coinciden.
     if (nuevaClave !== confirmarClave) {
       mandarAlerta({
         header: 'Error',
@@ -51,10 +47,9 @@ const CambiarClaveInicial: React.FC = () => {
 
     try{
 
-      const datosPeticion = {idIngresado: usuario.rut ,claveNuevaIng: nuevaClave};
-      const resCambiarClave = await apiClient.patch("/auth",datosPeticion);
+      // Cambiamos la clave del usuario.
+      await authService.cambiarClave({identificador: usuario.rut, clave: nuevaClave});
 
-      // Mensaje de éxito al actualizar la contraseña
       mandarAlerta({
         header: 'Clave Modificada',
         subHeader: 'Operación exitosa',
@@ -83,27 +78,25 @@ const CambiarClaveInicial: React.FC = () => {
 
   return (
     <IonPage>
-      {/* Contenedor principal con fondo oscuro correspondiente a la paleta institucional */}
+      
       <IonContent fullscreen style={{ '--background': '#3b5066' } as React.CSSProperties}>
         
-        {/* Grilla para centrar vertical y horizontalmente la tarjeta */}
         <IonGrid className="cambiar-clave-grid">
           <IonRow className="ion-align-items-center ion-justify-content-center cambiar-clave-row">
             <IonCol className="ion-text-center">
               
-              {/* Tarjeta principal con borde celeste y fondo oscuro idéntica al login */}
               <IonCard className="cambiar-clave-card">
                 
-                {/* Cabecera con logo de SIPPREM y título */}
+                
                 <IonCardHeader>
                   <IonImg src="/assets/logoSIPPREM.png" alt="SIPPREM Logo" className="cambiar-clave-logo" />
                   <IonCardTitle className="cambiar-clave-title">Cambio de Clave Inicial</IonCardTitle>
                 </IonCardHeader>
 
-                {/* Contenido del formulario */}
+                {/* Formulario de clave nueva, y confirmacion de clave. */}
                 <IonCardContent>
                   
-                  {/* Primer campo: Ingreso de la nueva clave */}
+
                   <IonLabel className="input-label">Ingrese su nueva clave:</IonLabel>
                   <IonInput
                     className="cambiar-clave-input"
@@ -112,7 +105,7 @@ const CambiarClaveInicial: React.FC = () => {
                     onIonInput={(e: any) => setNuevaClave(e.detail.value!)}
                   />
 
-                  {/* Segundo campo: Confirmación de la nueva clave */}
+
                   <IonLabel className="input-label">Confirme su nueva clave:</IonLabel>
                   <IonInput
                     className="cambiar-clave-input"
@@ -121,7 +114,7 @@ const CambiarClaveInicial: React.FC = () => {
                     onIonInput={(e: any) => setConfirmarClave(e.detail.value!)}
                   />
 
-                  {/* Botón para efectuar el cambio de clave */}
+                  {/* Boton para cambiar la clave. Usa el handleCambiarClave definido anteriormente. */}
                   <IonButton 
                     className="cambiar-clave-button" 
                     shape="round" 
