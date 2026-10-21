@@ -3,13 +3,8 @@ import type { respuestaServices } from "../interfaces/respuestaServices.js";
 
 // Consulta a la base de datos por los equipamientos vehiculares dado un proyecto
 export const mostrarEquipamientosVehiculares= async (id_proyecto: number): Promise <respuestaServices> =>{
-    
-    const queryProyecto = `
-                                select * 
-                                from proyecto_patrullaje
-                                where id_proyecto = $1 and eliminado = false;
-    `;
-
+    //Verifica que el proyecto dado exista en la base de datos
+    const queryProyecto = `select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado = false;`;
     const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
     
     if (proyecto.rows.length === 0){
@@ -21,7 +16,7 @@ export const mostrarEquipamientosVehiculares= async (id_proyecto: number): Promi
         };
     }
 
-
+    //Query para mostrar los equipamientos vehiculares relacionados a un proyecto
     const query = `
                     select id_item, tipo_eq_vehicular 
                     from equipamiento_vehicular
@@ -52,8 +47,22 @@ export const mostrarEquipamientosVehiculares= async (id_proyecto: number): Promi
 
 // Consulta a la base de datos para mostrar un único equipamiento vehicular dado su ID
 export const mostrarUNequipamientoVehicular = async (id_item: string, id_proyecto : number): Promise<respuestaServices> => {
+     //Verifica que el proyecto dado exista en la base de datos
+    const queryProyecto = `select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado = false;`;
+    const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
+    
+    if (proyecto.rows.length === 0){
+        return{
+            exito: false, 
+            codHTTP: 404,
+            explicacion : "Ese proyecto no existe.",
+            datos : null
+        };
+    }
+
+    //Query para mostrar el registro de un equipamiento vehicular en el proyecto
     const query = `
-        select id_item, id_proyecto, equipamiento_vehicular.id_tipo_eq_vehicular, tipo_eq_vehicular
+        select id_item, tipo_eq_vehicular
         from equipamiento_vehicular
         inner join tipo_equipamiento_vehicular 
             on equipamiento_vehicular.id_tipo_eq_vehicular = tipo_equipamiento_vehicular.id_tipo_eq_vehicular
@@ -80,9 +89,9 @@ export const mostrarUNequipamientoVehicular = async (id_item: string, id_proyect
 };
 
 
-
 // agregar un equipamiento vehicular a la base de datos
 export const agregarEquipamientoVehicular = async (id_item: string, id_proyecto: number, id_tipo : number): Promise <respuestaServices> =>{
+    //Se verifica que el proyecto exista
     const queryProyecto =`select * from proyecto_patrullaje where id_proyecto = $1 and eliminado= false;`;
     const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
     
@@ -95,6 +104,7 @@ export const agregarEquipamientoVehicular = async (id_item: string, id_proyecto:
         };
     }
 
+    //Se verifica que el tipo de equipamiento exista
     const queryTipoEqVehicular = `select * from tipo_equipamiento_vehicular where id_tipo_eq_vehicular = $1;`
     const vehiculo = await poolDb.query(queryTipoEqVehicular, [id_tipo]);
 
@@ -108,7 +118,21 @@ export const agregarEquipamientoVehicular = async (id_item: string, id_proyecto:
     }
 
 
+    //valida que no haya algun objeto con el mismo identificador en la base de datos
+    const queryEqVe ='select id_item from item where id_item = $1;';
+    const EqVehicular = await poolDb.query(queryEqVe, [id_item]);
 
+    if (EqVehicular.rows.length === 0){
+        return{
+            exito: false, 
+            codHTTP: 409,
+            explicacion : "Ya existe un objeto con ese identificador.",
+            datos : null
+        };
+    }
+
+
+    //Query para agregar un equipamiento a la base de datos
     const query = `
                     insert into equipamiento_vehicular (id_item, id_proyecto, id_tipo_eq_vehicular)
                     values ($1, $2, $3)
@@ -125,13 +149,21 @@ export const agregarEquipamientoVehicular = async (id_item: string, id_proyecto:
 };
 
 // Actualiza un equipamiento vehicular usando COALESCE
-export const actualizarEquipamientoVehicular = async (
-    id_item: string, 
-    id_tipo: number | null, 
-    id_proyecto: number | null
-): Promise<respuestaServices> => {
+export const actualizarEquipamientoVehicular = async (id_item: string, id_tipo: number | null, id_proyecto: number): Promise<respuestaServices> => {
+    //Se valida que exista el proyecto en la base de datos
+    const queryProyecto = `select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado = false;`;
+    const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
+    
+    if (proyecto.rows.length === 0) {
+        return {
+            exito: false,
+            codHTTP: 404,
+            explicacion: "El proyecto no existe.",
+            datos: null
+        };
+    }
 
-    // 1. Si se envía id_tipo, verificar previamente que exista en la BD
+    //Se valida el tipo de equipamiento vehicular
     if (id_tipo !== null) {
         const queryTipo = `select * from tipo_equipamiento_vehicular where id_tipo_eq_vehicular = $1;`;
         const tipoExiste = await poolDb.query(queryTipo, [id_tipo]);
@@ -146,26 +178,11 @@ export const actualizarEquipamientoVehicular = async (
         }
     }
 
-    // 2. Si se envía id_proyecto, verificar previamente que exista en la BD
-    if (id_proyecto !== null) {
-        const queryProyecto = `select * from proyecto_patrullaje where id_proyecto = $1 and eliminado = false;`;
-        const proyectoExiste = await poolDb.query(queryProyecto, [id_proyecto]);
-
-        if (proyectoExiste.rows.length === 0) {
-            return {
-                exito: false,
-                codHTTP: 404,
-                explicacion: "El proyecto especificado no existe.",
-                datos: null
-            };
-        }
-    }
-
-    // 3. Usamos COALESCE para mantener el valor actual si la variable llega como null
+    //Usamos COALESCE para mantener el valor actual si la variable llega como null
     const query = `
         update equipamiento_vehicular
         set 
-            id_tipo_eq_vehicular = coalesce($1, id_tipo_eq_vehicular),
+            id_tipo_eq_vehicular = coalesce($1, id_tipo_eq_vehicular)
         where id_item = $3 and eliminado = false and id_proyecto = $2
         returning id_item, id_proyecto, id_tipo_eq_vehicular;
     `;

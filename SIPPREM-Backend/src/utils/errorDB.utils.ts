@@ -1,5 +1,10 @@
 import type { Response } from "express";
 
+/*
+Esta es una función que es muy util para reconocer los errores tipicos arrojados por la base de datos.
+La idea es usarlo en el catch de los controladores para no tener un solo error generico.
+*/
+
 export const identificarErrorDB = (error: any, res: Response) => {
     switch (error.code) {
         case "23505": // error de duplicado
