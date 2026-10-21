@@ -21,7 +21,7 @@ export const obtenerTrabajadoresProyecto = async (id_proyecto: number): Promise<
   }
 
   const query = `
-        SELECT usuario.rut,usuario.nombre,usuario.correo,usuario.telefono,rol.tipo_rol,acceso_proyecto.es_encargado
+        SELECT usuario.rut,usuario.nombre,usuario.correo,usuario.telefono,rol.tipo_rol
         FROM acceso_proyecto
         INNER JOIN usuario ON acceso_proyecto.rut = usuario.rut
         INNER JOIN rol ON usuario.id_rol = rol.id_rol
@@ -41,7 +41,7 @@ export const obtenerTrabajadoresProyecto = async (id_proyecto: number): Promise<
 
 
 // Asignar un trabajador a un proyecto 
-export const asignarTrabajadorProyecto = async (rut: string,id_proyecto: number,es_encargado: boolean): Promise<respuestaServices> => {
+export const asignarTrabajadorProyecto = async (rut: string, id_proyecto: number): Promise<respuestaServices> => {
     //  Validamos que el proyecto exista y esté activo
     const queryProyecto = `
         SELECT id_proyecto 
@@ -95,11 +95,11 @@ export const asignarTrabajadorProyecto = async (rut: string,id_proyecto: number,
 
     // insertamos el trabajador al proyecto
     const queryInsert = `
-        INSERT INTO acceso_proyecto (rut, id_proyecto, es_encargado)
-        VALUES ($1, $2, $3)
-        RETURNING rut, id_proyecto, es_encargado;
+        INSERT INTO acceso_proyecto (rut, id_proyecto)
+        VALUES ($1, $2)
+        RETURNING rut, id_proyecto;
     `;
-    const resultado = await poolDb.query(queryInsert, [rut, id_proyecto, es_encargado]);
+    const resultado = await poolDb.query(queryInsert, [rut, id_proyecto]);
 
     return {
         exito: true,

@@ -43,7 +43,8 @@ export const obtenerTrabajadoresProyectoControlador = async (req: Request, res: 
 // Y este loquito no tiene que participar en ningún proyecto, para poder asignarlo a un proyecto 
 export const asignarTrabajadorControlador = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { rut, id_proyecto, es_encargado } = req.body;
+        const { id_proyecto } = req.params;
+        const { rut } = req.body;
 
         // Validamos que los campos que en teoría son obligatorios estén presentes y sean del tipo correcto
         if (!rut || typeof rut !== "string" || rut.trim() === "") {
@@ -64,20 +65,11 @@ export const asignarTrabajadorControlador = async (req: Request, res: Response):
             return;
         }
 
-        if (es_encargado === undefined || es_encargado === null || typeof es_encargado !== "boolean") {
-            res.status(400).json({
-                ok: false,
-                message: "El campo es_encargado es obligatorio y debe ser un booleano (true o false).",
-                data: null
-            });
-            return;
-        }
 
         // llamamos al servicio
         const resultado = await trabajadoresService.asignarTrabajadorProyecto(
             rut.trim(),
             Number(id_proyecto),
-            es_encargado
         );
 
         // la respuesta que da según el resultado devuelto por el servicio

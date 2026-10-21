@@ -11,6 +11,8 @@ import {
 import vehiculosRutas from "./vehiculo.routes.js"
 import eqPersonalRutas from "./equipamientoPersonal.routes.js"
 import eqVehicularRutas from "./equipamientoVehicular.routes.js"
+import trabajadoresRutas from "./trabajadores.routes.js";
+import actividadRutas from "./actividad.routes.js";
 
 const router = Router();
 
@@ -23,5 +25,7 @@ router.delete("/:id_proyecto", verificarTokenJWT, verificarRol(["admin"]), elimi
 router.use("/:id_proyecto/vehiculos", vehiculosRutas);
 router.use("/:id_proyecto/eq_personal", eqPersonalRutas);
 router.use("/:id_proyecto/eq_vehicular", eqVehicularRutas);
+router.use("/:id_proyecto/trabajadores", trabajadoresRutas);
+router.use("/:id_proyecto/actividades", actividadRutas);
 
 export default router;

@@ -36,7 +36,9 @@ return;
 
 export const crearActividadControlador = async(req :Request, res: Response): Promise<void> => {
     try {
-    const { titulo, fecha, descripcion, id_proyecto } = req.body;
+        const { id_proyecto } = req.params;
+    const { titulo, fecha, descripcion } = req.body;
+
     //validamos que los campos no esten vacios y que el id_proyecto sea un número
     if (!titulo || !fecha || !descripcion || !id_proyecto || isNaN(Number(id_proyecto))){
         res.status(400).json({
