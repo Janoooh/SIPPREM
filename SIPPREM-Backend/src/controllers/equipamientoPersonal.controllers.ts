@@ -73,7 +73,7 @@ export const agregarEquipamientoPersonalControlador = async (req: Request, res: 
         const { id_proyecto } = req.params;
         const { id_item, id_tipo, talla } = req.body;
 
-        if (!id_item || String(id_item).trim() === ""|| !id_proyecto || isNaN(Number(id_proyecto)) || !id_tipo || isNaN(Number(id_tipo))) {
+        if (!id_item || String(id_item).trim() === ""|| !id_proyecto || isNaN(Number(id_proyecto)) || !id_tipo || isNaN(Number(id_tipo)) || !talla ) {
             res.status(400).json({
                 ok: false,
                 message: "Faltan datos para poder completar la accion o los datos no tiene el formato correcto.",
@@ -82,7 +82,8 @@ export const agregarEquipamientoPersonalControlador = async (req: Request, res: 
             return;
         }
 
-        const nuevoEquipamiento: respuestaServices = await equipamientoPersonalServices.agregarEquipamientoPersonal((String(id_item)).toUpperCase(), Number(id_proyecto), Number(id_tipo), talla || null);
+        
+        const nuevoEquipamiento: respuestaServices = await equipamientoPersonalServices.agregarEquipamientoPersonal((String(id_item)).toUpperCase(), Number(id_proyecto), Number(id_tipo), String(talla) );
 
         res.status(nuevoEquipamiento.codHTTP).json({
             ok: nuevoEquipamiento.exito,
@@ -179,76 +180,3 @@ export const eliminarEquipamientoPersonalControlador = async (req : Request, res
             return;
         }
 };
-
-
-
-/*
-export const mostrarEquipamientoPersonalControlador = async (req:Request,  res:Response) =>{
-    try{
-        const {id} = req.params;
-
-        if (!id){
-            res.status(400).json({
-                ok: false,
-                message : "Faltan datos para completar la accion.",
-                data: null
-            });
-            return;
-        }
-
-        const eq_personal : respuestaServices = await equipamientoPersonalServices.mostrarEquipamientoPersonal(String(id));
-
-        res.status(eq_personal.codHTTP).json({
-            ok: eq_personal.exito,
-            message: eq_personal.explicacion,
-            data: eq_personal.datos
-        });
-        return;
-
-
-    }catch(error: any){
-        console.error("Error en controlador vehiculo (buscarVehiculo): ",error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor al procesar la consulta",
-            data : null
-        });
-        return;
-    }
-};
-*/
-
-/*
-export const actualizarEquipamientoPersonalControlador = async (req : Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const { id_tipo, talla } = req.body;
-
-        if (!id || !id_tipo) {
-            res.status(400).json({
-                ok: false,
-                message: "Faltan datos obligatorios para poder completar la accion",
-                data: null
-            });
-            return;
-        }
-
-        const equipamientoActualizado: respuestaServices = await equipamientoPersonalServices.actualizarEquipamientoPersonal(String(id), Number(id_tipo), talla || null);
-        
-        res.status(equipamientoActualizado.codHTTP).json({
-            ok: equipamientoActualizado.exito,
-            message: equipamientoActualizado.explicacion,
-            data: equipamientoActualizado.datos
-        });
-        return;
-
-    } catch (error: any) {
-        console.error("Error en controlador equipamientoPersonal (updateEquipamientoPersonal): ", error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor al procesar la consulta",
-            data: null
-        });
-        return;
-    }
-};*/

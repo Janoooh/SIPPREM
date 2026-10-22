@@ -7,7 +7,8 @@ import { identificarErrorDB } from "../utils/errorDB.utils.js";
 export const mostrarEquipamientosVehicularesControlador = async (req : Request, res: Response) : Promise <void> =>{
     try{
         const {id_proyecto} = req.params;
-
+        
+        // verifica que tenga el parametro del proyecto y que el dato sea numerico
         if(!id_proyecto || isNaN(Number(id_proyecto))){
             res.status(400).json({
                 ok: false,
@@ -16,6 +17,7 @@ export const mostrarEquipamientosVehicularesControlador = async (req : Request, 
             });
             return;
         }
+
         const articulosVehiculares: respuestaServices = await EquipamientoVehiculoServices.mostrarEquipamientosVehiculares(Number(id_proyecto));
         
         res.status(articulosVehiculares.codHTTP).json({
@@ -38,7 +40,8 @@ export const mostrarUNequipamientoVehicularControlador = async (req: Request, re
     try {
         const { id_eq_vehicular } = req.params;
         const { id_proyecto } = req.params;
-
+        
+        //verifica que el request tenga el id del vehiculo y el id del proyecto y que ambos esten en el formato solicitado
         if (!id_eq_vehicular || String(id_eq_vehicular).trim() === "" || !id_proyecto || isNaN(Number(id_proyecto))) {
             res.status(400).json({
                 ok: false,
@@ -106,59 +109,32 @@ export const actualizarEquipamientoVehicularControlador = async (req: Request, r
         const { id_eq_vehicular } = req.params;
         const { id_tipo} = req.body;
 
-        if (!id_eq_vehicular || String(id_eq_vehicular).trim() === "") {
+        if (!id_eq_vehicular || String(id_eq_vehicular).trim() === "" || !id_proyecto || isNaN(Number(id_proyecto))) {
             res.status(400).json({
                 ok: false,
-                message: "El identificador del equipamiento vehicular no es válido.",
+                message: "Los datos no son validos.",
                 data: null
             });
             return;
         }
 
-        // NORMALIZACIÓN: Aseguramos que nunca sea undefined hacia el servicio.
         // Si no se envía o viene vacío/inválido, se convierte explícitamente en null.
         const idTipoFinal = (id_tipo !== undefined && id_tipo !== null && id_tipo !== "") 
             ? Number(id_tipo) 
             : null;
 
-        const idProyectoFinal = (id_proyecto !== undefined && id_proyecto !== null && id_proyecto !== "") 
-            ? Number(id_proyecto) 
-            : null;
 
         // Validación: Debe proporcionarse al menos un campo a actualizar
-        if (idTipoFinal === null && idProyectoFinal === null) {
+        if (idTipoFinal === null) {
             res.status(400).json({
                 ok: false,
-                message: "Debe proporcionar al menos un campo válido para actualizar (id_tipo o id_proyecto).",
+                message: "Debe proporcionar al menos un campo válido para actualizar.",
                 data: null
             });
             return;
         }
 
-        // Validación de formatos numéricos si fueron provistos
-        if (idTipoFinal !== null && (isNaN(idTipoFinal) || idTipoFinal <= 0)) {
-            res.status(400).json({
-                ok: false,
-                message: "El formato del ID del tipo de equipamiento no es válido.",
-                data: null
-            });
-            return;
-        }
-
-        if (idProyectoFinal !== null && (isNaN(idProyectoFinal) || idProyectoFinal <= 0)) {
-            res.status(400).json({
-                ok: false,
-                message: "El formato del ID de proyecto no es válido.",
-                data: null
-            });
-            return;
-        }
-
-        const resultado: respuestaServices = await EquipamientoVehiculoServices.actualizarEquipamientoVehicular(
-            String(id_eq_vehicular).toUpperCase(),
-            idTipoFinal,
-            idProyectoFinal
-        );
+        const resultado: respuestaServices = await EquipamientoVehiculoServices.actualizarEquipamientoVehicular(String(id_eq_vehicular).toUpperCase(),idTipoFinal, Number(id_proyecto));
 
         res.status(resultado.codHTTP).json({
             ok: resultado.exito,

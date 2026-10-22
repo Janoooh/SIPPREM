@@ -120,7 +120,7 @@ create table tipo_equipamiento_personal (
 );
 
 create table equipamiento_personal(
-	talla varchar(10),
+	talla varchar(10) not null,
 	id_tipo_eq_personal integer not null,
 
 	constraint pk_equipamiento_personal primary key (id_item),
@@ -422,9 +422,9 @@ INSERT INTO equipamiento_vehicular (id_item, id_proyecto, id_vehiculo, id_tipo_e
 
 INSERT INTO equipamiento_personal (id_item, id_proyecto, talla, id_tipo_eq_personal) VALUES 
 ('EQP-01', 1, 'L', 1),
-('EQP-02', 1, null, 5),
+('EQP-02', 1, 'No aplica', 5),
 ('EQP-03', 2, 'XL', 1),
-('EQP-04', 2, null, 7);
+('EQP-04', 2, 'No aplica', 7);
 
 INSERT INTO planificacion_patrullaje (hora_inicio, hora_termino, zona, id_proyecto) VALUES 
 (

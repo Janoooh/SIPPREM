@@ -6,6 +6,6 @@ import { verificarRol } from "../middleware/verificarRol.js";
 const router = Router();
 
 // solo tiene el get, ya que solo es necesario ver estos datos
-router.get('/' , mostrarTiposEqPersonalControlador);
+router.get('/', verificarTokenJWT, verificarRol(["admin","supervisor"]), mostrarTiposEqPersonalControlador);
 
 export default router;

@@ -132,7 +132,7 @@ export const eliminarActividad = async (id_actividad: number): Promise<respuesta
         UPDATE actividad
         SET eliminado = true
         WHERE id_actividad = $1
-        RETURNING id_actividad, nombre, descripcion, eliminado;
+        RETURNING id_actividad, titulo, descripcion, eliminado;
     `;
     const resultadoEliminacion = await poolDb.query(consultaEliminar, [id_actividad]);
 

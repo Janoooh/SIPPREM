@@ -3,10 +3,10 @@ import { obtenerTrabajadoresProyectoControlador } from "../controllers/trabajado
 import { asignarTrabajadorControlador } from "../controllers/trabajadores.controllers.js";
 import { sacarTrabajadorControlador} from "../controllers/trabajadores.controllers.js";
 
-const router = Router();
+const router = Router({mergeParams: true}); 
 
-router.get('/proyecto/:id_proyecto', obtenerTrabajadoresProyectoControlador);
+router.get('/', obtenerTrabajadoresProyectoControlador);
 router.post("/", asignarTrabajadorControlador);
-router.delete("/proyecto/:id_proyecto/usuario/:rut", sacarTrabajadorControlador);
+router.delete("/:rut", sacarTrabajadorControlador);
 
 export default router;

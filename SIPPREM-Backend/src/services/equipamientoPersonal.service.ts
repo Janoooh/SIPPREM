@@ -3,13 +3,8 @@ import type { respuestaServices } from "../interfaces/respuestaServices.js";
 
 // Funcion que hace la consulta a la base de datos para mostrar los equipamientos personales de un proyecto
 export const mostrarEquipamientosPersonales= async (id_proyecto : number): Promise <respuestaServices> =>{
-
-    const queryProyecto = `
-                                select id_proyecto 
-                                from proyecto_patrullaje
-                                where id_proyecto = $1 and eliminado = false;
-    `;
-
+    // Valida que el proyecto exista
+    const queryProyecto = `select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado = false;`;
     const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
     
     if (proyecto.rows.length === 0){
@@ -21,7 +16,7 @@ export const mostrarEquipamientosPersonales= async (id_proyecto : number): Promi
         };
     }
 
-
+    //SE hace la consulta a la base de datos para que muestre todos los equipamientos personales en el proyecto
     const query = `
                     select id_item, talla, tipo_eq_personal
                     from equipamiento_personal
@@ -52,6 +47,20 @@ export const mostrarEquipamientosPersonales= async (id_proyecto : number): Promi
 
 // Funcion para consultar un equipamiento personal
 export const mostrarUNequipamientoPersonal = async (id_item: string, id_proyecto: number): Promise<respuestaServices> => {
+        // Valida que el proyecto exista
+    const queryProyecto = `select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado = false;`;
+    const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
+    
+    if (proyecto.rows.length === 0){
+        return{
+            exito: false, 
+            codHTTP: 404,
+            explicacion : "Ese proyecto no existe.",
+            datos : null
+        };
+    }
+
+    //Query para que muestre el registro con el id dado dentro del proyecto indicado
     const query = `
         select id_item,tipo_eq_personal, talla
         from equipamiento_personal
@@ -81,8 +90,9 @@ export const mostrarUNequipamientoPersonal = async (id_item: string, id_proyecto
 
 
 // Agrega un equipamiento personal a la base de datos
-export const agregarEquipamientoPersonal = async (id_item: string, id_proyecto: number, id_tipo: number, talla : string | null = null): Promise <respuestaServices> =>{
-    const queryProyecto =`select * from proyecto_patrullaje where id_proyecto = $1 and eliminado= false;`;
+export const agregarEquipamientoPersonal = async (id_item: string, id_proyecto: number, id_tipo: number, talla : string): Promise <respuestaServices> =>{
+    //Verifica que el proyecto exista
+    const queryProyecto =`select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado= false;`;
     const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
     
     if (proyecto.rows.length === 0){
@@ -94,7 +104,8 @@ export const agregarEquipamientoPersonal = async (id_item: string, id_proyecto: 
         };
     }
 
-    const queryTipoEqPersonal = `select * from tipo_equipamiento_personal where id_tipo_eq_personal = $1;`
+    //Verifica que el equipamiento personal exista
+    const queryTipoEqPersonal = `select id_tipo_eq_personal from tipo_equipamiento_personal where id_tipo_eq_personal = $1;`
     const vehiculo = await poolDb.query(queryTipoEqPersonal, [id_tipo]);
 
     if (vehiculo.rows.length === 0){
@@ -106,16 +117,27 @@ export const agregarEquipamientoPersonal = async (id_item: string, id_proyecto: 
         };
     }
     
-    
+    //valida que no haya algun objeto con el mismo identificador en la base de datos
+    const queryEqPer ='select id_item from item where id_item = $1;';
+    const EqPersonal = await poolDb.query(queryEqPer, [id_item]);
+
+    if (EqPersonal.rows.length === 0){
+        return{
+            exito: false, 
+            codHTTP: 409,
+            explicacion : "Ya existe un objeto con ese identificador.",
+            datos : null
+        };
+    }
+
+    //Luego de todas la verificaciones se agrega el equipamiento
     const query = `
                     insert into equipamiento_personal (id_item, id_proyecto, id_tipo_eq_personal, talla)
                     values ($1, $2, $3, $4)
                     returning *;
     `;
     
-    const tallaValor = talla && talla.trim() !== "" ? talla : null;
-
-    const resultado = await poolDb.query(query, [id_item, id_proyecto, id_tipo, tallaValor]);
+    const resultado = await poolDb.query(query, [id_item, id_proyecto, id_tipo, talla]);
     return {
         exito: true, 
         codHTTP: 201,
@@ -125,8 +147,36 @@ export const agregarEquipamientoPersonal = async (id_item: string, id_proyecto: 
 };
 
 // Funcion para actualizar un equipamiento personal usando COALESCE
-export const actualizarEquipamientoPersonal = async (id_item: string, id_tipo_eq_personal: number | null, talla: string | null, id_proyecto:number): Promise<respuestaServices> => {
+export const actualizarEquipamientoPersonal = async (id_item: string, id_tipo: number | null, talla: string | null, id_proyecto:number): Promise<respuestaServices> => {
+    //Se valida que exista el proyecto en la base de datos
+    const queryProyecto = `select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado = false;`;
+    const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
+    
+    if (proyecto.rows.length === 0) {
+        return {
+            exito: false,
+            codHTTP: 404,
+            explicacion: "El proyecto no existe.",
+            datos: null
+        };
+    }
 
+    //Se valida el tipo de equipamiento personal
+    if (id_tipo !== null) {
+        const queryTipo = `select id_tipo_eq_personal from tipo_equipamiento_personal where id_tipo_eq_personal = $1;`;
+        const tipoExiste = await poolDb.query(queryTipo, [id_tipo]);
+
+        if (tipoExiste.rows.length === 0) {
+            return {
+                exito: false,
+                codHTTP: 404,
+                explicacion: "El tipo de equipamiento personal especificado no existe.",
+                datos: null
+            };
+        }
+    }
+
+    //query para modificar el equipamiento dado
     const query = `
         update equipamiento_personal
         set 
@@ -136,7 +186,7 @@ export const actualizarEquipamientoPersonal = async (id_item: string, id_tipo_eq
         returning id_item, id_proyecto, id_tipo_eq_personal, talla;
     `;
 
-    const resultado = await poolDb.query(query, [id_tipo_eq_personal, talla, id_item, id_proyecto]);
+    const resultado = await poolDb.query(query, [id_tipo, talla, id_item, id_proyecto]);
 
     if (resultado.rows.length === 0) {
         return {

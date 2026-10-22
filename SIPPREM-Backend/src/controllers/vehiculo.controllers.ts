@@ -56,7 +56,7 @@ export const mostrarUNvehiculoControlador = async (req: Request, res: Response):
         }
 
         // se llama a la funcion que hace la consulta a la base de datos. 
-        const vehiculos : respuestaServices = await vehiculoServices.mostrarUNvehiculo(String(id_vehiculo), Number(id_proyecto));
+        const vehiculos : respuestaServices = await vehiculoServices.mostrarUNvehiculo((String(id_vehiculo)).toLocaleUpperCase(), Number(id_proyecto));
         
         // Se retorna la respuesta 
         res.status(vehiculos.codHTTP).json({
@@ -115,17 +115,17 @@ export const actualizarVehiculoControlador = async (req: Request, res: Response)
         const { nombre_vehiculo, id_tipo_vehiculo } = req.body;
 
         // Validar que el id no sea null o undefined
-        if (!id_vehiculo || String(id_proyecto).trim() === "") {
+        if (!id_vehiculo || String(id_vehiculo).trim() === "" || !id_proyecto ||  isNaN(Number(id_proyecto)) ){
             res.status(400).json({
                 ok: false,
-                message: "Se requiere el id del vehículo para actualizar.",
+                message: "Faltan datos.",
                 data: null
             });
             return;
         }
 
         // Validar que al menos uno de los campos a actualizar esté presente
-        if (!nombre_vehiculo && !id_tipo_vehiculo && !id_proyecto) {
+        if (!nombre_vehiculo && !id_tipo_vehiculo) {
             res.status(400).json({
                 ok: false,
                 message: "Debe enviar al menos un campo para actualizar.",
@@ -137,9 +137,8 @@ export const actualizarVehiculoControlador = async (req: Request, res: Response)
         // Validaciones para que los datos se vayan como null o como un dato correcto
         const nombreFinal = (nombre_vehiculo && nombre_vehiculo.trim() !== "") ? nombre_vehiculo : null;
         const tipoVehiculoFinal = id_tipo_vehiculo ? Number(id_tipo_vehiculo) : null;
-        const proyectoFinal = id_proyecto ? Number(id_proyecto) : null;
 
-        const resultado: respuestaServices = await vehiculoServices.actualizarVehiculo(String(id_vehiculo), nombreFinal, tipoVehiculoFinal, proyectoFinal);
+        const resultado: respuestaServices = await vehiculoServices.actualizarVehiculo((String(id_vehiculo)).toUpperCase(), nombreFinal, tipoVehiculoFinal, Number(id_proyecto));
 
         res.status(resultado.codHTTP).json({
             ok: resultado.exito,
