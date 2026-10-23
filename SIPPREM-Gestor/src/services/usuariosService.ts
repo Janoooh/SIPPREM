@@ -1,3 +1,4 @@
+import { dataUsuario } from '../interfaces/dataUsuario';
 import { apiClient } from './apiClient';
 
 export const usuariosService = {
@@ -10,6 +11,14 @@ export const usuariosService = {
         const resObtenerUsuarios = await apiClient.get("/usuarios", { params });
         
         return resObtenerUsuarios.data.data;
+    },
+
+    /*Funcion crearUsuario: Encargada de crear un usuario nuevo en el sistema, enviando
+    la informacion al backend para hacer el almacenamiento de dichos datos. */
+    crearUsuario: async (nuevoUsuario: dataUsuario) => {
+        
+        const resCrearUsuario = await apiClient.post("/usuarios",nuevoUsuario);
+        return resCrearUsuario;
     },
 
     /*Funcion eliminarUsuario: Encargada de eliminar un usuario de la base de datos,

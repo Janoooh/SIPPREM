@@ -104,13 +104,7 @@ const Usuarios: React.FC = () => {
   // Funcion handleAgregarUsuario: Representa la logica a ejecutar cuando el usuario
   // presione el boton de agregar usuario.
   const handleAgregarUsuario = () => {
-    
-    // AQUI A FUTURO TENGO QUE PONERLE LO DE REEDIRIGIR AL FORM PARA CREAR USUARIO.
-    mandarAlerta({
-      header: 'Agregar usuario',
-      message: 'TENGO QUE CAMBIAR ESTO POR EL FORMULARIO',
-      buttons: ['Entendido']
-    });
+    router.push("/admin/usuarios/agregar",'forward');
   };
 
   // Funcion handleEditarUsuario: Representa la logica a ejecutar cuando el usuario
@@ -159,11 +153,19 @@ const Usuarios: React.FC = () => {
         },
         {
           text: 'Eliminar',
-          handler: () => {
+          handler: async () => {
             // Usamos eliminarUsuario de usuariosServices para quitar al user del backend, y 
             // actualizamos la lista de usuarios quitandolo.
-            usuariosService.eliminarUsuario(usuarioSeleccionado.rut);
-            setUsuarios((prev) => prev.filter((u) => u.rut !== usuarioSeleccionado.rut));
+            try{
+              await usuariosService.eliminarUsuario(usuarioSeleccionado.rut);
+              setUsuarios((prev) => prev.filter((u) => u.rut !== usuarioSeleccionado.rut));
+            }catch(error: any){
+              mandarAlerta({
+                header: 'Error al eliminar',
+                message: error.response?.data?.message || 'No fue posible eliminar al usuario del servidor.',
+                buttons: ['Aceptar']
+              });
+            }
           }
         }
       ]
@@ -184,11 +186,19 @@ const Usuarios: React.FC = () => {
         },
         {
           text: 'Restaurar',
-          handler: () => {
+          handler: async () => {
             // Usamos restaurarUsuario de usuariosServices para restaurar al user del backend, y 
             // actualizamos la lista de usuarios quitando al restaurado.
-            usuariosService.restaurarUsuario(usuarioSeleccionado.rut);
-            setUsuarios((prev) => prev.filter((u) => u.rut !== usuarioSeleccionado.rut));
+            try{
+              await usuariosService.restaurarUsuario(usuarioSeleccionado.rut);
+              setUsuarios((prev) => prev.filter((u) => u.rut !== usuarioSeleccionado.rut));
+            }catch(error: any){
+              mandarAlerta({
+                header: 'Error al restaurar',
+                message: error.response?.data?.message || 'No fue posible restaurar al usuario.',
+                buttons: ['Aceptar']
+              });
+            };
           }
         }
       ]
@@ -199,7 +209,7 @@ const Usuarios: React.FC = () => {
     <IonPage>
       
       <IonHeader className="ion-no-border">
-        <HeaderSistema nombreUsuario={nombreUsuario} rol={rol} />
+        <HeaderSistema rol={rol} />
       </IonHeader>
 
 

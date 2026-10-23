@@ -11,11 +11,10 @@ import {
 import './HeaderSistema.css';
 
 interface HeaderSistemaProps{
-    nombreUsuario: string,
     rol: string
 };
 
-const HeaderSistema: React.FC<HeaderSistemaProps> = ({nombreUsuario ,rol}) => {
+const HeaderSistema: React.FC<HeaderSistemaProps> = ({rol}) => {
     const router = useIonRouter();
     const esUsuariosActivo = window.location.pathname.includes('/usuarios');
 

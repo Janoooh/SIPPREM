@@ -38,7 +38,7 @@ const InicioProyecto: React.FC = () => {
     <IonPage>
       
       <IonHeader className="ion-no-border">
-        <HeaderSistema nombreUsuario={nombreUsuario} rol={rol} />
+        <HeaderSistema rol={rol} />
       </IonHeader>
 
       <IonContent fullscreen style={{ '--background': '#4a5e73' } as React.CSSProperties}>
