@@ -4,6 +4,7 @@ import rutasUsuario from "./routes/usuario.routes.js";
 import rutasProyecto from "./routes/proyecto.routes.js";
 import dotenv from "dotenv";
 import cors from "cors";
+import { verificarTokenJWT } from "./middleware/verificarTokenJWT.js";
 
 dotenv.config();
 
@@ -40,8 +41,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/auth",rutasAuth);
-app.use("/api/v1/usuarios", rutasUsuario);
-app.use("/api/v1/proyectos", rutasProyecto);
+app.use("/api/v1/usuarios", verificarTokenJWT, rutasUsuario);
+app.use("/api/v1/proyectos", verificarTokenJWT,rutasProyecto);
 
 
 /*

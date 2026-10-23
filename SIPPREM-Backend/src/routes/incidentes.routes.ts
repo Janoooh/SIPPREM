@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { verificarTokenJWT } from "../middleware/verificarTokenJWT.js";
 import { verificarRol } from "../middleware/verificarRol.js";
 import {
   obtenerIncidentesControlador,
@@ -9,8 +8,8 @@ import {
 
 const router = Router({ mergeParams: true });
 
-router.get("/", verificarTokenJWT, verificarRol(["admin", "supervisor"]), obtenerIncidentesControlador);
-router.post("/", verificarTokenJWT, verificarRol(["admin", "supervisor", "patrullero"]), crearIncidenteControlador);
-router.get("/:id_incidente", verificarTokenJWT, verificarRol(["admin", "supervisor", "patrullero"]), obtenerIncidentePorIdControlador);
+router.get("/", verificarRol(["admin", "supervisor"]), obtenerIncidentesControlador);
+router.post("/", verificarRol(["admin", "supervisor", "patrullero"]), crearIncidenteControlador);
+router.get("/:id_incidente", verificarRol(["admin", "supervisor", "patrullero"]), obtenerIncidentePorIdControlador);
 
 export default router;

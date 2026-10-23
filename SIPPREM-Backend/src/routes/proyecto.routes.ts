@@ -1,5 +1,4 @@
 import {Router} from "express";
-import {verificarTokenJWT} from "../middleware/verificarTokenJWT.js";
 import {verificarRol} from "../middleware/verificarRol.js";
 import {
   obtenerProyectosControlador,
@@ -17,11 +16,11 @@ import incidentesRutas from "./incidentes.routes.js";
 
 const router = Router();
 
-router.get("/", verificarTokenJWT, verificarRol(["admin", "supervisor"]), obtenerProyectosControlador);
-router.post("/", verificarTokenJWT, verificarRol(["admin"]), crearProyectoControlador);
-router.get("/:id_proyecto", verificarTokenJWT, verificarRol(["admin", "supervisor"]), obtenerProyectoPorIdControlador);
-router.put("/:id_proyecto", verificarTokenJWT, verificarRol(["admin"]), actualizarProyectoControlador);
-router.delete("/:id_proyecto", verificarTokenJWT, verificarRol(["admin"]), eliminarProyectoControlador);
+router.get("/", verificarRol(["admin", "supervisor"]), obtenerProyectosControlador);
+router.post("/", verificarRol(["admin"]), crearProyectoControlador);
+router.get("/:id_proyecto", verificarRol(["admin", "supervisor"]), obtenerProyectoPorIdControlador);
+router.put("/:id_proyecto", verificarRol(["admin"]), actualizarProyectoControlador);
+router.delete("/:id_proyecto", verificarRol(["admin"]), eliminarProyectoControlador);
 
 router.use("/:id_proyecto/vehiculos", vehiculosRutas);
 router.use("/:id_proyecto/eq_personal", eqPersonalRutas);

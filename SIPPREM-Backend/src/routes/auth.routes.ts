@@ -7,6 +7,6 @@ import { verificarRol } from "../middleware/verificarRol.js";
 const router = Router();
 
 router.post("/",login);
-router.patch("/", verificarTokenJWT, verificarRol(["admin","supervisor"]) ,cambiarClave);
+router.patch("/", verificarTokenJWT, verificarRol(["admin","supervisor","patrullero"]) ,cambiarClave);
 
 export default router;
