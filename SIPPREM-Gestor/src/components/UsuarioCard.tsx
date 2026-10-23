@@ -11,7 +11,7 @@ import {
   IonButton, 
   IonIcon 
 } from '@ionic/react';
-import { trashOutline, createOutline, arrowUndoCircleOutline } from 'ionicons/icons';
+import { trashOutline, createOutline, arrowUndoCircleOutline, keyOutline } from 'ionicons/icons';
 import './UsuarioCard.css';
 
 /*
@@ -30,6 +30,7 @@ export interface UsuarioCardProps {
   onEditar?: () => void;
   onEliminar?: () => void;
   onRestaurar?: () => void;
+  onRestablecerClave?: () => void;
 }
 
 
@@ -41,7 +42,8 @@ const UsuarioCard: React.FC<UsuarioCardProps> = ({
   eliminado, 
   onEditar, 
   onEliminar,
-  onRestaurar 
+  onRestaurar,
+  onRestablecerClave 
 }) => {
   return (
     <IonCard className="usuario-card">
@@ -93,6 +95,17 @@ const UsuarioCard: React.FC<UsuarioCardProps> = ({
                   >
                     <IonIcon slot="icon-only" icon={arrowUndoCircleOutline} />
                   </IonButton>}
+
+              {!eliminado && (
+                <IonButton 
+                  fill="clear" 
+                  className="usuario-btn-accion usuario-btn-clave"
+                  onClick={onRestablecerClave}
+                  title="Restablecer contraseña"
+                >
+                  <IonIcon slot="icon-only" icon={keyOutline} />
+                </IonButton>
+              )}
               
 
               <IonButton 

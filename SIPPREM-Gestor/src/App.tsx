@@ -9,6 +9,7 @@ import InicioProyecto from './pages/InicioProyecto';
 import CambiarClaveInicial from './pages/CambiarClaveInicial';
 import Usuarios from './pages/Usuarios';
 import AgregarUsuario from './pages/AgregarUsuario';
+import ModificarUsuario from './pages/ModificarUsuario';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -88,6 +89,12 @@ const App: React.FC = () => {
           <Route path="/admin/usuarios/agregar" element={
             <RutaProtegida rolesPermitidos={["admin"]}>
                 <AgregarUsuario />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/usuarios/editar/:id_user" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <ModificarUsuario />
             </RutaProtegida>
           } />
 

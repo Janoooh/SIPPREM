@@ -133,7 +133,7 @@ const FormularioUsuario: React.FC<FormularioUsuarioProps> = ({
       rut: rut.trim(),
       nombre: nombre.trim(),
       correo: correo.trim().toLowerCase(),
-      telefono: telefono.trim() ? `+56${telefono.trim()}` : '',
+      telefono: telefono.trim() ? `${telefono.trim()}` : '',
       id_rol: idRol as number,
       foto: foto,
       tipo_rol: idRol === 1 ? "admin" : idRol === 2 ? "supervisor" : "patrullero"

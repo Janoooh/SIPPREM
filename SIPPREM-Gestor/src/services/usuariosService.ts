@@ -17,8 +17,20 @@ export const usuariosService = {
     la informacion al backend para hacer el almacenamiento de dichos datos. */
     crearUsuario: async (nuevoUsuario: dataUsuario) => {
         
-        const resCrearUsuario = await apiClient.post("/usuarios",nuevoUsuario);
+        const resCrearUsuario = await apiClient.post("/usuarios", nuevoUsuario);
         return resCrearUsuario;
+    },
+
+    obtenerUsuario: async (id_user: string) => {
+        
+        const resObtenerUsuario = await apiClient.get(`/usuarios/${id_user}`);
+        return resObtenerUsuario;
+    },
+
+    modificarUsuario: async (usuarioModificado: dataUsuario) => {
+
+        const resModificarUsuario = await apiClient.put(`/usuarios/${usuarioModificado.rut}`,usuarioModificado);
+        return resModificarUsuario;
     },
 
     /*Funcion eliminarUsuario: Encargada de eliminar un usuario de la base de datos,
@@ -26,7 +38,7 @@ export const usuariosService = {
     eliminarUsuario: async (id_user: string) => {
 
         const resEliminarUsuario = await apiClient.delete(`/usuarios/${id_user}`);
-        return;
+        return resEliminarUsuario;
     },
 
     /*Funcion restaurarUsuario: Encargada de restaurar un usuario que fue eliminado de 
@@ -35,7 +47,16 @@ export const usuariosService = {
     restaurarUsuario: async (id_user: string) => {
 
         const resRestaurarUsuario = await apiClient.patch(`/usuarios/${id_user}/restaurar`);
-        return;
+        return resRestaurarUsuario;
+    },
+
+    /*Funcion reestablecerClave: Encargada de solicitar al backend el restablecimiento
+    de la contrasenia de un usuario a una aleatoria, con tal de poder cambiar su contrasenia
+    cuando vuelva a entrar al sistema.*/
+    reestablecerClave: async (id_user: string) => {
+
+        const resReestablecer = await apiClient.patch(`/usuarios/${id_user}/reestablecer-clave`);
+        return resReestablecer;
     }
 
 };

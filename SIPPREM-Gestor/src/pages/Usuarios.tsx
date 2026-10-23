@@ -16,9 +16,10 @@ import {
   IonToggle,
   useIonViewWillEnter,
   useIonRouter,
-  useIonAlert
+  useIonAlert,
+  useIonToast
 } from '@ionic/react';
-import { searchOutline } from 'ionicons/icons';
+import { clipboard, searchOutline } from 'ionicons/icons';
 import HeaderSistema from '../components/HeaderSistema';
 import UsuarioCard from '../components/UsuarioCard';
 import { useUsuario } from '../hooks/obtenerUsuario';
@@ -40,6 +41,9 @@ const Usuarios: React.FC = () => {
 
   const router = useIonRouter();
   const [mandarAlerta] = useIonAlert();
+  const [mandarAlertaDeClave] = useIonAlert();
+
+  const [mandarToast] = useIonToast();
 
   // Estado para cargar lista de usuarios.
   const [usuarios, setUsuarios] = useState<dataUsuarioConEliminar[]>([]);
@@ -110,12 +114,7 @@ const Usuarios: React.FC = () => {
   // Funcion handleEditarUsuario: Representa la logica a ejecutar cuando el usuario
   // presione el boton de modificar usuario, que esta en la usuarioCard.
   const handleEditarUsuario = (usuarioSeleccionado: dataUsuarioConEliminar) => {
-    // AQUI A FUTURO TENGO QUE PONERLE LO DE REEDIRIGIR AL FORM PARA MODIFICAR USUARIO.
-    mandarAlerta({
-      header: 'Editar usuario',
-      message: `CAMBIAR ESTO POR UNA REEDIRECCION AL FORM DE MODIFICAR.`,
-      buttons: ['Aceptar']
-    });
+    router.push(`/admin/usuarios/editar/${usuarioSeleccionado.rut}`,"forward");
   };
 
   // Funcion handleEliminarUsuario: Representa la logica a ejecutar cuando el usuario
@@ -199,6 +198,57 @@ const Usuarios: React.FC = () => {
                 buttons: ['Aceptar']
               });
             };
+          }
+        }
+      ]
+    });
+  };
+
+  // Funcion handleRestablecerClave: Representa la logica para restablecer la clave
+  // de un usuario seleccionado a una clave aleatoria usando usuariosService.
+  const handleRestablecerClave = (usuarioSeleccionado: dataUsuarioConEliminar) => {
+    mandarAlerta({
+      header: 'Restablecer contraseña',
+      subHeader: usuarioSeleccionado.nombre,
+      message: '¿Está seguro de que desea restablecer la contraseña a una clave aleatoria?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Restablecer',
+          handler: async () => {
+            try {
+              const res = await usuariosService.reestablecerClave(usuarioSeleccionado.rut);
+              
+              mandarAlertaDeClave({
+                header: 'Contraseña restablecida',
+                subHeader: `LA CLAVE ALEATORIA ES: ${res.data?.data}`,
+                message: 'La contraseña se restableció correctamente.',
+                buttons: [{text: 'Copiar clave y aceptar',
+                        handler: () => {
+                          navigator.clipboard.writeText(res.data?.data);
+                          mandarToast({
+                            message: '¡Clave copiada al portapapeles!',
+                            duration: 3000, // 3 segundos de duracion
+                            position: 'bottom',
+                            color: 'success'
+                          });
+                          return true;
+                        }
+                }]
+              });
+              
+            } catch (error: any) {
+              
+              mandarAlertaDeClave({
+                header: 'Error al restablecer',
+                message: error.response?.data?.message || 'No fue posible restablecer la contraseña.',
+                buttons: ['Aceptar']
+              });
+              
+            }
           }
         }
       ]
@@ -303,6 +353,7 @@ const Usuarios: React.FC = () => {
                       onEditar={() => handleEditarUsuario(usuarioItem)}
                       onEliminar={() => handleEliminarUsuario(usuarioItem)}
                       onRestaurar={() => handleRestaurarUsuario(usuarioItem)}
+                      onRestablecerClave={() => handleRestablecerClave(usuarioItem)}
                     />
                   ))
                 ) : (

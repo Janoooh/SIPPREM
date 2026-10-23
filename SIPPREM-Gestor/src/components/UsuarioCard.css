@@ -99,6 +99,10 @@
   --color: #0b5394;
 }
 
+.usuario-btn-clave:hover {
+  --color: #d97706;
+}
+
 /* Adaptación responsive */
 @media (max-width: 600px) {
   .usuario-card-content {

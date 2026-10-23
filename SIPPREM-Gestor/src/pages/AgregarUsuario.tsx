@@ -2,7 +2,8 @@ import { IonPage,
         IonHeader,
         IonContent,
         useIonAlert,
-        useIonRouter
+        useIonRouter,
+        useIonToast
 } from "@ionic/react";
 
 import HeaderSistema from "../components/HeaderSistema";
@@ -16,6 +17,7 @@ const AgregarUsuario: React.FC = () => {
     
     const {usuario} =  useUsuario();
     const [mandarAlerta] = useIonAlert();
+    const [mandarToast] = useIonToast();
     const router = useIonRouter();
 
     const [cargando,setCargando] = useState<boolean>(false);
@@ -28,9 +30,17 @@ const AgregarUsuario: React.FC = () => {
 
             mandarAlerta({
                 header: 'Usuario creado.',
+                subHeader: `LA CLAVE ALEATORIA ES: ${resBackend.data?.data}`,
                 message: 'El usuario se creo correctamente.',
-                buttons: [{text: 'Aceptar', 
+                buttons: [{text: 'Copiar clave y aceptar', 
                         handler: () => {
+                            navigator.clipboard.writeText(resBackend.data?.data);
+                            mandarToast({
+                                message: '¡Clave copiada al portapapeles!',
+                                duration: 3000, // 3 segundos de duracion
+                                position: 'bottom',
+                                color: 'success'
+                            });
                             router.push("/admin/usuarios","back");
                         }}]
             });
@@ -54,7 +64,7 @@ const AgregarUsuario: React.FC = () => {
 
             <IonContent fullscreen style={{ '--background': '#3b5066' } as React.CSSProperties}>
                 <FormularioUsuario 
-                    modo="agregar" 
+                    modo="modificar" 
                     onSubmit={handleCrearUsuario} 
                     cargando={cargando}
                 />
