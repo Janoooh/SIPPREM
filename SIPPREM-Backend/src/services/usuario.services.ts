@@ -50,7 +50,7 @@ export const obtenerUsuarios = async (estado? : string) : Promise<respuestaServi
 export const obtenerUsuario = async (id_user : string) : Promise<respuestaServices> => {
 
     const queryObtenerUser = `
-        SELECT us.rut, us.nombre, us.correo, us.telefono, us.foto, r.tipo_rol, us.fecha_registro
+        SELECT us.rut, us.nombre, us.correo, us.telefono, us.foto, r.id_rol, r.tipo_rol, us.fecha_registro
         FROM usuario us
         INNER JOIN rol r USING(id_rol)
         WHERE us.rut = $1 OR us.correo = $1
@@ -74,8 +74,35 @@ export const obtenerUsuario = async (id_user : string) : Promise<respuestaServic
             : null
     };
 
+    return {
+        exito: true, 
+        codHTTP: 200,
+        explicacion : "Se encontraron los datos del usuario.",
+        datos : infoUsuario
+    };
+};
+
+export const obtenerProyectosDeUsuario = async (id_user: string): Promise<respuestaServices> => {
+
+    const queryBuscarUser = `
+        SELECT rut
+        FROM usuario
+        WHERE rut = $1
+    `;
+
+    const resBuscarUsuario = await poolDb.query(queryBuscarUser,[id_user.toLowerCase()]);
+
+    if (resBuscarUsuario.rows.length === 0){
+        return {
+            exito: false, 
+            codHTTP: 404,
+            explicacion : `El usuario con id ${id_user} no se encontro.`,
+            datos : null
+        };
+    };
+
     const queryProyectosUsuario = `
-        SELECT proy.nombre_proyecto
+        SELECT proy.id_proyecto, proy.nombre_proyecto
         FROM acceso_proyecto acs
         INNER JOIN proyecto_patrullaje proy USING(id_proyecto)
         WHERE acs.rut = $1
@@ -87,9 +114,9 @@ export const obtenerUsuario = async (id_user : string) : Promise<respuestaServic
     return {
         exito: true, 
         codHTTP: 200,
-        explicacion : "Se encontraron los datos del usuario.",
-        datos : {infoUsuario,proyectosUsuario}
-    };
+        explicacion : "Se encontraron los proyectos del usuario.",
+        datos : proyectosUsuario
+    }; 
 };
 
 export const crearUsuario = async (usuarioNuevo: tipoUsuario) : Promise<respuestaServices> => {

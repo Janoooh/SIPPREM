@@ -45,6 +45,26 @@ export const obtenerUsuario = async (req: Request, res: Response): Promise<void>
     };
 };
 
+export const obtenerProyectosDeUsuario = async (req: Request, res: Response): Promise<void> => {
+    try{
+        const id_user = req.params.id_user as string;
+
+        const resObtenerProyectosDeUsuario : respuestaServices= await usuarioServices.obtenerProyectosDeUsuario(id_user);
+
+        res.status(resObtenerProyectosDeUsuario.codHTTP).json({
+            ok: resObtenerProyectosDeUsuario.exito,
+            message: resObtenerProyectosDeUsuario.explicacion,
+            data: resObtenerProyectosDeUsuario.datos
+        });
+
+    }catch(error){
+        console.error("Error en controlador obtenerProyectosDeUsuario, de usuario.controllers.ts : ",error);
+
+        identificarErrorDB(error,res);
+        return;
+    };
+};
+
 export const obtenerMiPerfil = async (req: RequestConUsuario, res: Response): Promise<void> => {
     try{
         const id_personal = req.usuario?.rutUsuario.toLowerCase() as string;
