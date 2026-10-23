@@ -5,14 +5,33 @@ import rutasProyecto from "./routes/proyecto.routes.js";
 import dotenv from "dotenv";
 import cors from "cors";
 
+dotenv.config();
 
+const origenesPermitidos = [
+  "http://localhost:5173", // Puerto para servidor de vite
+  "http://localhost:8100" // Puerto para servidor de Ionic serve
+];
 
+const opcionesCors: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || origenesPermitidos.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Acceso bloqueado por política de CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+};
 
 const app = express();
-app.use(express.json());
-app.use(cors());
+app.use(express.json(
+  {limit: "10mb"}
+));
+app.use(cors(opcionesCors));
 
-dotenv.config();
+
 
 app.get("/", (req, res) => {
   res.json({
