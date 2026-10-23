@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import type { RequestConUsuario } from "./verificarTokenJWT.js";
+import type { RequestConUsuario } from "../interfaces/RequestConUsuario.js";
 
 /* Esta funcion retorna otra funcion (La middleware), con la intencion de poder pasar
 la lista de roles permitidos para la peticion de endpoint especifica. */

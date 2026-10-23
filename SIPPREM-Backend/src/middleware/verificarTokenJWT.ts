@@ -1,13 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-
-export interface RequestConUsuario extends Request{
-    usuario? : {
-        rutUsuario : string,
-        correoUsuario : string,
-        rol : string
-    };
-};
+import type { RequestConUsuario } from "../interfaces/RequestConUsuario.js";
 
 export const verificarTokenJWT = (req: RequestConUsuario, res : Response, next: NextFunction): void => {
     const authHeader = req.headers.authorization;

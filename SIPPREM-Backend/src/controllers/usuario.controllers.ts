@@ -3,7 +3,7 @@ import type { respuestaServices } from "../interfaces/respuestaServices.js";
 import * as usuarioServices from "../services/usuario.services.js"
 import * as validadores from "../utils/validadores.utils.js";
 import { identificarErrorDB } from "../utils/errorDB.utils.js";
-import type { RequestConUsuario } from "../middleware/verificarTokenJWT.js";
+import type { RequestConUsuario } from "../interfaces/RequestConUsuario.js";
 
 export const obtenerUsuarios = async (req: Request, res: Response): Promise<void> =>{
     try{
