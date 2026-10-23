@@ -108,7 +108,7 @@ const UsuarioCard: React.FC<UsuarioCardProps> = ({
               )}
               
 
-              <IonButton 
+              {!eliminado && (<IonButton 
                 fill="clear" 
                 className="usuario-btn-accion usuario-btn-editar"
                 onClick={onEditar}
@@ -116,6 +116,7 @@ const UsuarioCard: React.FC<UsuarioCardProps> = ({
               >
                 <IonIcon slot="icon-only" icon={createOutline} />
               </IonButton>
+            )}
             </IonCol>
 
           </IonRow>

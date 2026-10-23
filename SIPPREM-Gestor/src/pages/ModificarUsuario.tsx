@@ -29,7 +29,7 @@ const ModificarUsuario : React.FC = () => {
         const conseguirUsuario = async(rut: string) => {
             try{
                 const resObtenerUsuario = await usuariosService.obtenerUsuario(rut as string);
-                setUsuarioSeleccionado(resObtenerUsuario.data.data.infoUsuario);
+                setUsuarioSeleccionado(resObtenerUsuario.data.data);
             }catch(error: any){
                 mandarAlerta({
                 header: 'Error al cargar usuario a modificar',
