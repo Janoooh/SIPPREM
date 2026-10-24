@@ -119,6 +119,38 @@ export const obtenerProyectosDeUsuario = async (id_user: string): Promise<respue
     }; 
 };
 
+export const obtenerPatrullajesDeUsuario = async (id_user: string): Promise<respuestaServices> => {
+    
+    const queryPatrullajesUsuario = `
+        SELECT proy.nombre_proyecto,
+                proy.id_proyecto,
+                rp.id_patrullaje,
+                pp.hora_inicio,
+                pp.hora_termino,
+                ST_AsGeoJSON(pp.zona)::json AS zona, 
+                CASE 
+                    WHEN ep.hora_real_termino IS NOT NULL THEN 'Finalizado'
+                    WHEN ep.hora_real_inicio IS NOT NULL THEN 'En curso'
+                    ELSE 'Planificado'
+                END AS estado
+        FROM realizacion_patrullaje rp
+        INNER JOIN planificacion_patrullaje pp USING (id_patrullaje)
+        LEFT JOIN ejecucion_patrullaje ep USING (id_patrullaje)
+        INNER JOIN proyecto_patrullaje proy USING (id_proyecto)
+        WHERE rp.rut = $1
+        ORDER BY pp.hora_inicio ASC
+    `;
+
+    const resPatrullajesUsuario = await poolDb.query(queryPatrullajesUsuario,[id_user]);
+
+    return {
+        exito: true, 
+        codHTTP: 200,
+        explicacion : "Patrullajes del usuario obtenidos correctamente.",
+        datos : resPatrullajesUsuario.rows
+    };
+}
+
 export const crearUsuario = async (usuarioNuevo: tipoUsuario) : Promise<respuestaServices> => {
 
     const fotoFormateada = usuarioNuevo.foto 

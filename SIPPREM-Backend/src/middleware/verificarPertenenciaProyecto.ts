@@ -8,6 +8,32 @@ export const verificarPertenenciaProyecto = async (req: RequestConUsuario, res: 
         const id_user = req.usuario?.rutUsuario;
         const {id_proyecto} = req.params;
 
+        if (!id_proyecto || isNaN(Number(id_proyecto))){
+            res.status(400).json({
+                ok: false,
+                message: `La id del proyecto debe ser un numero.`,
+                data: null
+            });
+            return;
+        }
+
+        const queryVerificarProyecto = `
+            SELECT id_proyecto
+            FROM proyecto_patrullaje
+            WHERE id_proyecto = $1 AND eliminado = false
+        `;
+
+        const resQueryVerificarProyecto = await poolDb.query(queryVerificarProyecto,[id_proyecto]);
+
+        if (resQueryVerificarProyecto.rows.length === 0){
+            res.status(404).json({
+                ok: false,
+                message: `El proyecto con id ${id_proyecto} no se encontro.`,
+                data: null
+            });
+            return;
+        }
+
         if (rol?.toLowerCase() === "admin"){
             next();
             return;
