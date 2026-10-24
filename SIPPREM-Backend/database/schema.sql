@@ -370,102 +370,352 @@ INSERT INTO tipo_equipamiento_personal (tipo_eq_personal) VALUES
 ('otro');
 
 INSERT INTO categoria_incidente (categoria) VALUES 
-('Vehículo sospechoso'),
-('Obstrucción de vía pública'),
-('Emergencia médica menor'),
-('Daño a infraestructura pública');
+('Vandalismo y daño a la propiedad pública'),
+('Vehículo mal estacionado o abandonado'),
+('Luminaria pública defectuosa o apagada'),
+('Consumo de alcohol o sustancias ilícitas en la vía pública'),
+('Comercio ambulante no autorizado'),
+('Presencia de personas en actitud sospechosa'),
+('Basural clandestino o acumulación de escombros'),
+('Animales sueltos o potencialmente peligrosos'),
+('Altercado, riña o disturbios en la vía pública'),
+('Daño en infraestructura vial (baches, señalética caída, etc.)'),
+('Ruidos molestos o alteración del orden'),
+('otro');
 
 INSERT INTO usuario (rut, nombre, correo, telefono, hash_contrasenia, nuevo_user, fecha_registro, eliminado, id_rol) VALUES 
-('00000000-0','Administrador root','admin@sipprem.com',null,'$2a$10$sG6X2ZW52kws8YOS7vZfousnSaZiClk5S/wpdk8GlkrHEAh5OkIK6',true,CURRENT_TIMESTAMP,false,1),
-('12345678-9', 'Edgar De La Cruz', 'lil.crux@procasting.cl', '912345678', '$2b$10$WU5N9TLYVwNLuvl/TXcp7eWJXLCN2F2VI/1bpUum95WNVf3/inow6', true,CURRENT_TIMESTAMP,false, 1),
-('98765432-1', 'Fernanda Barraza', 'fer.barra@procasting.cl', '987654321', '$2b$10$2NfPAyuUYxjrEpxBTIvCsuPIuVbp6x.S4W71lFbP/BdAI1qk1588e', true,CURRENT_TIMESTAMP,false, 2),
-('11223344-5', 'Alejandro Orellana', 'jano.ohh@procasting.cl', '911223344', '$2b$10$llTLLOaAWqjjx.IONcwHeex9BkdHLiVV3MYfAQ/R3M14d./GIRwiW', true,CURRENT_TIMESTAMP,false, 3);
+('00000000-0','Administrador root','admin@sipprem.com',null,'$2a$10$sG6X2ZW52kws8YOS7vZfousnSaZiClk5S/wpdk8GlkrHEAh5OkIK6',true,CURRENT_TIMESTAMP,false,1), --2pD7Api1Y8Wn
+('12345678-9', 'Edgar De La Cruz', 'lil.crux@procasting.cl', '912345678', '$2b$10$WU5N9TLYVwNLuvl/TXcp7eWJXLCN2F2VI/1bpUum95WNVf3/inow6', true,CURRENT_TIMESTAMP,false, 1), --claveAdmin
+('98765432-1', 'Fernanda Barraza', 'fer.barra@procasting.cl', '987654321', '$2b$10$2NfPAyuUYxjrEpxBTIvCsuPIuVbp6x.S4W71lFbP/BdAI1qk1588e', true,CURRENT_TIMESTAMP,false, 2),--claveSupervisor
+('11223344-5', 'Alejandro Orellana', 'jano.ohh@procasting.cl', '911223344', '$2b$10$llTLLOaAWqjjx.IONcwHeex9BkdHLiVV3MYfAQ/R3M14d./GIRwiW', true,CURRENT_TIMESTAMP,false, 3), --clavePatrullero
 
-INSERT INTO proyecto_patrullaje (nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, zona_seleccionada) VALUES 
+('11111111-1', 'Juan Pérez', 'juan.perez@example.com', '911111111', '$2b$10$cdg6h9SaGY80GjlCtA90rO8/7W19RTjUFHc83.jC7dQkvCmhgfVAu', true,CURRENT_TIMESTAMP,false, 2), --1111111111
+('18222333-k', 'Carlos Gomez', 'carlos.gomez@sipprem.com', '999999999', '$2b$10$xFtisP3ex8tZ0pu5QYW18eL6jG53xjRrDpbednEXrxkoFkjTnCGdW', true,CURRENT_TIMESTAMP,false, 3), --dcf3239cde37
+('19333444-5', 'Maria Silva', 'maria.silva@sipprem.com', '922222222', '$2b$10$XFkzu3iLlYwOqKetPWa/Pe6.6HuW7iebKpebZy9XsyMN4rLsS.OCi', true,CURRENT_TIMESTAMP,false, 2), --ff8332d2050b
+('20444555-k', 'Juan Soto', 'juan.soto@sipprem.com', '933333333', '$2b$10$jNDyTHWPHnSX5HGnZKb5Luw4dnQoK2g8n0QW1nfY54SU7hNl8lSj.', true,CURRENT_TIMESTAMP,false, 3), --d0691a1dbe47
+('21555666-8', 'Ana Morales', 'ana.morales@sipprem.com', '944444444', '$2b$10$revqFHB/JZ1GF8uqBGHRquZBF5utJhODzw3oVikgcJvlGGBhvLnhy', true,CURRENT_TIMESTAMP,false, 3)--fe90573d9eeb
+;
+
+
+INSERT INTO proyecto_patrullaje (nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, zona_seleccionada) 
+VALUES 
 (
-    'Patrullaje SAFE ver. 2026', 
-    'Sector de la moneda de 100', 
+    'Patrullaje Preventivo Plan Valparaíso', 
+    'Valparaíso', 
     15000000, 
-    '2026-10-10', 
-    '2026-12-31', 
-    ST_GeomFromText('POLYGON((-70.66 -33.44, -70.65 -33.44, -70.65 -33.45, -70.66 -33.45, -70.66 -33.44))', 4326)
+    '2026-06-01', 
+    '2026-12-01', 
+    ST_GeomFromText('POLYGON((-71.63 -33.03, -71.61 -33.03, -71.61 -33.05, -71.63 -33.05, -71.63 -33.03))', 4326)
 ),
 (
-	'Patrullaje Narnia', 
-    'Detras del closet', 
-    35000000, 
-    '2026-12-10', 
-    '2027-04-30', 
-    ST_GeomFromText('POLYGON((-70.6700 -33.4300, -70.6400 -33.4300, -70.6400 -33.4600, -70.6700 -33.4600, -70.6700 -33.4300))', 4326)
+    'Seguridad Urbana Sector Centro Rancagua', 
+    'Rancagua', 
+    10000000, 
+    '2026-06-01', 
+    '2027-07-01',
+    ST_GeomFromText('POLYGON((-70.75 -34.16, -70.73 -34.16, -70.73 -34.18, -70.75 -34.18, -70.75 -34.16))', 4326)
 );
 
 INSERT INTO acceso_proyecto (rut, id_proyecto) VALUES 
-('98765432-1', 1),
+('12345678-9', 1),
+('12345678-9', 2),
+('00000000-0', 1),
+('00000000-0', 2),
+('11111111-1', 1),
+('19333444-5', 1),
+('18222333-k', 1),
+('21555666-8', 1),
 ('98765432-1', 2),
-('11223344-5', 1),
-('11223344-5', 2)
+('19333444-5', 2),
+('20444555-k', 2),
+('11223344-5', 2);
 
 INSERT INTO actividad (titulo, fecha, descripcion, id_proyecto) VALUES 
-('Reunion', '2026-10-11', 'Hay que hacer la tarea', 1),
-('FUNA', '2026-12-20', 'Vamos a funar al --', 2);
-
-INSERT INTO vehiculo (id_item, id_proyecto, nombre_vehiculo, id_tipo_vehiculo) VALUES 
-('VEH-01', 1, 'Nissan v-16 tuneao', 1),
-('VEH-02', 1, 'Toyota HILUX', 2),
-('VEH-03', 2, 'YAMAHA 360cc', 3);
-
-INSERT INTO equipamiento_vehicular (id_item, id_proyecto, id_vehiculo, id_tipo_eq_vehicular) VALUES 
-('EQV-01', 1, 'VEH-01', 1),
-('EQV-02', 2, 'VEH-03', 1),
-('EQV-03', 1, 'VEH-02', 2);
-
-INSERT INTO equipamiento_personal (id_item, id_proyecto, talla, id_tipo_eq_personal) VALUES 
-('EQP-01', 1, 'L', 1),
-('EQP-02', 1, 'No aplica', 5),
-('EQP-03', 2, 'XL', 1),
-('EQP-04', 2, 'No aplica', 7);
-
-INSERT INTO planificacion_patrullaje (hora_inicio, hora_termino, zona, id_proyecto) VALUES 
 (
-    '2026-10-11 08:00:00', 
-    '2026-10-11 16:00:00', 
-    ST_GeomFromText('POLYGON((-70.6600 -33.4400, -70.6500 -33.4400, -70.6500 -33.4500, -70.6600 -33.4500, -70.6600 -33.4400))', 4326), -- esta es una linea
+    'Reunión de coordinación inicial', 
+    '2026-06-02', 
+    'Reunión con carabineros y delegados municipales para definir rutas críticas en el Plan.', 
     1
 ),
 (
-	'2026-10-20 08:00:00',
-    '2026-10-20 16:00:00',
-	ST_GeomFromText('POLYGON((-70.6600 -33.4400, -70.6500 -33.4400, -70.6500 -33.4500, -70.6600 -33.4500, -70.6600 -33.4400))', 4326),
-	1
-);
-
-insert into ejecucion_patrullaje(id_patrullaje, hora_real_inicio, hora_real_termino, id_vehiculo) values
-(1, '2026-10-11 08:05:32', '2026-10-11 15:58:43', 'VEH-01'),
-(2, '2026-10-20 08:05:00', '2026-10-20 15:55:00', 'VEH-03');
-
-INSERT INTO realizacion_patrullaje (rut, id_patrullaje) VALUES 
-('11223344-5', 1),
-('11223344-5', 2);
-
-INSERT INTO uso_eq_personal (id_patrullaje, id_eq_personal) VALUES 
-(1, 'EQP-01');
-
-INSERT INTO incidente (observaciones, fecha_hora, ubicacion, nivel_gravedad, id_patrullaje, id_categoria_incidente) VALUES 
+    'Capacitación en plataforma y geolocalización', 
+    '2026-06-10', 
+    'Inducción al personal de patrullaje sobre el registro de incidentes y uso del sistema.', 
+    1
+),
 (
-    'El edgar se saco la chucha xd', 
-    '2026-10-11 10:30:00', 
-    ST_GeomFromText('POINT(-70.6565 -33.4435)', 4326),--- este es un punto 
-    2, 
-    1, 
+    'Mantenimiento preventivo de flota', 
+    '2026-07-15', 
+    'Revisión técnica y mantención de vehículos y equipamiento vehicular asignados.', 
+    1
+),
+(
+    'Operativo conjunto de fiscalización', 
+    '2026-08-05', 
+    'Fiscalización de comercio ambulante no autorizado en zonas de alta afluencia.', 
+    1
+),
+(
+    'Auditoría intermedia de presupuesto', 
+    '2026-09-01', 
+    'Revisión de gastos y avance financiero del proyecto de patrullaje.', 
+    1
+),
+(
+    'Lanzamiento oficial del proyecto', 
+    '2026-06-02', 
+    'Ceremonia de presentación del plan de seguridad sector centro con autoridades locales.', 
     2
 ),
 (
-	'Avistamiento de actividad sospechosa',
-    '2026-10-20 10:30:00',
-    ST_GeomFromText('POINT(-70.6550 -33.4450)', 4326),
-    3,
-    2,
+    'Inspección de luminarias y espacios públicos', 
+    '2026-06-20', 
+    'Levantamiento de puntos oscuros y zonas con deficiencias lumínicas junto al municipio.', 
+    2
+),
+(
+    'Entrega de equipamiento personal', 
+    '2026-06-25', 
+    'Distribución de chalecos antibalas, cámaras corporales y bastones al personal operativo.', 
+    2
+),
+(
+    'Reunión con junta de vecinos', 
+    '2026-07-18', 
+    'Conversatorio de seguridad preventiva y entrega de canales de reporte ciudadano.', 
+    2
+),
+(
+    'Evaluación operacional mensual', 
+    '2026-08-10', 
+    'Análisis de estadísticas de patrullaje y reasignación de recursos móviles según demanda.', 
+    2
+);
+
+INSERT INTO vehiculo (id_item, id_proyecto, nombre_vehiculo, id_tipo_vehiculo) VALUES 
+('VEH-001', 1, 'Chevrolet Sail 1.5', 1),
+('VEH-002', 1, 'Toyota Hilux 4x4', 2),
+('VEH-003', 1, 'Yamaha XT 250', 3),
+('VEH-004', 1, 'Trek Marlin 7', 4),
+('VEH-005', 1, 'Boston Whaler 220', 5),
+('VEH-006', 2, 'Nissan Versa Sense', 1),
+('VEH-007', 2, 'Mitsubishi L200 Katana', 2),
+('VEH-008', 2, 'Honda XR 190L', 3),
+('VEH-009', 2, 'Polaris Sportsman 570', 7),
+('VEH-010', 2, 'Xiaomi Mi Electric Scooter Pro 2', 6);
+
+INSERT INTO equipamiento_vehicular (id_item, id_proyecto, id_vehiculo, id_tipo_eq_vehicular) VALUES 
+('EQV-001', 1, 'VEH-001', 1),
+('EQV-002', 1, 'VEH-001', 2),
+('EQV-003', 1, 'VEH-002', 4),
+('EQV-004', 1, 'VEH-002', 5),
+('EQV-005', 1, 'VEH-003', 12),
+('EQV-006', 2, 'VEH-006', 1),
+('EQV-007', 2, 'VEH-006', 8),
+('EQV-008', 2, 'VEH-007', 7),
+('EQV-009', 2, 'VEH-008', 12),
+('EQV-010', 2, 'VEH-009', 10);
+
+INSERT INTO equipamiento_personal (id_item, id_proyecto, talla, id_tipo_eq_personal) VALUES 
+('EQP-001', 1, 'L', 1),
+('EQP-002', 1, 'M', 2),
+('EQP-003', 1, '42', 3),
+('EQP-004', 1, 'No aplica', 5),
+('EQP-005', 1, 'No aplica', 6),
+('EQP-006', 2, 'XL', 1),
+('EQP-007', 2, 'L', 2),
+('EQP-008', 2, '43', 3),
+('EQP-009', 2, 'No aplica', 7),
+('EQP-010', 2, 'No aplica', 5);
+
+INSERT INTO planificacion_patrullaje (hora_inicio, hora_termino, zona, id_proyecto) VALUES 
+(
+    '2026-06-05 08:00:00', 
+    '2026-06-05 16:00:00', 
+    ST_GeomFromText('POLYGON((-71.625 -33.035, -71.615 -33.035, -71.615 -33.045, -71.625 -33.045, -71.625 -33.035))', 4326), 
     1
+),
+(
+    '2026-06-12 16:00:00', 
+    '2026-06-13 00:00:00', 
+    ST_GeomFromText('POLYGON((-71.630 -33.040, -71.620 -33.040, -71.620 -33.050, -71.630 -33.050, -71.630 -33.040))', 4326), 
+    1
+),
+(
+    '2026-06-20 00:00:00', 
+    '2026-06-20 08:00:00', 
+    ST_GeomFromText('POLYGON((-71.620 -33.030, -71.610 -33.030, -71.610 -33.040, -71.620 -33.040, -71.620 -33.030))', 4326), 
+    1
+),
+(
+    '2026-07-02 10:00:00', 
+    '2026-07-02 18:00:00', 
+    ST_GeomFromText('POLYGON((-71.628 -33.038, -71.618 -33.038, -71.618 -33.048, -71.628 -33.048, -71.628 -33.038))', 4326), 
+    1
+),
+(
+    '2026-07-05 08:00:00', 
+    '2026-07-05 16:00:00', 
+    ST_GeomFromText('POLYGON((-70.745 -34.165, -70.735 -34.165, -70.735 -34.175, -70.745 -34.175, -70.745 -34.165))', 4326), 
+    2
+),
+(
+    '2026-07-10 16:00:00', 
+    '2026-07-11 00:00:00', 
+    ST_GeomFromText('POLYGON((-70.750 -34.170, -70.740 -34.170, -70.740 -34.180, -70.750 -34.180, -70.750 -34.170))', 4326), 
+    2
+),
+(
+    '2026-07-18 22:00:00', 
+    '2026-07-19 06:00:00', 
+    ST_GeomFromText('POLYGON((-70.740 -34.160, -70.730 -34.160, -70.730 -34.170, -70.740 -34.170, -70.740 -34.160))', 4326), 
+    2
+),
+(
+    '2026-07-25 09:00:00', 
+    '2026-07-25 17:00:00', 
+    ST_GeomFromText('POLYGON((-70.748 -34.168, -70.738 -34.168, -70.738 -34.178, -70.748 -34.178, -70.748 -34.168))', 4326), 
+    2
+);
+
+INSERT INTO ejecucion_patrullaje (id_patrullaje, hora_real_inicio, hora_real_termino, id_vehiculo) VALUES 
+(
+    1, 
+    '2026-06-05 08:05:00', 
+    '2026-06-05 15:55:00', 
+    'VEH-001'
+),
+(
+    2, 
+    '2026-06-12 16:10:00', 
+    '2026-06-13 00:05:00', 
+    'VEH-002'
+),
+(
+    3, 
+    '2026-06-20 00:00:00', 
+    '2026-06-20 08:15:00', 
+    'VEH-003'
+),
+(
+    4, 
+    '2026-06-02 10:02:00', 
+    '2026-06-02 17:50:00', 
+    'VEH-004'
+),
+(
+    5, 
+    '2026-07-05 08:00:00', 
+    '2026-07-05 16:10:00', 
+    'VEH-006'
+),
+(
+    6, 
+    '2026-07-10 15:50:00', 
+    '2026-07-11 00:15:00', 
+    'VEH-007'
+),
+(
+    7, 
+    '2026-07-18 22:05:00', 
+    '2026-07-19 05:55:00', 
+    'VEH-008'
+),
+(
+    8, 
+    '2026-07-25 09:10:00', 
+    '2026-07-25 17:05:00', 
+    'VEH-009'
+);
+
+INSERT INTO realizacion_patrullaje (rut, id_patrullaje) VALUES 
+('18222333-k', 1),
+('21555666-8', 2),
+('18222333-k', 3),
+('21555666-8', 3),
+('18222333-k', 4),
+('20444555-k', 5),
+('11223344-5', 6),
+('20444555-k', 7),
+('11223344-5', 7),
+('20444555-k', 8);
+
+INSERT INTO uso_eq_personal (id_patrullaje, id_eq_personal) VALUES 
+(1, 'EQP-001'),
+(1, 'EQP-002'),
+(2, 'EQP-003'),
+(3, 'EQP-004'),
+(4, 'EQP-005'),
+(5, 'EQP-006'),
+(6, 'EQP-007'),
+(7, 'EQP-008'),
+(8, 'EQP-009'),
+(8, 'EQP-010');
+
+INSERT INTO incidente (observaciones, fecha_hora, ubicacion, nivel_gravedad, id_patrullaje, id_categoria_incidente) VALUES 
+(
+    'Se encontró un vehículo abandonado bloqueando parcialmente el tránsito en calle Almirante Montt.', 
+    '2026-03-05 09:30:00', 
+    ST_GeomFromText('POINT(-71.622 -33.038)', 4326), 
+    2, 
+    1, 
+    2 
+),
+(
+    'Luminaria pública completamente apagada en esquina de Plaza Sotomayor generando punto ciego.', 
+    '2026-03-12 18:15:00', 
+    ST_GeomFromText('POINT(-71.627 -33.042)', 4326), 
+    3, 
+    2, 
+    3 
+),
+(
+    'Presencia de grupo consumiendo alcohol en la vía pública frente a comercio local.', 
+    '2026-03-20 02:45:00', 
+    ST_GeomFromText('POINT(-71.618 -33.033)', 4326), 
+    4, 
+    3, 
+    4 
+),
+(
+    'Acumulación de escombros y restos de muebles en la vía pública.', 
+    '2026-04-02 12:20:00', 
+    ST_GeomFromText('POINT(-71.625 -33.045)', 4326), 
+    2, 
+    4, 
+    7 
+),
+(
+    'Comercio ambulante no autorizado ocupando el flujo peatonal en Paseo Independencia.', 
+    '2026-04-05 10:10:00', 
+    ST_GeomFromText('POINT(-70.742 -34.168)', 4326), 
+    1, 
+    5, 
+    5 
+),
+(
+    'Bache profundo de gran tamaño en calzada que pone en riesgo a vehículos menores.', 
+    '2026-04-10 17:30:00', 
+    ST_GeomFromText('POINT(-70.746 -34.172)', 4326), 
+    3, 
+    6, 
+    10 
+),
+(
+    'Denuncia por ruidos molestos excesivos provenientes de domicilio particular a altas horas.', 
+    '2026-04-19 01:15:00', 
+    ST_GeomFromText('POINT(-70.735 -34.165)', 4326), 
+    2, 
+    7, 
+    11 
+),
+(
+    'Perro potencialmente peligroso suelto deambulando sin supervisión ni arnés.', 
+    '2026-04-25 11:00:00', 
+    ST_GeomFromText('POINT(-70.740 -34.175)', 4326), 
+    3, 
+    8, 
+    8 
 );
 
 INSERT INTO foto_incidente (foto, id_incidente) VALUES 
