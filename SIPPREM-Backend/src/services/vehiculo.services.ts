@@ -223,7 +223,7 @@ export const eliminarVehiculo =  async (id: string, id_proyecto : number):Promis
     const query = `
                     update vehiculo 
                     set eliminado = true
-                    where id_item = $1 and eliminado = false and id_proyecto $2
+                    where id_item = $1 and eliminado = false and id_proyecto = $2
                     returning *;
     `;
 
