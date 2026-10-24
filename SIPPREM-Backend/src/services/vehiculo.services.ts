@@ -129,7 +129,7 @@ export const agregarVehiculo = async(id_item: string, id_proyecto: number, nombr
     const queryVehiculo ='select id_item from item where id_item = $1;';
     const vehiculo = await poolDb.query(queryVehiculo, [id_item]);
 
-    if (vehiculo.rows.length === 0){
+    if (vehiculo.rows.length !== 0){
         return{
             exito: false, 
             codHTTP: 409,
