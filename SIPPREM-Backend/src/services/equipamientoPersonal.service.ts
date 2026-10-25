@@ -121,7 +121,7 @@ export const agregarEquipamientoPersonal = async (id_item: string, id_proyecto: 
     const queryEqPer ='select id_item from item where id_item = $1;';
     const EqPersonal = await poolDb.query(queryEqPer, [id_item]);
 
-    if (EqPersonal.rows.length === 0){
+    if (EqPersonal.rows.length !== 0){
         return{
             exito: false, 
             codHTTP: 409,
@@ -234,63 +234,3 @@ export const eliminarEquipamientoPersonal = async (id: string, id_proyecto: numb
     };
 };
 
-
-/*
-export const mostrarEquipamientoPersonal = async (id: string): Promise <respuestaServices> =>{
-    const query = `
-                    select id_item, talla, tipo_eq_personal
-                    from equipamiento_personal
-                    inner join tipo_equipamiento_personal 
-                        on equipamiento_personal.id_tipo_eq_personal = tipo_equipamiento_personal.id_tipo_eq_personal
-                    where id_item = $1 and eliminado = false;
-    `;
-
-    const resultado = await poolDb.query(query, [id]);
-
-    if(resultado.rows.length === 0){
-        return{
-            exito: false,
-            codHTTP: 404,
-            explicacion: "No hay equipamiento personal con ese identificador.",
-            datos: null
-        };
-    }
-    
-    return {
-        exito: true,
-        codHTTP: 200,
-        explicacion: "equipamiento personal encontrado.",
-        datos: resultado.rows[0]
-    };
-};
-
-*/
-
-/*
-export const actualizarEquipamientoPersonal = async (id: string, id_tipo: number, talla: string | null = null): Promise<respuestaServices> => {
-    const query = `
-                    update equipamiento_personal
-                    set id_tipo_eq_personal = $1, talla = $2
-                    where id_item = $3 and eliminado = false
-                    returning *;
-    `;
-    const tallaValor = talla && talla.trim() !== "" ? talla : null;
-
-    const resultado = await poolDb.query(query, [id_tipo, tallaValor, id]);
-
-    if (!resultado.rows[0]) {
-        return {
-            exito: false,
-            codHTTP: 404,
-            explicacion: "Equipamiento personal no encontrado para actualizar.",
-            datos: null
-        };
-    }
-
-    return {
-        exito: true,
-        codHTTP: 200,
-        explicacion: "Equipamiento personal actualizado correctamente.",
-        datos: resultado.rows[0]
-    };
-};*/

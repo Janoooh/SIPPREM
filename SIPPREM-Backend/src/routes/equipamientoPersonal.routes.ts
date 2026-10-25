@@ -6,6 +6,9 @@ import tipoEqPersonalRutas from "./tipoEqPersonal.routes.js"
 
 const router = Router({ mergeParams: true });
 
+//redirige a los tipos de equipamientos personales
+router.use('/tipos', tipoEqPersonalRutas);
+
 // Se utiliza el GET (para todos y para uno en especifico), POST, PATCH y DELETE
 router.get('/', verificarRol(["admin","supervisor"]), mostrarEquipamientosPersonalesControlador);
 router.get('/:id_eq_personal', verificarRol(["admin","supervisor"]), mostrarUNequipamientoPersonalControlador);
@@ -13,8 +16,6 @@ router.post('/', verificarRol(["admin","supervisor"]), agregarEquipamientoPerson
 router.patch('/:id_eq_personal', verificarRol(["admin","supervisor"]), actualizarEquipamientoPersonalControlador);
 router.delete('/:id_eq_personal' , verificarRol(["admin","supervisor"]), eliminarEquipamientoPersonalControlador);
 
-//redirige a los tipos de equipamientos personales
-router.use('/tipos', tipoEqPersonalRutas);
 
 export default router;
 

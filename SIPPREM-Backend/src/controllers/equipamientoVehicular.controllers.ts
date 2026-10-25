@@ -73,9 +73,9 @@ export const mostrarUNequipamientoVehicularControlador = async (req: Request, re
 export const agregarEquipamientoVehicularControlador = async (req : Request, res: Response): Promise <void> => {
     try{
         const {id_proyecto} = req.params;
-        const {id_item, id_tipo} = req.body;
+        const {id_item, id_tipo, id_vehiculo} = req.body;
 
-        if (!id_item || !id_proyecto || isNaN(Number(id_proyecto)) || !id_tipo || isNaN(Number(id_tipo))){
+        if (!id_item || !id_proyecto || isNaN(Number(id_proyecto)) || !id_tipo || isNaN(Number(id_tipo)) || !id_vehiculo){
             res.status(400).json({
                     ok: false,
                     message: "Faltan datos para poder completar la accion o los datos no tiene el formato correcto.",
@@ -84,7 +84,7 @@ export const agregarEquipamientoVehicularControlador = async (req : Request, res
             return;
         }
     
-        const nuevoArticuloVehicular : respuestaServices = await EquipamientoVehiculoServices.agregarEquipamientoVehicular((String(id_item)).toUpperCase(), Number(id_proyecto), Number(id_tipo));
+        const nuevoArticuloVehicular : respuestaServices = await EquipamientoVehiculoServices.agregarEquipamientoVehicular((String(id_item)).toUpperCase(), Number(id_proyecto), Number(id_tipo), String(id_vehiculo));
     
         res.status(nuevoArticuloVehicular.codHTTP).json({
             ok: nuevoArticuloVehicular.exito,

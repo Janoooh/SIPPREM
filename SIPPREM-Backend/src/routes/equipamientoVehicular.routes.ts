@@ -7,6 +7,9 @@ import tipoEqVehicularRutas from "./tipoEqVehicular.routes.js"
 
 const router = Router({ mergeParams: true });
 
+//redirige a los tipos de equipamientos vehiculares
+router.use('/tipos', tipoEqVehicularRutas);
+
 // get para toda la coleccion, para un recurso en especifico, post, patch y delete.
 router.get('/' , verificarRol(["admin","supervisor"]), mostrarEquipamientosVehicularesControlador);
 router.get('/:id_eq_vehicular', verificarRol(["admin","supervisor"]), mostrarUNequipamientoVehicularControlador);
@@ -14,7 +17,6 @@ router.post('/' , verificarRol(["admin","supervisor"]), agregarEquipamientoVehic
 router.patch('/:id_eq_vehicular', verificarRol(["admin","supervisor"]), actualizarEquipamientoVehicularControlador);
 router.delete('/:id_eq_vehicular', verificarRol(["admin","supervisor"]), eliminarEquipamientoVehicularControlador);
 
-//redirige a los tipos de equipamientos vehiculares
-router.use('/tipos', tipoEqVehicularRutas);
+
 
 export default router;

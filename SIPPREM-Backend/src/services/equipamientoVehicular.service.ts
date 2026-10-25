@@ -18,7 +18,7 @@ export const mostrarEquipamientosVehiculares= async (id_proyecto: number): Promi
 
     //Query para mostrar los equipamientos vehiculares relacionados a un proyecto
     const query = `
-                    select id_item, tipo_eq_vehicular 
+                    select id_item, tipo_eq_vehicular, id_vehiculo
                     from equipamiento_vehicular
                     inner join tipo_equipamiento_vehicular 
                         on equipamiento_vehicular.id_tipo_eq_vehicular = tipo_equipamiento_vehicular.id_tipo_eq_vehicular
@@ -90,7 +90,7 @@ export const mostrarUNequipamientoVehicular = async (id_item: string, id_proyect
 
 
 // agregar un equipamiento vehicular a la base de datos
-export const agregarEquipamientoVehicular = async (id_item: string, id_proyecto: number, id_tipo : number): Promise <respuestaServices> =>{
+export const agregarEquipamientoVehicular = async (id_item: string, id_proyecto: number, id_tipo : number, id_vehiculo :string): Promise <respuestaServices> =>{
     //Se verifica que el proyecto exista
     const queryProyecto =`select * from proyecto_patrullaje where id_proyecto = $1 and eliminado= false;`;
     const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
@@ -122,7 +122,7 @@ export const agregarEquipamientoVehicular = async (id_item: string, id_proyecto:
     const queryEqVe ='select id_item from item where id_item = $1;';
     const EqVehicular = await poolDb.query(queryEqVe, [id_item]);
 
-    if (EqVehicular.rows.length === 0){
+    if (EqVehicular.rows.length !== 0){
         return{
             exito: false, 
             codHTTP: 409,
@@ -134,8 +134,8 @@ export const agregarEquipamientoVehicular = async (id_item: string, id_proyecto:
 
     //Query para agregar un equipamiento a la base de datos
     const query = `
-                    insert into equipamiento_vehicular (id_item, id_proyecto, id_tipo_eq_vehicular)
-                    values ($1, $2, $3)
+                    insert into equipamiento_vehicular (id_item, id_proyecto, id_tipo_eq_vehicular, id_vehiculo)
+                    values ($1, $2, $3, $4)
                     returning *;
     `;
 
