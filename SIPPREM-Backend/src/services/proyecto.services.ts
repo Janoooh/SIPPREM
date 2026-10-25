@@ -1,18 +1,30 @@
 import { poolDb } from "../config/db.js";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 
-// Obtener todos los proyectos activos y no eliminados
-export const obtenerProyectos = async (): Promise<respuestaServices> => {
-    const query = `
-        SELECT id_proyecto, nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, ST_AsGeoJSON(zona_seleccionada)::json AS zona_seleccionada, activo
-        FROM proyecto_patrullaje
-        WHERE eliminado = false
-        ORDER BY nombre_proyecto;
-    `;
+export const obtenerProyectos = async (rutUsuario: string, rolUsuario: string): Promise<respuestaServices> => {
+    let resultado;
 
-    const resultado = await poolDb.query(query);
+    // Si el usuario es administrador, tiene acceso a todos los proyectos no eliminados
+    if (rolUsuario.toLowerCase() === "admin") {
+        const queryTodosProyectos = `
+            SELECT id_proyecto, nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, ST_AsGeoJSON(zona_seleccionada)::json AS zona_seleccionada, activo
+            FROM proyecto_patrullaje
+            WHERE eliminado = false
+            ORDER BY nombre_proyecto;
+        `;
+        resultado = await poolDb.query(queryTodosProyectos);
+    } else {
+        // Si el usuario es supervisor, solo se obtienen los proyectos asignados a su RUT en acceso_proyecto
+        const queryProyectosSupervisor = `
+            SELECT p.id_proyecto, p.nombre_proyecto, p.nombre_sector, p.presupuesto, p.fecha_inicio, p.fecha_termino, ST_AsGeoJSON(p.zona_seleccionada)::json AS zona_seleccionada, p.activo
+            FROM proyecto_patrullaje p
+            INNER JOIN acceso_proyecto ap ON p.id_proyecto = ap.id_proyecto
+            WHERE p.eliminado = false AND LOWER(ap.rut) = $1
+            ORDER BY p.nombre_proyecto;
+        `;
+        resultado = await poolDb.query(queryProyectosSupervisor, [rutUsuario.toLowerCase()]);
+    }
 
-    // Si no hay proyectos registrados
     if (resultado.rows.length === 0) {
         return {
             exito: false,

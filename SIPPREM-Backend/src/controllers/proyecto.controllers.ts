@@ -1,13 +1,18 @@
 import type { Request, Response } from "express";
 import * as proyectoServices from "../services/proyecto.services.js";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
+import type { RequestConUsuario } from "../interfaces/RequestConUsuario.js";
 import { esPoligonoValido } from "../utils/validadores.utils.js";
 import { identificarErrorDB } from "../utils/errorDB.utils.js";
 
-// Obtener todos los proyectos
-export const obtenerProyectosControlador = async (req: Request, res: Response): Promise<void> => {
+// Obtener los proyectos para un usuario
+export const obtenerProyectosControlador = async (req: RequestConUsuario, res: Response): Promise<void> => {
     try {
-        const resultado: respuestaServices = await proyectoServices.obtenerProyectos();
+        
+        const rutUsuario = req.usuario?.rutUsuario.toLowerCase() as string;
+        const rolUsuario = req.usuario?.rol.toLowerCase() as string;
+
+        const resultado: respuestaServices = await proyectoServices.obtenerProyectos(rutUsuario, rolUsuario);
 
         res.status(resultado.codHTTP).json({
             ok: resultado.exito,

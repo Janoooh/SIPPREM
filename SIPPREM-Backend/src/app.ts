@@ -44,26 +44,6 @@ app.use("/api/v1/auth",rutasAuth);
 app.use("/api/v1/usuarios", verificarTokenJWT, rutasUsuario);
 app.use("/api/v1/proyectos", verificarTokenJWT,rutasProyecto);
 
-
-/*
- 
-  NO PONGAN NINGUNA RUTA ACA WN DESPUES LO UNIFICAMOS ENTRE TODOS 
-    ES EL UNICO ARCHIVO QUE COMPARTIMOS ENTRE TODOS ASI QUE PUEDE
-      QUEDAR LA CAGA PORFA NO PONGAN WEAS AQUI
-        USELO PARA PROBAR PERO DESPUES BORREN LAS COSAS
- 
- */
-/* ZONA DE PRUEBAS
-son imports: 
-import rutasActividad from "./routes/actividad.routes.js";
-import rutastrabajadores from "./routes/trabajadores.routes.js";
-son rutas:
-app.use("/api/v1/actividades", rutasActividad); No borrar!
-app.use("/api/v1/trabajadores", rutastrabajadores);
-
-
-*/
-
 app.listen(Number(process.env.BACKEND_PORT), () => {
   console.log(`Servidor ejecutándose en http://localhost:${Number(process.env.BACKEND_PORT)}`);
 });
