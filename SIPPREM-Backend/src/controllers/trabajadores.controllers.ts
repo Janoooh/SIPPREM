@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import * as trabajadoresService from "../services/trabajadores.service.js";
+import { identificarErrorDB } from "../utils/errorDB.utils.js";
 
 // este es del get de trabajadores
 export const obtenerTrabajadoresProyectoControlador = async (req: Request, res: Response): Promise<void> => {
@@ -27,11 +28,7 @@ export const obtenerTrabajadoresProyectoControlador = async (req: Request, res: 
     }catch (error) {
         // 4. Captura de errores internos
         console.error("Error en controlador obtenerTrabajadoresProyectoControlador, de trabajadores.controllers.ts: ", error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al obtener los trabajadores del proyecto.",
-            data: null
-        });
+        identificarErrorDB(error,res);
         return;
     }
 };
@@ -82,11 +79,7 @@ export const asignarTrabajadorControlador = async (req: Request, res: Response):
 
     } catch (error) {
         console.error("Error en asignarTrabajadorControlador, de trabajadores.controllers.ts:", error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al asignar el trabajador al proyecto.",
-            data: null
-        });
+        identificarErrorDB(error,res);
         return;
     }
 };
@@ -131,11 +124,7 @@ export const sacarTrabajadorControlador = async (req: Request, res: Response): P
 
     } catch (error) {
         console.error("Error en sacarTrabajadorControlador, de trabajadores.controllers.ts:", error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al sacar al trabajador del proyecto.",
-            data: null
-        });
+        identificarErrorDB(error,res);
         return;
     }
 };

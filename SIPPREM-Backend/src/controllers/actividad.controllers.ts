@@ -1,35 +1,32 @@
 import type {Request, Response} from "express";
 import * as actividadService from "../services/actividad.service.js";
+import { identificarErrorDB } from "../utils/errorDB.utils.js";
 
 export const tenerActividadProyecto = async(req :Request, res: Response): Promise<void> => {
     try {
-    const { id_proyecto } = req.params;
-    //Validamos la entrada 
-    if(!id_proyecto || isNaN(Number(id_proyecto))){
-        res.status(400).json({
-            ok: false,
-            message: "El id del proyecto es inválido",
-            data:null
+        const { id_proyecto } = req.params;
+        //Validamos la entrada 
+        if(!id_proyecto || isNaN(Number(id_proyecto))){
+            res.status(400).json({
+                ok: false,
+                message: "El id del proyecto es inválido",
+                data:null
+            });
+            return;
+        }
+        // llamada al servicio 
+        const resultado = await actividadService.obtenerActividadesPorProyecto(Number(id_proyecto));
+        // respuesta del servicio
+        res.status(resultado.codHTTP).json({
+            ok: resultado.exito,
+            message: resultado.explicacion,
+            data: resultado.datos
         });
         return;
-}
-// llamada al servicio 
-const resultado = await actividadService.obtenerActividadesPorProyecto(Number(id_proyecto));
-// respuesta del servicio
-res.status(resultado.codHTTP).json({
-    ok: resultado.exito,
-    message: resultado.explicacion,
-    data: resultado.datos
-});
-return;
-}catch (error) {
+    }catch (error) {
         // Captura de errores no controlados 
         console.error("Error en controlador tenerActividadProyecto, de actividad.controllers.ts: ", error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al obtener las actividades del proyecto.",
-            data: null
-        });
+        identificarErrorDB(error,res);
         return;
     }
 };
@@ -65,11 +62,7 @@ export const crearActividadControlador = async(req :Request, res: Response): Pro
     }catch (error) {
         // Captura de errores no controlados
         console.error("Error en controlador crearActividadControlador, de actividad.controllers.ts: ", error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al crear la actividad.",
-            data: null
-        });
+        identificarErrorDB(error,res);
         return;
     }
 
@@ -115,11 +108,7 @@ export const actualizarActividadControlador = async (req: Request, res: Response
     }catch (error) {
         //captura 
         console.error("Error en controlador actualizarActividadControlador, de actividad.controllers.ts: ", error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al actualizar la actividad.",
-            data: null
-        });
+        identificarErrorDB(error,res);
         return;
     }
 };
@@ -149,11 +138,7 @@ export const eliminarActividadControlador = async (req: Request, res: Response):
     }catch (error) {
 
         console.error("Error en controlador eliminarActividadControlador, de actividad.controllers.ts: ", error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al eliminar la actividad.",
-            data: null
-        });
+        identificarErrorDB(error,res);
         return;
     }
 }; 
