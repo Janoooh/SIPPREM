@@ -5,7 +5,7 @@ import type { respuestaServices } from "../interfaces/respuestaServices.js";
 export const mostrarTiposEqPersonales= async (): Promise <respuestaServices> =>{
 
     const query = `
-                    select tipo_eq_personal
+                    select *
                     from tipo_equipamiento_personal;
     `;
     

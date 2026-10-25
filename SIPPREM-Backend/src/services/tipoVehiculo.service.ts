@@ -5,7 +5,7 @@ import type { respuestaServices } from "../interfaces/respuestaServices.js";
 export const mostrarTipoVehiculo= async (): Promise <respuestaServices> =>{
 
     const query = `
-                    select tipo_vehiculo
+                    select *
                     from tipo_vehiculo;
     `;
     
