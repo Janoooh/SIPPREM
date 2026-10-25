@@ -16,6 +16,7 @@ export const obtenerPatrullajes = async (id_proyecto: string): Promise<respuesta
             p.id_patrullaje,
             p.hora_inicio,
             p.hora_termino,
+            ST_AsGeoJSON(p.zona)::json AS zona,
             
             CASE 
                 WHEN e.hora_real_termino IS NOT NULL THEN 'Finalizado'
@@ -89,4 +90,137 @@ export const crearPlanificacionPatrullaje = async (patrullajeNuevo: tipoPatrulla
     } finally {
         cliente.release();
     }
+};
+
+export const actualizarPlanificacionPatrullaje = async (id_patrullaje: number, patrullajeModificado: tipoPatrullaje ): Promise<respuestaServices> => {
+    const { hora_inicio, hora_termino, zona, id_proyecto, patrulleros } = patrullajeModificado;
+
+    const queryVerificarEstado = `
+        SELECT 
+            p.id_patrullaje,
+            e.id_patrullaje AS id_ejecucion
+        FROM planificacion_patrullaje p
+        LEFT JOIN ejecucion_patrullaje e ON p.id_patrullaje = e.id_patrullaje
+        WHERE p.id_patrullaje = $1 AND p.id_proyecto = $2;
+    `;
+
+    const resVerificar = await poolDb.query(queryVerificarEstado, [id_patrullaje, id_proyecto]);
+
+    if (resVerificar.rows.length === 0) {
+        return {
+            exito: false,
+            codHTTP: 404,
+            explicacion: "El patrullaje solicitado no existe en este proyecto.",
+            datos: null
+        };
+    }
+
+    if (resVerificar.rows[0].id_ejecucion !== null) {
+        return {
+            exito: false,
+            codHTTP: 409,
+            explicacion: "No se puede modificar un patrullaje que ya se encuentra en curso o finalizado.",
+            datos: null
+        };
+    }
+
+    const cliente = await poolDb.connect();
+
+    try {
+        await cliente.query("BEGIN");
+
+        const queryActualizarPlanificacion = `
+            UPDATE planificacion_patrullaje
+            SET hora_inicio = $1,
+                hora_termino = $2,
+                zona = ST_GeomFromText($3, 4326)
+            WHERE id_patrullaje = $4 AND id_proyecto = $5
+            RETURNING id_patrullaje, hora_inicio, hora_termino, ST_AsGeoJSON(zona)::json AS zona, id_proyecto;
+        `;
+
+        const resActualizacion = await cliente.query(queryActualizarPlanificacion, [
+            hora_inicio,
+            hora_termino,
+            zona,
+            id_patrullaje,
+            id_proyecto
+        ]);
+
+        const planificacionActualizada = resActualizacion.rows[0];
+
+        const queryEliminarAsignadosAnteriores = `
+            DELETE FROM realizacion_patrullaje
+            WHERE id_patrullaje = $1;
+        `;
+        await cliente.query(queryEliminarAsignadosAnteriores, [id_patrullaje]);
+
+        const queryAsignarNuevosPatrulleros = `
+            INSERT INTO realizacion_patrullaje (rut, id_patrullaje)
+            SELECT unnest($1::varchar[]), $2;
+        `;
+        await cliente.query(queryAsignarNuevosPatrulleros, [patrulleros, id_patrullaje]);
+
+        await cliente.query("COMMIT");
+
+        return {
+            exito: true,
+            codHTTP: 200,
+            explicacion: "Planificación de patrullaje actualizada correctamente.",
+            datos: {
+                ...planificacionActualizada,
+                patrulleros
+            }
+        };
+    } catch (error) {
+        await cliente.query("ROLLBACK");
+        throw error;
+    } finally {
+        cliente.release();
+    }
+};
+
+export const eliminarPlanificacionPatrullaje = async (id_proyecto: string, id_patrullaje: number): Promise<respuestaServices> => {
+    
+    const queryVerificarEstado = `
+        SELECT 
+            p.id_patrullaje,
+            e.id_patrullaje AS id_ejecucion
+        FROM planificacion_patrullaje p
+        LEFT JOIN ejecucion_patrullaje e ON p.id_patrullaje = e.id_patrullaje
+        WHERE p.id_patrullaje = $1 AND p.id_proyecto = $2;
+    `;
+
+    const resVerificar = await poolDb.query(queryVerificarEstado, [id_patrullaje, id_proyecto]);
+
+    if (resVerificar.rows.length === 0) {
+        return {
+            exito: false,
+            codHTTP: 404,
+            explicacion: "El patrullaje solicitado no existe en este proyecto.",
+            datos: null
+        };
+    }
+
+    if (resVerificar.rows[0].id_ejecucion !== null) {
+        return {
+            exito: false,
+            codHTTP: 409,
+            explicacion: "No se puede eliminar un patrullaje que ya se encuentra en curso o finalizado.",
+            datos: null
+        };
+    }
+
+    const queryEliminarPatrullaje = `
+        DELETE FROM planificacion_patrullaje 
+        WHERE id_patrullaje = $1 AND id_proyecto = $2
+    `;
+
+    await poolDb.query(queryEliminarPatrullaje,[id_patrullaje, id_proyecto]);
+
+    return {
+            exito: true,
+            codHTTP: 200,
+            explicacion: "Planificación de patrullaje eliminada correctamente.",
+            datos: null
+        };
 };
