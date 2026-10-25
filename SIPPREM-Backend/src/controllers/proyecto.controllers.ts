@@ -26,9 +26,9 @@ export const obtenerProyectosControlador = async (req: Request, res: Response): 
 // Obtener un proyecto específico por ID
 export const obtenerProyectoPorIdControlador = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { id } = req.params;
+        const { id_proyecto } = req.params;
 
-        if (!id || isNaN(Number(id))) {
+        if (!id_proyecto || isNaN(Number(id_proyecto))) {
             res.status(400).json({
                 ok: false,
                 message: "El ID debe ser válido para completar la acción",
@@ -37,7 +37,7 @@ export const obtenerProyectoPorIdControlador = async (req: Request, res: Respons
             return;
         }
 
-        const resultado: respuestaServices = await proyectoServices.obtenerProyectoPorId(Number(id));
+        const resultado: respuestaServices = await proyectoServices.obtenerProyectoPorId(Number(id_proyecto));
 
         res.status(resultado.codHTTP).json({
             ok: resultado.exito,
@@ -98,10 +98,10 @@ export const crearProyectoControlador = async (req: Request, res: Response): Pro
 // Actualizar un proyecto
 export const actualizarProyectoControlador = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { id } = req.params;
+        const { id_proyecto } = req.params;
         const { nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, zona_seleccionada, activo } = req.body;
 
-        if (!id || isNaN(Number(id))) {
+        if (!id_proyecto || isNaN(Number(id_proyecto))) {
             res.status(400).json({
                 ok: false,
                 message: "El ID debe ser válido para completar la acción",
@@ -111,7 +111,7 @@ export const actualizarProyectoControlador = async (req: Request, res: Response)
         }
 
         const resultado: respuestaServices = await proyectoServices.actualizarProyecto(
-            Number(id),
+            Number(id_proyecto),
             nombre_proyecto,
             nombre_sector,
             presupuesto ? Number(presupuesto) : undefined,
@@ -140,9 +140,9 @@ export const actualizarProyectoControlador = async (req: Request, res: Response)
 // Eliminar un proyecto
 export const eliminarProyectoControlador = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { id } = req.params;
+        const { id_proyecto } = req.params;
 
-        if (!id || isNaN(Number(id))) {
+        if (!id_proyecto || isNaN(Number(id_proyecto))) {
             res.status(400).json({
                 ok: false,
                 message: "Faltan datos para completar la acción",
@@ -151,7 +151,7 @@ export const eliminarProyectoControlador = async (req: Request, res: Response): 
             return;
         }
 
-        const resultado: respuestaServices = await proyectoServices.eliminarProyecto(Number(id));
+        const resultado: respuestaServices = await proyectoServices.eliminarProyecto(Number(id_proyecto));
 
         res.status(resultado.codHTTP).json({
             ok: resultado.exito,
