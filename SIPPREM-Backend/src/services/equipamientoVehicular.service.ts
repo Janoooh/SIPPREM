@@ -139,7 +139,7 @@ export const agregarEquipamientoVehicular = async (id_item: string, id_proyecto:
                     returning *;
     `;
 
-    const resultado = await poolDb.query(query, [id_item, id_proyecto, id_tipo]);
+    const resultado = await poolDb.query(query, [id_item, id_proyecto, id_tipo, id_vehiculo]);
     return {
         exito: true, 
         codHTTP: 201,
