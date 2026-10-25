@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   IonPage, 
   IonHeader,
@@ -16,51 +16,75 @@ import {
   IonChip,
   IonLabel,
   IonAvatar,
-  useIonRouter
+  IonSpinner,
+  useIonRouter,
+  useIonAlert,
+  useIonViewWillEnter
 } from '@ionic/react';
 import ProyectoPatrullajeCard from '../components/ProyectoPatrullajeCard';
 import HeaderSistema from '../components/HeaderSistema';
 import { proyectoPatrullaje } from '../interfaces/proyectoPatrullaje';
 import './Inicio.css';
 import { useUsuario } from '../hooks/obtenerUsuario';
+import { proyectosService } from '../services/proyectosService';
 
 const Inicio: React.FC = () => {
   
-  const {usuario} = useUsuario();
+  /* ==========================================================================
+     INICIO SECCIÓN MODIFICADA: Obtención de proyectos mediante proyectosService
+     ========================================================================== */
+  // Obtenemos los datos del usuario en sesion mediante el hook useUsuario
+  const { usuario } = useUsuario();
   const nombreUsuario = usuario.nombre;
   const rol = usuario.tipo_rol;
   const foto = usuario.foto;
-  // Creacion de proyectos de ejemplo para mostrarlos en el inicio.
-  const proyectos: proyectoPatrullaje[] = [
-    {
-      id: 1,
-      nombre: 'Proyecto Eje Brasil',
-      fechaInicio: new Date(),
-      fechaTermino: new Date(),
-      presupuestoAsignado: 1000
-    },
-    {
-      id: 2,
-      nombre: 'Patrullajes en Cerro Alegre',
-      fechaInicio: new Date(),
-      fechaTermino: new Date(),
-      presupuestoAsignado: 2000
-    },
-    {
-      id: 3,
-      nombre: 'Proyecto de patrullaje en Bellavista',
-      fechaInicio: new Date(),
-      fechaTermino: new Date(),
-      presupuestoAsignado: 3000
-    },
-    {
-      id: 4,
-      nombre: 'Proyecto Las Arboleadas',
-      fechaInicio: new Date(),
-      fechaTermino: new Date(),
-      presupuestoAsignado: 3000
+
+  // Hook de Ionic para mostrar alertas en caso de fallo al consultar la API
+  const [mandarAlerta] = useIonAlert();
+
+  // Estado para guardar la lista de proyectos obtenidos desde el backend
+  const [proyectos, setProyectos] = useState<proyectoPatrullaje[]>([]);
+
+  // Estado para controlar el spinner de carga durante la peticion asincrona
+  const [cargando, setCargando] = useState<boolean>(false);
+
+  // Funcion cargarProyectos: Encargada de usar proyectosService para traer desde el
+  // endpoint /proyectos del backend la lista de proyectos correspondientes.
+  const cargarProyectos = async () => {
+    try {
+      setCargando(true); // Indicamos que comenzo la carga de datos
+      const respuesta = await proyectosService.obtenerProyectos();
+      setProyectos(respuesta || []); // Guardamos los proyectos obtenidos en el estado
+    } catch (error: any) {
+      // Si el backend responde 404 (no hay proyectos para mostrar), dejamos la lista vacia sin alerta de error
+      if (error.response?.status === 404) {
+        setProyectos([]);
+        return;
+      }
+      console.error("Error al obtener proyectos:", error);
+      mandarAlerta({
+        header: "Error",
+        message: "No fue posible cargar la lista de proyectos.",
+        buttons: ["Aceptar"]
+      });
+    } finally {
+      setCargando(false); // Finalizamos la carga de datos
     }
-  ];
+  };
+
+  // Uso de hook useEffect para cargar la lista de proyectos al iniciar el componente.
+  useEffect(() => {
+    cargarProyectos();
+  }, []);
+
+  // Uso de hook useIonViewWillEnter para recargar la lista de proyectos cada vez que se entra a la ventana,
+  // manteniendo siempre la informacion actualizada.
+  useIonViewWillEnter(() => {
+    cargarProyectos();
+  });
+  /* ==========================================================================
+     FIN SECCIÓN MODIFICADA
+     ========================================================================== */
 
   const router = useIonRouter();
 
@@ -95,14 +119,35 @@ const Inicio: React.FC = () => {
                 </IonCol>
               </IonRow>
 
-              {/*Lista de proyectos existentes.*/}
-              <IonRow>
-                <IonCol size="12">
-                  {proyectos.map((proyecto) => (
-                    <ProyectoPatrullajeCard key={proyecto.id} proyecto={proyecto} rolUsuario={rol}/>
-                  ))}
-                </IonCol>
-              </IonRow>
+              {/* ==========================================================================
+                 INICIO SECCIÓN MODIFICADA: Renderizado dinámico de proyectos del backend
+                 ========================================================================== */}
+              {/* Spinner que se muestra mientras se obtienen los proyectos desde el backend */}
+              {cargando && (
+                <IonRow className="ion-justify-content-center ion-margin-top">
+                  <IonSpinner name="crescent" color="light" />
+                </IonRow>
+              )}
+
+              {/* Lista de proyectos obtenidos desde el endpoint /proyectos */}
+              {!cargando && (
+                <IonRow>
+                  <IonCol size="12">
+                    {proyectos.length > 0 ? (
+                      proyectos.map((proyecto) => (
+                        <ProyectoPatrullajeCard key={proyecto.id_proyecto} proyecto={proyecto} rolUsuario={rol}/>
+                      ))
+                    ) : (
+                      <IonText style={{ color: 'white' }}>
+                        <p>No hay proyectos registrados para mostrar.</p>
+                      </IonText>
+                    )}
+                  </IonCol>
+                </IonRow>
+              )}
+              {/* ==========================================================================
+                 FIN SECCIÓN MODIFICADA
+                 ========================================================================== */}
 
             </IonCol>
 
