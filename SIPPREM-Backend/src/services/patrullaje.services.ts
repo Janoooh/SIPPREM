@@ -9,6 +9,20 @@ interface tipoPatrullaje{
     patrulleros: string[]
 };
 
+/* ==========================================================================
+   INICIO SECCIÓN AGREGADA: Interfaz de datos para iniciar patrullaje (RF06)
+   ========================================================================== */
+interface tipoIniciarPatrullaje {
+    id_proyecto: number;     // ID del proyecto al que pertenece el patrullaje
+    id_patrullaje: number;   // ID del patrullaje planificado que se va a iniciar
+    rut_usuario: string;     // RUT extraído del token JWT de quien inicia el patrullaje
+    id_vehiculo: string;     // Identificador/patente del vehículo a utilizar (ej: 'VEH-001')
+    eq_personal: string[];   // Lista de IDs de equipamiento personal a llevar (ej: ['EQP-001'])
+}
+/* ==========================================================================
+   FIN SECCIÓN AGREGADA: Interfaz de datos para iniciar patrullaje (RF06)
+   ========================================================================== */
+
 export const obtenerPatrullajes = async (id_proyecto: string): Promise<respuestaServices> => {
 
     const queryObtenerPatrullajes = `
@@ -223,4 +237,167 @@ export const eliminarPlanificacionPatrullaje = async (id_proyecto: string, id_pa
             explicacion: "Planificación de patrullaje eliminada correctamente.",
             datos: null
         };
+};
+
+export const iniciarPatrullaje = async (datosInicio: tipoIniciarPatrullaje): Promise<respuestaServices> => {
+    
+    const { id_proyecto, id_patrullaje, rut_usuario, id_vehiculo, eq_personal } = datosInicio;
+
+    const queryVerificarEstado = `
+        SELECT 
+            p.id_patrullaje,
+            e.id_patrullaje AS id_ejecucion
+        FROM planificacion_patrullaje p
+        LEFT JOIN ejecucion_patrullaje e ON p.id_patrullaje = e.id_patrullaje
+        WHERE p.id_patrullaje = $1 AND p.id_proyecto = $2;
+    `;
+
+    const resVerificar = await poolDb.query(queryVerificarEstado, [id_patrullaje, id_proyecto]);
+
+    if (resVerificar.rows.length === 0) {
+        return {
+            exito: false,
+            codHTTP: 404,
+            explicacion: "El patrullaje solicitado no existe en este proyecto.",
+            datos: null
+        };
+    }
+
+    if (resVerificar.rows[0].id_ejecucion !== null) {
+        return {
+            exito: false,
+            codHTTP: 409,
+            explicacion: "Este patrullaje ya fue iniciado o finalizado.",
+            datos: null
+        };
+    }
+
+    const queryVerificarAsignacion = `
+        SELECT rut
+        FROM realizacion_patrullaje
+        WHERE id_patrullaje = $1 AND rut = $2;
+    `;
+    const resAsignacion = await poolDb.query(queryVerificarAsignacion, [id_patrullaje, rut_usuario]);
+
+    if (resAsignacion.rows.length === 0) {
+        return {
+            exito: false,
+            codHTTP: 403,
+            explicacion: "No tienes permiso para iniciar este patrullaje porque no estás asignado a él.",
+            datos: null
+        };
+    }
+
+    const cliente = await poolDb.connect();
+
+    try {
+        await cliente.query("BEGIN");
+
+        const queryInsertarEjecucion = `
+            INSERT INTO ejecucion_patrullaje (id_patrullaje, hora_real_inicio, hora_real_termino, id_vehiculo)
+            VALUES ($1, CURRENT_TIMESTAMP, NULL, $2)
+            RETURNING id_patrullaje, hora_real_inicio, hora_real_termino, id_vehiculo;
+        `;
+        const resEjecucion = await cliente.query(queryInsertarEjecucion, [id_patrullaje, id_vehiculo]);
+        const ejecucionIniciada = resEjecucion.rows[0];
+
+        if (eq_personal.length > 0) {
+            const queryInsertarEquipamiento = `
+                INSERT INTO uso_eq_personal (id_patrullaje, id_eq_personal)
+                SELECT $1, unnest($2::varchar[]);
+            `;
+            await cliente.query(queryInsertarEquipamiento, [id_patrullaje, eq_personal]);
+        }
+
+        await cliente.query("COMMIT");
+
+        return {
+            exito: true,
+            codHTTP: 201,
+            explicacion: "Patrullaje iniciado correctamente.",
+            datos: {
+                ...ejecucionIniciada,
+                eq_personal
+            }
+        };
+    } catch (error) {
+        await cliente.query("ROLLBACK");
+        throw error;
+    } finally {
+        cliente.release();
+    }
+};
+
+export const finalizarPatrullaje = async (id_proyecto: number, id_patrullaje: number, rut_usuario: string ): Promise<respuestaServices> => {
+    
+    const queryVerificarEstado = `
+        SELECT 
+            p.id_patrullaje,
+            e.id_patrullaje AS id_ejecucion,
+            e.hora_real_termino
+        FROM planificacion_patrullaje p
+        LEFT JOIN ejecucion_patrullaje e ON p.id_patrullaje = e.id_patrullaje
+        WHERE p.id_patrullaje = $1 AND p.id_proyecto = $2;
+    `;
+    const resVerificar = await poolDb.query(queryVerificarEstado, [id_patrullaje, id_proyecto]);
+
+    if (resVerificar.rows.length === 0) {
+        return {
+            exito: false,
+            codHTTP: 404,
+            explicacion: "El patrullaje solicitado no existe en este proyecto.",
+            datos: null
+        };
+    }
+
+    const estadoActual = resVerificar.rows[0];
+
+    if (estadoActual.id_ejecucion === null) {
+        return {
+            exito: false,
+            codHTTP: 409,
+            explicacion: "No se puede finalizar un patrullaje que aún no ha sido iniciado.",
+            datos: null
+        };
+    }
+
+    if (estadoActual.hora_real_termino !== null) {
+        return {
+            exito: false,
+            codHTTP: 409,
+            explicacion: "Este patrullaje ya fue finalizado anteriormente.",
+            datos: null
+        };
+    }
+
+    const queryVerificarAsignacion = `
+        SELECT rut
+        FROM realizacion_patrullaje
+        WHERE id_patrullaje = $1 AND rut = $2;
+    `;
+    const resAsignacion = await poolDb.query(queryVerificarAsignacion, [id_patrullaje, rut_usuario]);
+
+    if (resAsignacion.rows.length === 0) {
+        return {
+            exito: false,
+            codHTTP: 403,
+            explicacion: "No tienes permiso para finalizar este patrullaje porque no estás asignado a él.",
+            datos: null
+        };
+    }
+
+    const queryFinalizar = `
+        UPDATE ejecucion_patrullaje
+        SET hora_real_termino = CURRENT_TIMESTAMP
+        WHERE id_patrullaje = $1
+        RETURNING id_patrullaje, hora_real_inicio, hora_real_termino, id_vehiculo;
+    `;
+    const resFinalizar = await poolDb.query(queryFinalizar, [id_patrullaje]);
+
+    return {
+        exito: true,
+        codHTTP: 200,
+        explicacion: "Patrullaje finalizado correctamente.",
+        datos: resFinalizar.rows[0]
+    };
 };

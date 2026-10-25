@@ -3,6 +3,7 @@ import type { respuestaServices } from "../interfaces/respuestaServices.js";
 import * as patrullajeServices from "../services/patrullaje.services.js";
 import { identificarErrorDB } from "../utils/errorDB.utils.js";
 import { esPoligonoValido, esRutValido } from "../utils/validadores.utils.js";
+import type { RequestConUsuario } from "../interfaces/RequestConUsuario.js"; // <-- AGREGADO: Para leer req.usuario del token JWT
 
 export const obtenerPatrullajes = async (req: Request, res: Response): Promise<void> => {
     try{
@@ -212,6 +213,111 @@ export const eliminarPlanificacionPatrullaje = async (req: Request, res: Respons
 
     }catch(error){
         console.log("Error en controlador eliminarPlanificacionPatrullaje, de patrullaje.controllers.ts : ", error);
+        identificarErrorDB(error, res);
+        return;
+    }
+};
+
+export const iniciarPatrullaje = async (req: RequestConUsuario, res: Response): Promise<void> => {
+    try {
+        
+        const id_proyecto = req.params.id_proyecto as string;
+        const id_patrullaje = req.params.id_patrullaje as string;
+
+        const rut_usuario = req.usuario?.rutUsuario?.toLowerCase() as string;
+
+        const { id_vehiculo, eq_personal } = req.body;
+
+        if (!id_patrullaje || isNaN(Number(id_patrullaje))) {
+            res.status(400).json({
+                ok: false,
+                message: "El ID del patrullaje debe ser un número válido.",
+                data: null
+            });
+            return;
+        }
+
+        if (!id_vehiculo || typeof id_vehiculo !== "string" || id_vehiculo.trim() === "") {
+            res.status(400).json({
+                ok: false,
+                message: "Debe indicar la patente o identificador del vehículo a utilizar.",
+                data: null
+            });
+            return;
+        }
+
+
+        const listaEqPersonal: string[] = eq_personal === undefined ? [] : eq_personal;
+        if (!Array.isArray(listaEqPersonal) || !listaEqPersonal.every((item: any) => typeof item === "string" && item.trim() !== "")) {
+            res.status(400).json({
+                ok: false,
+                message: "El campo eq_personal debe ser un arreglo de identificadores válidos.",
+                data: null
+            });
+            return;
+        }
+
+        const eqPersonalSinEspacios = listaEqPersonal.map((item: string) => item.trim());
+        if (new Set(eqPersonalSinEspacios).size !== eqPersonalSinEspacios.length) {
+            res.status(400).json({
+                ok: false,
+                message: "No se puede agregar dos veces el mismo artículo de equipamiento personal.",
+                data: null
+            });
+            return;
+        }
+
+        const resIniciarPatrullaje: respuestaServices = await patrullajeServices.iniciarPatrullaje({
+            id_proyecto: Number(id_proyecto),
+            id_patrullaje: Number(id_patrullaje),
+            rut_usuario,
+            id_vehiculo: id_vehiculo.trim(),
+            eq_personal: eqPersonalSinEspacios
+        });
+
+        res.status(resIniciarPatrullaje.codHTTP).json({
+            ok: resIniciarPatrullaje.exito,
+            message: resIniciarPatrullaje.explicacion,
+            data: resIniciarPatrullaje.datos
+        });
+
+    } catch (error) {
+        console.log("Error en controlador iniciarPatrullaje, de patrullaje.controllers.ts : ", error);
+        identificarErrorDB(error, res);
+        return;
+    }
+};
+
+export const finalizarPatrullaje = async (req: RequestConUsuario, res: Response): Promise<void> => {
+    try {
+        const id_proyecto = req.params.id_proyecto as string;
+        const id_patrullaje = req.params.id_patrullaje as string;
+
+        const rut_usuario = req.usuario?.rutUsuario?.toLowerCase() as string;
+
+        if (!id_patrullaje || isNaN(Number(id_patrullaje))) {
+            res.status(400).json({
+                ok: false,
+                message: "El ID del patrullaje debe ser un número válido.",
+                data: null
+            });
+            return;
+        }
+
+        const resFinalizarPatrullaje: respuestaServices = await patrullajeServices.finalizarPatrullaje(
+            Number(id_proyecto),
+            Number(id_patrullaje),
+            rut_usuario
+        );
+
+        res.status(resFinalizarPatrullaje.codHTTP).json({
+            ok: resFinalizarPatrullaje.exito,
+            message: resFinalizarPatrullaje.explicacion,
+            data: resFinalizarPatrullaje.datos
+        });
+
+    } catch (error) {
+        console.log("Error en controlador finalizarPatrullaje, de patrullaje.controllers.ts : ", error);
         identificarErrorDB(error, res);
         return;
     }
