@@ -7,8 +7,10 @@ import {
   IonRow, 
   IonCol,
   IonLabel,
-  IonButton
+  IonButton,
+  useIonRouter
 } from '@ionic/react';
+import { useParams } from 'react-router-dom';
 import HeaderSistema from '../components/HeaderSistema';
 import ActividadFuturaCard from '../components/ActividadFuturaCard';
 import { ActividadFutura } from '../interfaces/actividadFutura';
@@ -32,8 +34,9 @@ const InicioProyecto: React.FC = () => {
 
   const {usuario} = useUsuario();
   const nombreUsuario = usuario.nombre;
+  const { id_proyecto } = useParams<{ id_proyecto: string }>();
   const rol = usuario.tipo_rol;
-
+  const router = useIonRouter();
   return (
     <IonPage>
       
@@ -60,12 +63,20 @@ const InicioProyecto: React.FC = () => {
                   <IonRow className="menu-divider"></IonRow>
                   
                   {/*Resto de botones.*/}
-                  <IonButton className="menu-btn" expand="block" fill="clear">
+                  <IonButton className="menu-btn" expand="block" fill="clear" >
                     Cronograma
                   </IonButton>
                   <IonRow className="menu-divider"></IonRow>
 
-                  <IonButton className="menu-btn" expand="block" fill="clear">
+                  <IonButton 
+                    className="menu-btn" 
+                    expand="block" 
+                    fill="clear"
+                    onClick={() => {
+                      // Aquí puedes ejecutar lógica extra antes de navegar si lo necesitas
+                      router.push(`/supervisor/proyecto/${id_proyecto}/inventario`, 'forward');
+                    }}
+                  >
                     Inventario
                   </IonButton>
                   <IonRow className="menu-divider"></IonRow>

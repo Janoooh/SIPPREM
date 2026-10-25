@@ -10,6 +10,9 @@ import CambiarClaveInicial from './pages/CambiarClaveInicial';
 import Usuarios from './pages/Usuarios';
 import AgregarUsuario from './pages/AgregarUsuario';
 import ModificarUsuario from './pages/ModificarUsuario';
+import Inventario from './pages/Inventario';
+import AgregarVehiculo from './pages/AgregarVehiculo';
+import AgregarArticulo from './pages/AgregarArticulo';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -31,7 +34,6 @@ import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
-
 
 
 interface datosUsuario{
@@ -107,9 +109,27 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
-          <Route path="/supervisor/proyecto/:id" element={
+          <Route path="/supervisor/proyecto/:id_proyecto" element={
             <RutaProtegida rolesPermitidos={["supervisor"]}>
                 <InicioProyecto />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/inventario" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <Inventario />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/inventario/vehiculos/agregar" element={
+           <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <AgregarVehiculo />
+          </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/inventario/articulos/registrar" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+              <AgregarArticulo />
             </RutaProtegida>
           } />
 
