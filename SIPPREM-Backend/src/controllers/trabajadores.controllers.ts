@@ -33,11 +33,6 @@ export const obtenerTrabajadoresProyectoControlador = async (req: Request, res: 
     }
 };
 
-
-//post
-// este es del post de trabajadores
-// esta wea no funciona si es que el trabajador no está registrado como tal 
-// Y este loquito no tiene que participar en ningún proyecto, para poder asignarlo a un proyecto 
 export const asignarTrabajadorControlador = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id_proyecto } = req.params;
