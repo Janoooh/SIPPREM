@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import * as proyectoServices from "../services/proyecto.services.js";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 import { esPoligonoValido } from "../utils/validadores.utils.js";
+import { identificarErrorDB } from "../utils/errorDB.utils.js";
 
 // Obtener todos los proyectos
 export const obtenerProyectosControlador = async (req: Request, res: Response): Promise<void> => {
@@ -15,11 +16,7 @@ export const obtenerProyectosControlador = async (req: Request, res: Response): 
         });
     } catch (error) {
         console.error("Error en controlador obtenerProyectosControlador, de proyecto.controllers.ts : ", error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al procesar los proyectos.",
-            data: null
-        });
+        identificarErrorDB(error,res);
         return;
     }
 };
@@ -47,11 +44,7 @@ export const obtenerProyectoPorIdControlador = async (req: Request, res: Respons
         });
     } catch (error) {
         console.error("Error en controlador obtenerProyectoPorIdControlador, de proyecto.controllers.ts : ", error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al procesar el proyecto.",
-            data: null
-        });
+        identificarErrorDB(error,res);
         return;
     }
 };
@@ -96,11 +89,7 @@ export const crearProyectoControlador = async (req: Request, res: Response): Pro
         });
     } catch (error) {
         console.error("Error en controlador crearProyectoControlador, de proyecto.controllers.ts : ", error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al crear el proyecto.",
-            data: null
-        });
+        identificarErrorDB(error,res);
         return;
     }
 };
@@ -147,11 +136,7 @@ export const actualizarProyectoControlador = async (req: Request, res: Response)
         });
     } catch (error) {
         console.error("Error en controlador actualizarProyectoControlador, de proyecto.controllers.ts : ", error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al actualizar el proyecto.",
-            data: null
-        });
+        identificarErrorDB(error,res);
         return;
     }
 };
@@ -179,11 +164,7 @@ export const eliminarProyectoControlador = async (req: Request, res: Response): 
         });
     } catch (error) {
         console.error("Error en controlador eliminarProyectoControlador, de proyecto.controllers.ts : ", error);
-        res.status(500).json({
-            ok: false,
-            message: "Error del servidor interno al eliminar el proyecto.",
-            data: null
-        });
+        identificarErrorDB(error,res);
         return;
     }
 };
