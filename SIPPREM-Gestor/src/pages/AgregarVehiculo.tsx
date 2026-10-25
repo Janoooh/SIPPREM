@@ -233,7 +233,7 @@ const AgregarVehiculo: React.FC = () => {
                 </div>
 
                 {/* Botón Agregar Artículo */}
-                <IonButton expand="block" className="btn-agregar-articulo" onClick={() => router.push(`/supervisor/proyecto/${id_proyecto}/inventario/agregar-articulo`, 'forward')}>
+                <IonButton expand="block" className="btn-agregar-articulo" onClick={() => router.push(`/supervisor/proyecto/${id_proyecto}/inventario/articulos/registrar`, 'forward')}>
                   Agregar Articulo
                 </IonButton>
               </div>
