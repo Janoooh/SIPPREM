@@ -1,6 +1,14 @@
 import { poolDb } from "../config/db.js";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 
+interface tipoPatrullaje{
+    hora_inicio: string,
+    hora_termino: string,
+    zona: string,
+    id_proyecto: number,
+    patrulleros: string[]
+};
+
 export const obtenerPatrullajes = async (id_proyecto: string): Promise<respuestaServices> => {
 
     const queryObtenerPatrullajes = `
@@ -37,4 +45,48 @@ export const obtenerPatrullajes = async (id_proyecto: string): Promise<respuesta
         explicacion: "Patrullajes obtenidos correctamente.",
         datos: resQueryObtenerPatrullajes.rows
     };
+};
+
+export const crearPlanificacionPatrullaje = async (patrullajeNuevo: tipoPatrullaje): Promise<respuestaServices> => {
+    const { hora_inicio, hora_termino, zona, id_proyecto, patrulleros } = patrullajeNuevo;
+
+    const cliente = await poolDb.connect();
+
+    try {
+        await cliente.query("BEGIN");
+
+        const queryCrearPlanificacionPatrullaje = `
+            INSERT INTO planificacion_patrullaje (hora_inicio, hora_termino, zona, id_proyecto)
+            VALUES ($1, $2, ST_GeomFromText($3, 4326), $4)
+            RETURNING id_patrullaje, hora_inicio, hora_termino, ST_AsGeoJSON(zona)::json AS zona, id_proyecto;
+        `;
+
+        const resPlanificacion = await cliente.query(queryCrearPlanificacionPatrullaje, [hora_inicio, hora_termino, zona, id_proyecto]);
+
+        const planificacionCreada = resPlanificacion.rows[0];
+
+        const queryAsignarPatrulleros = `
+            INSERT INTO realizacion_patrullaje (rut, id_patrullaje)
+            SELECT unnest($1::varchar[]), $2;
+        `;
+
+        await cliente.query(queryAsignarPatrulleros, [patrulleros, planificacionCreada.id_patrullaje]);
+
+        await cliente.query("COMMIT");
+
+        return {
+            exito: true,
+            codHTTP: 201,
+            explicacion: "Planificacion de patrullaje creada correctamente.",
+            datos: {
+                ...planificacionCreada,
+                patrulleros
+            }
+        };
+    } catch (error) {
+        await cliente.query("ROLLBACK");
+        throw error;
+    } finally {
+        cliente.release();
+    }
 };

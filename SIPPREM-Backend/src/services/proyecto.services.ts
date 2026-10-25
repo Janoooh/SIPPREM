@@ -4,7 +4,7 @@ import type { respuestaServices } from "../interfaces/respuestaServices.js";
 // Obtener todos los proyectos activos y no eliminados
 export const obtenerProyectos = async (): Promise<respuestaServices> => {
     const query = `
-        SELECT id_proyecto, nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, zona_seleccionada, activo
+        SELECT id_proyecto, nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, ST_AsGeoJSON(zona_seleccionada)::json AS zona_seleccionada, activo
         FROM proyecto_patrullaje
         WHERE eliminado = false
         ORDER BY nombre_proyecto;
@@ -32,7 +32,7 @@ export const obtenerProyectos = async (): Promise<respuestaServices> => {
 
 export const obtenerProyectoPorId = async (id: number): Promise<respuestaServices> => {
     const query = `
-        SELECT id_proyecto, nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, zona_seleccionada, activo
+        SELECT id_proyecto, nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, ST_AsGeoJSON(zona_seleccionada)::json AS zona_seleccionada, activo
         FROM proyecto_patrullaje
         WHERE id_proyecto = $1 AND eliminado = false;
     `;
@@ -67,8 +67,8 @@ export const crearProyecto = async (
 ): Promise<respuestaServices> => {
     const query = `
         INSERT INTO proyecto_patrullaje (nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, zona_seleccionada)
-        VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING *;
+        VALUES ($1, $2, $3, $4, $5, ST_GeomFromText($6, 4326))
+        RETURNING id_proyecto, nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, ST_AsGeoJSON(zona_seleccionada)::json AS zona_seleccionada, activo, eliminado;
     `;
 
     const resultado = await poolDb.query(query, [
@@ -122,10 +122,10 @@ export const actualizarProyecto = async (
             presupuesto = $3,
             fecha_inicio = $4,
             fecha_termino = $5,
-            zona_seleccionada = $6,
+            zona_seleccionada = ST_GeomFromText($6, 4326),
             activo = $7
         WHERE id_proyecto = $8
-        RETURNING *;
+        RETURNING id_proyecto, nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, ST_AsGeoJSON(zona_seleccionada)::json AS zona_seleccionada, activo, eliminado;
     `;
 
     const resultado = await poolDb.query(queryActualizar, [
@@ -152,7 +152,7 @@ export const eliminarProyecto = async (id: number): Promise<respuestaServices> =
         UPDATE proyecto_patrullaje 
         SET eliminado = true
         WHERE id_proyecto = $1 AND eliminado = false
-        RETURNING *;
+        RETURNING id_proyecto, nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, ST_AsGeoJSON(zona_seleccionada)::json AS zona_seleccionada, activo, eliminado;
     `;
 
     const resultado = await poolDb.query(query, [id]);

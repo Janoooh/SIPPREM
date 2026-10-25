@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import * as proyectoServices from "../services/proyecto.services.js";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
+import { esPoligonoValido } from "../utils/validadores.utils.js";
 
 // Obtener todos los proyectos
 export const obtenerProyectosControlador = async (req: Request, res: Response): Promise<void> => {
@@ -70,6 +71,15 @@ export const crearProyectoControlador = async (req: Request, res: Response): Pro
             return;
         }
 
+        if (!esPoligonoValido(zona_seleccionada)){
+            res.status(400).json({
+                ok: false,
+                message: "El formato de la zona seleccionada no es valido como poligono de ubicacion.",
+                data: null
+            });
+            return;
+        }
+
         const resultado: respuestaServices = await proyectoServices.crearProyecto(
             String(nombre_proyecto),
             String(nombre_sector),
@@ -105,6 +115,15 @@ export const actualizarProyectoControlador = async (req: Request, res: Response)
             res.status(400).json({
                 ok: false,
                 message: "El ID debe ser válido para completar la acción",
+                data: null
+            });
+            return;
+        }
+
+        if (!esPoligonoValido(zona_seleccionada)){
+            res.status(400).json({
+                ok: false,
+                message: "El formato de la zona seleccionada no es valido como poligono de ubicacion.",
                 data: null
             });
             return;

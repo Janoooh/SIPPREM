@@ -34,7 +34,7 @@ export const obtenerIncidentes = async (id_proyecto: number): Promise<respuestaS
             i.id_incidente, 
             i.observaciones, 
             i.fecha_hora, 
-            ST_AsText(i.ubicacion) as ubicacion, 
+            ST_AsGeoJSON(i.ubicacion)::json as ubicacion, 
             i.nivel_gravedad, 
             i.id_patrullaje, 
             ci.categoria
@@ -70,7 +70,7 @@ export const obtenerIncidentePorId = async (id_proyecto: number, id_incidente: s
             i.id_incidente, 
             i.observaciones, 
             i.fecha_hora, 
-            ST_AsText(i.ubicacion) as ubicacion, 
+            ST_AsGeoJSON(i.ubicacion)::json as ubicacion, 
             i.nivel_gravedad, 
             i.id_patrullaje, 
             ci.categoria,
