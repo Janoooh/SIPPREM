@@ -1,4 +1,3 @@
---VAN A ESTAR TODOS LOS NAMES CON CAMELLO CAJA POR QUE EL GEMI ME DIJO QUE ERA BUENA PRACTICE
 -- TIENEN QUE TENER INSTALADO EL POSTGIS EN POSTGRE O SINO LE VA A SALTAR UN ERROR CON EL TIPO GEOMETRIA
 CREATE EXTENSION IF NOT EXISTS postgis;
 
@@ -13,11 +12,11 @@ create table usuario(
 	rut varchar(12),
 	nombre varchar(100) not null,
 	correo varchar(100) unique,
-	telefono varchar(15) unique, -- no se si va ser obligatorio, es un varchar por que se puede meter el +
+	telefono varchar(15) unique,
 	foto bytea,
 	hash_contrasenia varchar(255) not null,
 	nuevo_user bool default true not null,
-	fecha_registro timestamp default current_timestamp not null, -- esto lo saque de los mockups. Es para que guarde cuando se creo
+	fecha_registro timestamp default current_timestamp not null,
 	eliminado bool default false not null,
 	id_rol integer not null,
 
@@ -32,13 +31,13 @@ create table proyecto_patrullaje(
 	presupuesto integer not null,
 	fecha_inicio date not null,
 	fecha_termino date not null,
-	zona_seleccionada geometry (Geometry, 4326) not null, -- este es el tipo de dato que se maneja en postgis segun el geminais
+	zona_seleccionada geometry (Geometry, 4326) not null,
 	activo bool default true not null, -- este es para el estado de un proyecto (activo o cerrado).
 	eliminado bool default false not null, --este es para ver si fue eliminado. 
 	
 	constraint pk_proyecto_patrullaje primary key (id_proyecto)
 	/* No se si es necesario hacer check o si me manejaran en el frontend
-		Asi que los pongo porsiaca lol					
+		Asi que los pongo porsiaca				
 	*/,
 	constraint chk_fechas check (fecha_termino >= fecha_inicio),
 	constraint chk_presupuesto check (presupuesto > 0)
@@ -56,7 +55,7 @@ create table acceso_proyecto(
 create table actividad(
 	id_actividad integer generated always as identity,
 	titulo varchar (100) not null,
-	fecha date not null, -- en los mockups aparece hora tambien, pero no se si agregarlo
+	fecha date not null,
 	descripcion varchar(255) not null,
 	eliminado bool default false not null, -- este es para marcarlos como eliminado
 	id_proyecto integer not null,
@@ -128,7 +127,6 @@ create table equipamiento_personal(
 	constraint fk_eq_persona_tipo_eq_personal foreign key (id_tipo_eq_personal) references tipo_equipamiento_personal(id_tipo_eq_personal)
 )inherits (articulo);
 
---este se cambio
 create table planificacion_patrullaje(
 	id_patrullaje integer generated always as identity,
 	hora_inicio timestamp not null, -- un patrullaje puede empezar un dia y terminar otro
@@ -146,19 +144,20 @@ create table realizacion_patrullaje(
 
 	constraint pk_realizacion_patrullaje primary key (rut, id_patrullaje),
 	constraint fk_realizacion_patrullaje_rut foreign key(rut) references usuario(rut),
-	constraint fk_realizacion_patrullaje_plan_patrullaje foreign key(id_patrullaje) references planificacion_patrullaje(id_patrullaje)
+	constraint fk_realizacion_patrullaje_plan_patrullaje foreign key(id_patrullaje) references planificacion_patrullaje(id_patrullaje) on delete cascade
 );
 
 --tiene que tener el mismo id que la planificacion_patrullaje
 create table ejecucion_patrullaje(
 	id_patrullaje integer not null,
-	hora_real_inicio timestamp,
+	hora_real_inicio timestamp not null,
 	hora_real_termino timestamp,
 	id_vehiculo varchar(20) not null,
 
 	constraint pk_eje_patrullaje primary key (id_patrullaje),
 	constraint fk_eje_patrullaje_plan_patrullaje foreign key (id_patrullaje) references planificacion_patrullaje(id_patrullaje),
-	constraint fk_eje_patrullaje_vehiculo foreign key (id_vehiculo) references vehiculo(id_item)
+	constraint fk_eje_patrullaje_vehiculo foreign key (id_vehiculo) references vehiculo(id_item),
+    constraint chk_horas_ejecucion check (hora_real_termino is null or hora_real_termino >= hora_real_inicio)
 );
 
 create table categoria_incidente(
@@ -173,7 +172,7 @@ create table incidente (
 	observaciones varchar(255),
 	fecha_hora timestamp not null,
 	ubicacion geometry(Point, 4326) not null,
-	nivel_gravedad integer not null,  --- no se cual va a ser la escala asi que le voy poner del 1 al 5
+	nivel_gravedad integer not null, 
 	id_patrullaje integer not null,
 	id_categoria_incidente integer not null,
 
@@ -216,12 +215,16 @@ declare
 	fecha_ini date;
 	fecha_fin date;
 begin
+	if new.hora_termino <= new.hora_inicio then
+		raise exception 'La hora de término debe ser posterior a la hora de inicio.';
+	end if;
+
 	select fecha_inicio, fecha_termino into fecha_ini, fecha_fin
 	from proyecto_patrullaje
 	where id_proyecto = new.id_proyecto;
 
 	if new.hora_inicio::date < fecha_ini or new.hora_termino::date > fecha_fin then
-		raise exception 'las fechas del patrullaje estan fuera de rango del proyecto';
+		raise exception 'Las fechas del patrullaje estan fuera de rango del proyecto';
 	end if;
 	
 return new;
@@ -289,7 +292,7 @@ EXECUTE FUNCTION validar_zona_patrullaje();
 /*
 Trigger para que un incidente no pueda estar fuera del area de patrullaje.
 
-ESTE NO SE SI PONERLO PORQUE PUEDE OCURRIR QUE UN INCIDENTE ESTE FUERA DEL AREA POR UN PAR DE CUADRAS POR EJEMPLO
+---rev
 */
 CREATE OR REPLACE FUNCTION validar_ubicacion_incidente()
 RETURNS TRIGGER AS $$
@@ -317,11 +320,139 @@ BEFORE INSERT OR UPDATE ON incidente
 FOR EACH ROW
 EXECUTE FUNCTION validar_ubicacion_incidente();
 
+/*
+Trigger para validar que al asignar un patrullero a un patrullaje: tenga rol Patrullero activo, pertenezca al proyecto, y no tenga otro patrullaje con horario solapado.
+*/
+CREATE OR REPLACE FUNCTION validar_disponibilidad_patrullero()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_hora_inicio timestamp;
+    v_hora_termino timestamp;
+    v_id_proyecto integer;
+    v_es_patrullero boolean;
+    v_pertenece boolean;
+    v_conflicto boolean;
+BEGIN
+    SELECT EXISTS (
+        SELECT 1
+        FROM usuario
+        WHERE rut = NEW.rut AND id_rol = 3 AND eliminado = false
+    ) INTO v_es_patrullero;
+
+    IF NOT v_es_patrullero THEN
+        RAISE EXCEPTION 'El usuario con RUT % no es un patrullero activo.', NEW.rut;
+    END IF;
+
+    SELECT hora_inicio, hora_termino, id_proyecto
+    INTO v_hora_inicio, v_hora_termino, v_id_proyecto
+    FROM planificacion_patrullaje
+    WHERE id_patrullaje = NEW.id_patrullaje;
+
+    SELECT EXISTS (
+        SELECT 1
+        FROM acceso_proyecto
+        WHERE rut = NEW.rut AND id_proyecto = v_id_proyecto
+    ) INTO v_pertenece;
+
+    IF NOT v_pertenece THEN
+        RAISE EXCEPTION 'El patrullero con RUT % no pertenece a este proyecto.', NEW.rut;
+    END IF;
+
+    SELECT EXISTS (
+        SELECT 1
+        FROM realizacion_patrullaje rp
+        INNER JOIN planificacion_patrullaje p ON rp.id_patrullaje = p.id_patrullaje
+        WHERE rp.rut = NEW.rut
+          AND rp.id_patrullaje <> NEW.id_patrullaje
+          AND (p.hora_inicio, p.hora_termino) OVERLAPS (v_hora_inicio, v_hora_termino)
+    ) INTO v_conflicto;
+
+    IF v_conflicto THEN
+        RAISE EXCEPTION 'El patrullero con RUT % ya tiene un patrullaje asignado en ese horario.', NEW.rut;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_validar_disponibilidad_patrullero
+BEFORE INSERT OR UPDATE ON realizacion_patrullaje
+FOR EACH ROW
+EXECUTE FUNCTION validar_disponibilidad_patrullero();
+
+/*
+Trigger para validar que el vehículo utilizado en ejecucion_patrullaje pertenezca al proyecto y no esté eliminado.
+*/
+CREATE OR REPLACE FUNCTION validar_vehiculo_ejecucion()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_id_proyecto integer;
+    v_vehiculo_valido boolean;
+BEGIN
+    SELECT id_proyecto INTO v_id_proyecto
+    FROM planificacion_patrullaje
+    WHERE id_patrullaje = NEW.id_patrullaje;
+
+    SELECT EXISTS (
+        SELECT 1
+        FROM vehiculo
+        WHERE id_item = NEW.id_vehiculo
+          AND id_proyecto = v_id_proyecto
+          AND eliminado = false
+    ) INTO v_vehiculo_valido;
+
+    IF NOT v_vehiculo_valido THEN
+        RAISE EXCEPTION 'El vehículo % no pertenece a este proyecto, o se encuentra eliminado.', NEW.id_vehiculo;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_validar_vehiculo_ejecucion
+BEFORE INSERT OR UPDATE ON ejecucion_patrullaje
+FOR EACH ROW
+EXECUTE FUNCTION validar_vehiculo_ejecucion();
+
+/*
+Trigger para validar que el equipamiento personal utilizado en uso_eq_personal pertenezca al proyecto y no esté eliminado.
+*/
+CREATE OR REPLACE FUNCTION validar_eq_personal_ejecucion()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_id_proyecto integer;
+    v_eq_valido boolean;
+BEGIN
+    SELECT id_proyecto INTO v_id_proyecto
+    FROM planificacion_patrullaje
+    WHERE id_patrullaje = NEW.id_patrullaje;
+
+    SELECT EXISTS (
+        SELECT 1
+        FROM equipamiento_personal
+        WHERE id_item = NEW.id_eq_personal
+          AND id_proyecto = v_id_proyecto
+          AND eliminado = false
+    ) INTO v_eq_valido;
+
+    IF NOT v_eq_valido THEN
+        RAISE EXCEPTION 'El equipamiento personal % no pertenece a este proyecto, o se encuentra eliminado.', NEW.id_eq_personal;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_validar_eq_personal_ejecucion
+BEFORE INSERT OR UPDATE ON uso_eq_personal
+FOR EACH ROW
+EXECUTE FUNCTION validar_eq_personal_ejecucion();
+
 /*-----------------------------------------------------------
 
 
-AQUI EMPIEZA LA PARTE DE INSERCION DE DATOS. LOS SAQUE DEL DOCUMENTO QUE
-DEJARON EN EL GIT
+AQUI EMPIEZA LA PARTE DE INSERCION DE DATOS. 
+
 
 --------------------------------------------------------------*/
 
@@ -417,10 +548,6 @@ VALUES
 );
 
 INSERT INTO acceso_proyecto (rut, id_proyecto) VALUES 
-('12345678-9', 1),
-('12345678-9', 2),
-('00000000-0', 1),
-('00000000-0', 2),
 ('11111111-1', 1),
 ('19333444-5', 1),
 ('18222333-k', 1),
