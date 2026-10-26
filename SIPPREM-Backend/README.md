@@ -909,3 +909,215 @@ Casos de Error:
 
 ### Evidencia de pruebas en Postman
 ![Evidencia subtipos](./pruebas/capturas/evidencia-subtipos.png)
+
+
+# Módulo de actividades
+Módulo encargado de la gestión del cronograma y registro de actividades asociadas a un proyecto de patrullaje. Incluyendo operaciones de listado, creación, actualización y eliminación lógica.
+
+## 1. Listar todas las actividades de un proyecto
+Obtiene un listado de todas las actividades activas (que no hayan sido eliminadas lógicamente) asociadas a un proyecto específico, ordenadas por fecha de forma ascendente.
+
+Método: `GET`  
+Ruta: `/api/v1/proyectos/:id_proyecto/actividades`  
+Autenticación: Requiere Token JWT  
+Roles permitidos: `admin`, `supervisor`, `patrullero`  
+Parámetros de ruta (Path Params):  
+- `id_proyecto` (number): ID único del proyecto.  
+
+Respuestas Esperadas:  
+- 200 OK: Devuelve la lista con las actividades encontradas.
+
+```JSON
+{
+  "ok": true,
+  "message": "Actividades obtenidas correctamente.",
+  "data": [ ... ]
+}
+```
+Casos de Error:  
+- 400 Bad Request: El ID del proyecto es inválido o no es numérico.
+- 404 Not Found: El proyecto no existe o ha sido eliminado.
+- 500 Internal Server Error: Error del servidor interno al obtener las actividades del proyecto.
+
+## 2. Crear una actividad
+Registra una nueva actividad dentro de un proyecto de patrullaje en la base de datos.
+
+Método: `POST`  
+Ruta: `/api/v1/proyectos/:id_proyecto/actividades`  
+Autenticación: Requiere Token JWT  
+Roles permitidos: `admin`, `supervisor`  
+Parámetros de ruta (Path Params):  
+- `id_proyecto` (number): ID único del proyecto.  
+
+Body requerido (JSON):  
+```JSON
+{
+  "titulo": "string",
+  "fecha": "string (YYYY-MM-DD)",
+  "descripcion": "string"
+}
+```
+Respuestas Esperadas:  
+- 201 Created: Actividad creada exitosamente.
+
+```JSON
+{
+  "ok": true,
+  "message": "Actividad creada exitosamente.",
+  "data": { ... }
+}
+```
+
+Casos de Error:  
+- 400 Bad Request: Faltan campos obligatorios en el cuerpo de la petición o el ID del proyecto es inválido.
+- 404 Not Found: No se puede crear la actividad porque el proyecto no existe o ha sido eliminado.
+- 500 Internal Server Error: Error del servidor interno al crear la actividad (o fecha fuera del rango del proyecto).
+
+## 3. Actualizar una actividad
+Modifica los datos (título, fecha y descripción) de una actividad existente.
+
+Método: `PUT`  
+Ruta: `/api/v1/proyectos/:id_proyecto/actividades/:id_actividad`  
+Autenticación: Requiere Token JWT  
+Roles permitidos: `admin`, `supervisor`  
+Parámetros de ruta (Path Params):  
+- `id_proyecto` (number): ID único del proyecto.
+- `id_actividad` (number): ID único de la actividad a actualizar.  
+
+Body (JSON):  
+```JSON
+{
+  "titulo": "string",
+  "fecha": "string (YYYY-MM-DD)",
+  "descripcion": "string"
+}
+```
+Respuestas Esperadas:  
+- 200 OK: Actividad actualizada exitosamente.
+```JSON
+{
+  "ok": true,
+  "message": "Actividad actualizada exitosamente.",
+  "data": { ... }
+}
+```
+Casos de Error:  
+- 400 Bad Request: El ID de la actividad es inválido o faltan campos obligatorios (título, fecha, descripción).
+- 404 Not Found: No se pudo actualizar la actividad porque no existe o ha sido eliminada.
+- 500 Internal Server Error: Error del servidor interno al actualizar la actividad.
+
+## 4. Eliminar una actividad (Eliminación lógica)
+Realiza una baja lógica de la actividad cambiando su estado de eliminación a verdadero (`eliminado = true`).
+
+Método: `DELETE`  
+Ruta: `/api/v1/proyectos/:id_proyecto/actividades/:id_actividad`  
+Autenticación: Requiere Token JWT  
+Roles permitidos: `admin`, `supervisor`  
+Parámetros de ruta (Path Params):  
+- `id_proyecto` (number): ID único del proyecto.
+- `id_actividad` (number): ID único de la actividad a eliminar.  
+
+Respuestas Esperadas:  
+- 200 OK: Actividad marcada como eliminada exitosamente.
+```JSON
+{
+  "ok": true,
+  "message": "Actividad eliminada exitosamente.",
+  "data": { ... }
+}
+```
+Casos de Error:  
+- 400 Bad Request: El ID de la actividad es inválido.
+- 404 Not Found: La actividad no existe o ya ha sido eliminada.
+- 500 Internal Server Error: Error del servidor interno al eliminar la actividad.
+
+### Evidencia de pruebas en Postman
+![Evidencia actividades](./pruebas/capturas/evidencia-actividades.png)
+
+---
+
+# Módulo de trabajadores
+Este módulo gestiona la consulta, asignación y desvinculación de trabajadores (usuarios) que participan en un proyecto de patrullaje específico.
+
+## 1. Listar todos los trabajadores de un proyecto
+Obtiene un listado de todos los trabajadores activos asignados a un proyecto específico, incluyendo sus datos personales y su rol en el sistema.
+
+Método: `GET`  
+Ruta: `/api/v1/proyectos/:id_proyecto/trabajadores`  
+Autenticación: Requiere Token JWT  
+Roles permitidos: `admin`, `supervisor`  
+Parámetros de ruta (Path Params):  
+- `id_proyecto` (number): ID único del proyecto.  
+
+Respuestas Esperadas:  
+- 200 OK: Devuelve la lista con los trabajadores asignados al proyecto.
+```JSON
+{
+  "ok": true,
+  "message": "Trabajadores del proyecto obtenidos exitosamente.",
+  "data": [ ... ]
+}
+```
+Casos de Error:  
+- 400 Bad Request: El ID del proyecto es inválido o no es numérico.
+- 404 Not Found: El proyecto no existe o se ha eliminado.
+- 500 Internal Server Error: Error del servidor interno al obtener los trabajadores del proyecto.
+
+## 2. Asignar un trabajador a un proyecto
+Vincula un usuario registrado y activo a un proyecto de patrullaje.
+
+Método: `POST`  
+Ruta: `/api/v1/proyectos/:id_proyecto/trabajadores`  
+Autenticación: Requiere Token JWT  
+Roles permitidos: `admin`, `supervisor`  
+Parámetros de ruta (Path Params):  
+- `id_proyecto` (number): ID único del proyecto.  
+
+Body requerido (JSON):  
+```JSON
+{
+  "rut": "string"
+}
+```
+Respuestas Esperadas:  
+- 201 Created: Trabajador asignado al proyecto exitosamente.
+```JSON
+{
+  "ok": true,
+  "message": "Trabajador asignado al proyecto exitosamente.",
+  "data": { ... }
+}
+```
+Casos de Error:  
+- 400 Bad Request: El RUT del trabajador o el ID del proyecto no son válidos.
+- 404 Not Found: El proyecto o el usuario especificado no existe o ha sido eliminado.
+- 409 Conflict: El trabajador ya se encuentra asignado a este proyecto.
+- 500 Internal Server Error: Error del servidor interno al asignar el trabajador al proyecto.
+
+## 3. Retirar un trabajador de un proyecto
+Elimina la asignación de un trabajador dentro de un proyecto de patrullaje específico.
+
+Método: `DELETE`  
+Ruta: `/api/v1/proyectos/:id_proyecto/trabajadores/:rut`  
+Autenticación: Requiere Token JWT  
+Roles permitidos: `admin`, `supervisor`  
+Parámetros de ruta (Path Params):  
+- `id_proyecto` (number): ID único del proyecto.
+- `rut` (string): RUT único del trabajador a retirar del proyecto.  
+
+Respuestas Esperadas:  
+- 200 OK: Trabajador retirado del proyecto exitosamente.
+```JSON
+{
+  "ok": true,
+  "message": "Trabajador retirado del proyecto exitosamente.",
+  "data": { ... }
+}
+```
+Casos de Error:  
+- 400 Bad Request: El RUT del trabajador o el ID del proyecto no son válidos.
+- 404 Not Found: El trabajador no se encuentra asignado a este proyecto.
+- 500 Internal Server Error: Error del servidor interno al sacar al trabajador del proyecto.
+
+### Evidencia de pruebas en Postman
+![Evidencia trabajadores](./pruebas/capturas/evidencia-trabajadores.png)
