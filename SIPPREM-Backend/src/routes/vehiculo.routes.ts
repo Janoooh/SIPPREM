@@ -8,7 +8,7 @@ const router = Router({ mergeParams: true });
 router.use('/tipos', rutasTipoVehiculo);
 
 // Aqui se manejan las rutas. Para los vehiculos los métodos utilizados son GET, POST, PATCH y DELETE.
-router.get('/', verificarRol(["admin","supervisor"]), mostrarVehiculosControlador);
+router.get('/', verificarRol(["admin","supervisor", "patrullero"]), mostrarVehiculosControlador);
 router.get('/:id_vehiculo', verificarRol(["admin","supervisor"]) , mostrarUNvehiculoControlador);
 router.post('/', verificarRol(["admin","supervisor"]), agregarVehiculoControlador);
 router.patch('/:id_vehiculo', verificarRol(["admin","supervisor"]), actualizarVehiculoControlador);
