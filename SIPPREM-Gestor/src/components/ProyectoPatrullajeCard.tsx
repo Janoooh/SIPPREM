@@ -8,20 +8,71 @@ import {
   IonText, 
   IonButton, 
   IonIcon,
-  useIonRouter 
+  useIonRouter,
+  useIonAlert,
+  useIonToast
 } from '@ionic/react';
 import { createOutline, trashOutline } from 'ionicons/icons';
 import { proyectoPatrullaje } from '../interfaces/proyectoPatrullaje';
+import { proyectosService } from '../services/proyectosService';
 import './ProyectoPatrullajeCard.css';
 
 interface ProyectoPatrullajeCardProps {
   proyecto: proyectoPatrullaje;
-  rolUsuario : string;
+  rolUsuario: string;
+  onProyectoEliminado?: (id_proyecto: number) => void;
 }
 
-const ProyectoPatrullajeCard: React.FC<ProyectoPatrullajeCardProps> = ({ proyecto , rolUsuario}) => {
-
+const ProyectoPatrullajeCard: React.FC<ProyectoPatrullajeCardProps> = ({
+  proyecto,
+  rolUsuario,
+  onProyectoEliminado
+}) => {
   const router = useIonRouter();
+  const [mandarAlerta] = useIonAlert();
+  const [mandarToast] = useIonToast();
+
+  // Función encargada de confirmar y eliminar el proyecto usando el endpoint DELETE /proyectos/:id_proyecto
+  const handleEliminarProyecto = () => {
+    mandarAlerta({
+      header: 'Confirmar eliminación',
+      subHeader: proyecto.nombre_proyecto,
+      message: '¿Está seguro de que desea eliminar este proyecto?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Eliminar',
+          handler: async () => {
+            try {
+              await proyectosService.eliminarProyecto(proyecto.id_proyecto);
+
+              mandarToast({
+                message: 'Proyecto eliminado correctamente',
+                duration: 2500,
+                position: 'bottom',
+                color: 'success'
+              });
+
+              if (onProyectoEliminado) {
+                onProyectoEliminado(proyecto.id_proyecto);
+              }
+            } catch (error: any) {
+              mandarAlerta({
+                header: 'Error al eliminar',
+                message:
+                  error.response?.data?.message ||
+                  'No fue posible eliminar el proyecto.',
+                buttons: ['Aceptar']
+              });
+            }
+          }
+        }
+      ]
+    });
+  };
 
   return (
     <IonCard className="proyecto-card">
@@ -29,16 +80,12 @@ const ProyectoPatrullajeCard: React.FC<ProyectoPatrullajeCardProps> = ({ proyect
         <IonGrid className="ion-no-padding">
           <IonRow className="ion-align-items-center">
             
-            {/* ==========================================================================
-               INICIO SECCIÓN MODIFICADA: Uso de campos del backend (nombre_proyecto,
-               id_proyecto y fechas opcionales fecha_inicio / fecha_termino)
-               ========================================================================== */}
             {/* Nombre del proyecto, y sus fechas de duracion.*/}
             <IonCol size="8">
               <IonText className="proyecto-nombre">
-                {/* Mostramos el nombre del proyecto proveniente de la base de datos */}
+
                 <h3>{proyecto.nombre_proyecto}</h3>
-                {/* Si el endpoint entrega las fechas de inicio/termino, las formateamos y mostramos */}
+
                 {(proyecto.fecha_inicio || proyecto.fecha_termino) && (
                   <p className="proyecto-fechas">
                     {proyecto.fecha_inicio && (
@@ -58,24 +105,35 @@ const ProyectoPatrullajeCard: React.FC<ProyectoPatrullajeCardProps> = ({ proyect
 
             {/*Botones para interactuar con el proyecto.*/}
             <IonCol size="4" className="ion-text-right proyecto-acciones">
-              <IonRow className="ion-justify-content-end ion-align-items-center">
-                <IonButton fill="clear" className="icon-btn" onClick={() => {}}>
-                  <IonIcon icon={createOutline} />
-                </IonButton>
-                <IonButton fill="clear" className="icon-btn" onClick={() => {}}>
-                  <IonIcon icon={trashOutline} />
-                </IonButton>
-              </IonRow>
+              {rolUsuario?.toLowerCase() === 'admin' && (
+                <IonRow className="ion-justify-content-end ion-align-items-center">
+                  {/* Botón para redirigir a la vista de modificar proyecto */}
+                  <IonButton
+                    fill="clear"
+                    className="icon-btn"
+                    onClick={() => {
+                      router.push(`/admin/proyecto/editar/${proyecto.id_proyecto}`, 'forward');
+                    }}
+                  >
+                    <IonIcon icon={createOutline} />
+                  </IonButton>
+                  {/* Botón para eliminar el proyecto mediante la API */}
+                  <IonButton
+                    fill="clear"
+                    className="icon-btn"
+                    onClick={handleEliminarProyecto}
+                  >
+                    <IonIcon icon={trashOutline} />
+                  </IonButton>
+                </IonRow>
+              )}
               <IonRow className="ion-justify-content-end">
-                {/* Redireccion a la vista del proyecto usando id_proyecto del backend */}
+                {/* Redireccion a la vista del proyecto*/}
                 <IonButton className="ver-btn" onClick={() => {router.push(`/${rolUsuario.toLowerCase()}/proyecto/${proyecto.id_proyecto}`)}}>
                   VER PROYECTO
                 </IonButton>
               </IonRow>
             </IonCol>
-            {/* ==========================================================================
-               FIN SECCIÓN MODIFICADA
-               ========================================================================== */}
 
           </IonRow>
         </IonGrid>

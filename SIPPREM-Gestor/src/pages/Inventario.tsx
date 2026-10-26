@@ -16,7 +16,8 @@ import {
   IonSpinner
 } from '@ionic/react';
 import HeaderSistema from '../components/HeaderSistema';
-import './inventario.css';
+import MenuLateralProyecto from '../components/MenuLateralProyecto';
+import './Inventario.css';
 import './InicioProyecto.css';
 import { useUsuario } from '../hooks/obtenerUsuario';
 import { useParams } from 'react-router';
@@ -29,6 +30,7 @@ import { eqVehicularService } from '../services/EquipamientoVehicularService';
 const Inventario: React.FC = () => {
     const { usuario } = useUsuario();
     const rol = usuario.tipo_rol;
+    const rolRuta = (rol || 'supervisor').toLowerCase();
     const { id_proyecto } = useParams<{ id_proyecto: string }>();
     const router = useIonRouter();
 
@@ -185,33 +187,13 @@ const Inventario: React.FC = () => {
           <IonGrid className="inicio-proyecto-grid ion-padding">
             <IonRow>
               
-              {/* Menú Lateral */}
+              {/* Componente reutilizable del Menú Lateral */}
               <IonCol size="12" sizeMd="3" className="menu-lateral-col">
-                <IonRow className="menu-container">
-                  <IonCol size="12" className="ion-no-padding">
-                    <IonLabel className="menu-titulo">Menú de Opciones</IonLabel>
-                    <IonRow className="menu-divider"></IonRow>
-                    
-                    <IonButton className="menu-btn" expand="block" fill="clear" onClick={() => router.push(`/supervisor/proyecto/${id_proyecto}`, 'forward')}>
-                      Inicio
-                    </IonButton>
-                    <IonRow className="menu-divider"></IonRow>
-                    
-                    <IonButton className="menu-btn" expand="block" fill="clear">Cronograma</IonButton>
-                    <IonRow className="menu-divider"></IonRow>
-
-                    <IonButton className="menu-btn menu-btn-activo" expand="block" fill="solid">Inventario</IonButton>
-                    <IonRow className="menu-divider"></IonRow>
-
-                    <IonButton className="menu-btn" expand="block" fill="clear">Mapa GPS</IonButton>
-                    <IonRow className="menu-divider"></IonRow>
-
-                    <IonButton className="menu-btn" expand="block" fill="clear">Historial de Patrullajes</IonButton>
-                    <IonRow className="menu-divider"></IonRow>
-
-                    <IonButton className="menu-btn" expand="block" fill="clear">Personal</IonButton>
-                  </IonCol>
-                </IonRow>
+                <MenuLateralProyecto
+                  idProyecto={id_proyecto}
+                  rol={rol}
+                  opcionActiva="inventario"
+                />
               </IonCol>
 
               {/* Contenido Principal */}
@@ -223,7 +205,7 @@ const Inventario: React.FC = () => {
                   <IonButton 
                     className="btn-agregar-vehiculo" 
                     fill="solid"
-                    onClick={() => router.push(`/supervisor/proyecto/${id_proyecto}/inventario/vehiculos/agregar`, 'forward')}
+                    onClick={() => router.push(`/${rolRuta}/proyecto/${id_proyecto}/inventario/vehiculos/agregar`, 'forward')}
                   >
                     Agregar vehículo
                   </IonButton>
@@ -268,7 +250,7 @@ const Inventario: React.FC = () => {
                   <IonButton 
                     className="btn-agregar-vehiculo" 
                     fill="solid"
-                    onClick={() => router.push(`/supervisor/proyecto/${id_proyecto}/inventario/articulos/registrar`, 'forward')}
+                    onClick={() => router.push(`/${rolRuta}/proyecto/${id_proyecto}/inventario/articulos/registrar`, 'forward')}
                   >
                     Registrar Artículo
                   </IonButton>

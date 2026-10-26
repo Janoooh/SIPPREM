@@ -1,0 +1,55 @@
+/* Contenedor principal que alinea el mapa y el botón de retroceso al lado */
+.mapa-poligono-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+}
+
+/* Contenedor del mapa Leaflet */
+.mapa-poligono-lienzo {
+  flex: 1;
+  border: 2px solid #48D1E6;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Columna lateral para el botón de deshacer/volver último punto */
+.mapa-poligono-acciones {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Estilo del botón con flecha para quitar el último vértice marcado */
+.btn-deshacer-punto {
+  --background: #121c27;
+  --color: #ffffff;
+  --border-color: #48D1E6;
+  --border-style: solid;
+  --border-width: 1.5px;
+  --border-radius: 10px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  width: 48px;
+  height: 48px;
+  margin: 0;
+}
+
+.btn-deshacer-punto:hover {
+  --background: #48D1E6;
+  --color: #121c27;
+}
+
+/* Texto informativo debajo del mapa con la cantidad de vértices */
+.mapa-poligono-info {
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 8px;
+  text-align: center;
+}

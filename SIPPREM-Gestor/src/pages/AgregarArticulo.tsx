@@ -18,6 +18,7 @@ import {
   useIonToast
 } from '@ionic/react';
 import HeaderSistema from '../components/HeaderSistema';
+import MenuLateralProyecto from '../components/MenuLateralProyecto';
 import './Inventario.css';
 import './AgregarArticulo.css';
 import { useUsuario } from '../hooks/obtenerUsuario';
@@ -29,6 +30,7 @@ import { eqPersonalService} from '../services/EquipamientoPersonalService';
 const RegistrarArticulo: React.FC = () => {
   const { usuario } = useUsuario();
   const rol = usuario.tipo_rol;
+  const rolRuta = (rol || 'supervisor').toLowerCase();
   const { id_proyecto } = useParams<{ id_proyecto: string }>();
   const router = useIonRouter();
 
@@ -113,7 +115,7 @@ const RegistrarArticulo: React.FC = () => {
         color: "success"
       });
 
-      router.push(`/supervisor/proyecto/${id_proyecto}/inventario`, 'back');
+      router.push(`/${rolRuta}/proyecto/${id_proyecto}/inventario`, 'back');
 
     } catch (error: any) {
       mandarAlerta({
@@ -134,43 +136,13 @@ const RegistrarArticulo: React.FC = () => {
         <IonGrid className="inicio-proyecto-grid ion-padding">
           <IonRow>
             
-            {/* Menú Lateral Izquierdo */}
+            {/* Componente reutilizable del Menú Lateral Izquierdo */}
             <IonCol size="12" sizeMd="3" className="menu-lateral-col">
-              <IonRow className="menu-container">
-                <IonCol size="12" className="ion-no-padding">
-                  <IonLabel className="menu-titulo">Menú de Opciones</IonLabel>
-                  <IonRow className="menu-divider"></IonRow>
-                  
-                  <IonButton className="menu-btn" expand="block" fill="clear" onClick={() => router.push(`/supervisor/proyecto/${id_proyecto}`, 'forward')}>
-                    Inicio
-                  </IonButton>
-                  <IonRow className="menu-divider"></IonRow>
-                  
-                  <IonButton className="menu-btn" expand="block" fill="clear">
-                    Cronograma
-                  </IonButton>
-                  <IonRow className="menu-divider"></IonRow>
-
-                  <IonButton className="menu-btn menu-btn-activo" expand="block" fill="solid" onClick={() => router.push(`/supervisor/proyecto/${id_proyecto}/inventario`, 'back')}>
-                    Inventario
-                  </IonButton>
-                  <IonRow className="menu-divider"></IonRow>
-
-                  <IonButton className="menu-btn" expand="block" fill="clear">
-                    Mapa GPS
-                  </IonButton>
-                  <IonRow className="menu-divider"></IonRow>
-
-                  <IonButton className="menu-btn" expand="block" fill="clear">
-                    Historial de Patrullajes
-                  </IonButton>
-                  <IonRow className="menu-divider"></IonRow>
-
-                  <IonButton className="menu-btn" expand="block" fill="clear">
-                    Personal
-                  </IonButton>
-                </IonCol>
-              </IonRow>
+              <MenuLateralProyecto
+                idProyecto={id_proyecto}
+                rol={rol}
+                opcionActiva="inventario"
+              />
             </IonCol>
 
             {/* Columna Central: Formulario dinámico */}

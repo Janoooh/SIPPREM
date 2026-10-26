@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   IonPage, 
   IonHeader, 
@@ -7,20 +7,19 @@ import {
   IonRow, 
   IonCol,
   IonLabel,
-  IonButton,
-  useIonRouter
+  IonSpinner,
+  useIonAlert,
+  useIonViewWillEnter
 } from '@ionic/react';
 import { useParams } from 'react-router-dom';
 import HeaderSistema from '../components/HeaderSistema';
+import MenuLateralProyecto from '../components/MenuLateralProyecto';
 import ActividadFuturaCard from '../components/ActividadFuturaCard';
 import { ActividadFutura } from '../interfaces/actividadFutura';
+import { proyectoPatrullaje } from '../interfaces/proyectoPatrullaje';
+import { proyectosService } from '../services/proyectosService';
 import './InicioProyecto.css';
 import { useUsuario } from '../hooks/obtenerUsuario';
-
-/*interface InicioProyectoProps {
-  nombreUsuario: string;
-  rol: string;
-}*/
 
 const InicioProyecto: React.FC = () => {
   // Datos de ejemplo de actividades futuras para el proyecto.
@@ -32,11 +31,46 @@ const InicioProyecto: React.FC = () => {
     { id: 5, tipoActividad: 'Patrullaje', fechaHoraInicio: new Date(2023, 9, 22, 16, 45) }
   ];
 
-  const {usuario} = useUsuario();
-  const nombreUsuario = usuario.nombre;
+  const { usuario } = useUsuario();
   const { id_proyecto } = useParams<{ id_proyecto: string }>();
   const rol = usuario.tipo_rol;
-  const router = useIonRouter();
+  const [mandarAlerta] = useIonAlert();
+
+  // Estado para almacenar la información del proyecto obtenida del backend
+  const [proyecto, setProyecto] = useState<proyectoPatrullaje | null>(null);
+  const [cargando, setCargando] = useState<boolean>(false);
+
+  // Función encargada de consultar GET /proyectos/:id_proyecto mediante proyectosService
+  const cargarInformacionProyecto = async () => {
+    if (!id_proyecto) return;
+    try {
+      setCargando(true);
+      const datosProyecto = await proyectosService.obtenerProyectoPorId(String(id_proyecto));
+      setProyecto(datosProyecto);
+    } catch (error: any) {
+      console.error('Error al obtener la información del proyecto:', error);
+      mandarAlerta({
+        header: 'Error',
+        message:
+          error.response?.data?.message ||
+          'No fue posible cargar la información del proyecto.',
+        buttons: ['Aceptar']
+      });
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  // Cargamos la información al montar el componente o cambiar el id_proyecto
+  useEffect(() => {
+    cargarInformacionProyecto();
+  }, [id_proyecto]);
+
+  // Recargamos la información cada vez que se entra a la vista
+  useIonViewWillEnter(() => {
+    cargarInformacionProyecto();
+  });
+
   return (
     <IonPage>
       
@@ -48,89 +82,77 @@ const InicioProyecto: React.FC = () => {
         <IonGrid className="inicio-proyecto-grid ion-padding">
           <IonRow>
             
-            {/*Menu de navegacion del proyecto.*/}
+            {/* Componente reutilizable del menú de navegación lateral del proyecto */}
             <IonCol size="12" sizeMd="3" className="menu-lateral-col">
-              <IonRow className="menu-container">
-                <IonCol size="12" className="ion-no-padding">
-                  
-                  <IonLabel className="menu-titulo">Menú de Opciones</IonLabel>
-                  <IonRow className="menu-divider"></IonRow>
-                  
-                  {/*Boton incio, donde estamos.*/}
-                  <IonButton className="menu-btn menu-btn-activo" expand="block" fill="solid">
-                    Inicio
-                  </IonButton>
-                  <IonRow className="menu-divider"></IonRow>
-                  
-                  {/*Resto de botones.*/}
-                  <IonButton className="menu-btn" expand="block" fill="clear" >
-                    Cronograma
-                  </IonButton>
-                  <IonRow className="menu-divider"></IonRow>
-
-                  <IonButton 
-                    className="menu-btn" 
-                    expand="block" 
-                    fill="clear"
-                    onClick={() => {
-                      // Aquí puedes ejecutar lógica extra antes de navegar si lo necesitas
-                      router.push(`/supervisor/proyecto/${id_proyecto}/inventario`, 'forward');
-                    }}
-                  >
-                    Inventario
-                  </IonButton>
-                  <IonRow className="menu-divider"></IonRow>
-
-                  <IonButton className="menu-btn" expand="block" fill="clear">
-                    Mapa GPS
-                  </IonButton>
-                  <IonRow className="menu-divider"></IonRow>
-
-                  <IonButton className="menu-btn" expand="block" fill="clear">
-                    Historial de Patrullajes
-                  </IonButton>
-                  <IonRow className="menu-divider"></IonRow>
-
-                  <IonButton className="menu-btn" expand="block" fill="clear">
-                    Personal
-                  </IonButton>
-
-                </IonCol>
-              </IonRow>
+              <MenuLateralProyecto
+                idProyecto={id_proyecto}
+                rol={rol}
+                opcionActiva="inicio"
+              />
             </IonCol>
 
             <IonCol size="12" sizeMd="9" className="info-proyecto-col">
-              
-              <IonLabel className="titulo-proyecto">NOMBRE DEL PROYECTO</IonLabel>
-              
-              <IonRow className="detalle-row">
-                <IonLabel className="detalle-label">Nombre del Sector :</IonLabel>
-              </IonRow>
-              
-              <IonRow className="detalle-row">
-                <IonLabel className="detalle-label">Fecha de inicio :</IonLabel>
-              </IonRow>
-              
-              <IonRow className="detalle-row">
-                <IonLabel className="detalle-label">Fecha de termino :</IonLabel>
-              </IonRow>
-              
-              <IonRow className="detalle-row">
-                <IonLabel className="detalle-label">Jefe supervisor :</IonLabel>
-              </IonRow>
+              {cargando ? (
+                <IonRow className="ion-justify-content-center ion-margin-top">
+                  <IonSpinner name="crescent" color="light" />
+                </IonRow>
+              ) : (
+                <>
+                  {/* Título principal con el nombre del proyecto obtenido del backend */}
+                  <IonLabel className="titulo-proyecto">
+                    {proyecto?.nombre_proyecto || 'PROYECTO SIN NOMBRE'}
+                  </IonLabel>
+                  
+                  <IonRow className="detalle-row">
+                    <IonLabel className="detalle-label">
+                      Fecha de inicio :{' '}
+                      {proyecto?.fecha_inicio
+                        ? new Date(proyecto.fecha_inicio).toLocaleDateString()
+                        : 'No especificada'}
+                    </IonLabel>
+                  </IonRow>
+                  
+                  <IonRow className="detalle-row">
+                    <IonLabel className="detalle-label">
+                      Fecha de termino :{' '}
+                      {proyecto?.fecha_termino
+                        ? new Date(proyecto.fecha_termino).toLocaleDateString()
+                        : 'No especificada'}
+                    </IonLabel>
+                  </IonRow>
+                  
+                  <IonRow className="detalle-row">
+                    <IonLabel className="detalle-label">
+                      Presupuesto asignado :{' '}
+                      {proyecto?.presupuesto !== undefined && proyecto?.presupuesto !== null
+                        ? `$${Number(proyecto.presupuesto).toLocaleString('es-CL')}`
+                        : 'No especificado'}
+                    </IonLabel>
+                  </IonRow>
 
+                  <IonRow className="detalle-row">
+                    <IonLabel className="detalle-label">
+                      Estado :{' '}
+                      {proyecto?.activo !== undefined
+                        ? proyecto.activo
+                          ? 'Activo'
+                          : 'Cerrado'
+                        : 'Activo'}
+                    </IonLabel>
+                  </IonRow>
 
-              <IonLabel className="titulo-actividades">Actividades futuras :</IonLabel>
-              
-              {/* Lista de actividades futuras para el proyecto.*/}
-              <IonRow className="actividades-list">
-                <IonCol size="12" sizeMd="10" sizeLg="8" className="ion-no-padding">
-                  {actividades.map(actividad => (
-                    <ActividadFuturaCard key={actividad.id} actividad={actividad} />
-                  ))}
-                </IonCol>
-              </IonRow>
-
+                  <IonLabel className="titulo-actividades">Actividades futuras :</IonLabel>
+                  
+                  {/* Lista de actividades futuras para el proyecto.*/}
+                  <IonRow className="actividades-list">
+                    <IonCol size="12" sizeMd="10" sizeLg="8" className="ion-no-padding">
+                      {actividades.map(actividad => (
+                        <ActividadFuturaCard key={actividad.id} actividad={actividad} />
+                      ))}
+                    </IonCol>
+                  </IonRow>
+                </>
+              )}
             </IonCol>
           </IonRow>
         </IonGrid>

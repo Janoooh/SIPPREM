@@ -5,6 +5,7 @@ import { RutaProtegida } from './routes/rutaProtegida';
 import Login from './pages/Login';
 import Inicio from './pages/Inicio';
 import AgregarProyecto from './pages/AgregarProyecto';
+import ModificarProyecto from './pages/ModificarProyecto';
 import InicioProyecto from './pages/InicioProyecto';
 import CambiarClaveInicial from './pages/CambiarClaveInicial';
 import Usuarios from './pages/Usuarios';
@@ -76,7 +77,14 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
-          <Route path="/admin/proyecto/:id" element={
+          <Route path="/admin/proyecto/editar/:id_proyecto" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <ModificarProyecto />
+            </RutaProtegida>
+          } />
+
+          {/* Se unifica el parametro :id_proyecto para que coincida con las subrutas e InicioProyecto */}
+          <Route path="/admin/proyecto/:id_proyecto" element={
             <RutaProtegida rolesPermitidos={["admin"]}>
                 <InicioProyecto />
             </RutaProtegida>
@@ -97,6 +105,24 @@ const App: React.FC = () => {
           <Route path="/admin/usuarios/editar/:id_user" element={
             <RutaProtegida rolesPermitidos={["admin"]}>
                 <ModificarUsuario />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto/inventario" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <Inventario />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto/inventario/vehiculos/agregar" element={
+           <RutaProtegida rolesPermitidos={["admin"]}>
+                <AgregarVehiculo />
+          </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto/inventario/articulos/registrar" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+              <AgregarArticulo />
             </RutaProtegida>
           } />
 

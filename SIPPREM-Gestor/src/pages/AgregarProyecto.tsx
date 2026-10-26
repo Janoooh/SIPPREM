@@ -2,83 +2,113 @@ import React, { useState } from 'react';
 import { 
   IonPage, 
   IonHeader, 
-  IonToolbar, 
-  IonButtons, 
-  IonImg, 
   IonButton, 
   IonContent, 
   IonGrid, 
   IonRow, 
   IonCol,
   IonText,
-  IonInput,
-  IonSelect,
-  IonSelectOption,
-  IonIcon,
-  useIonViewDidEnter,
-  IonLabel
+  useIonAlert,
+  useIonToast,
+  useIonRouter
 } from '@ionic/react';
-import { addOutline } from 'ionicons/icons';
-import { MapContainer, TileLayer, useMap } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import './AgregarProyecto.css';
 import HeaderSistema from '../components/HeaderSistema';
+import FormularioProyecto from '../components/FormularioProyecto';
+import MapaPoligono, { PuntoMapa } from '../components/mapaPoligono';
 import { useUsuario } from '../hooks/obtenerUsuario';
-
-/*interface AgregarProyectoProps{
-    nombreUsuario: string,
-    rol: string
-};*/
-
-// Componente hijo para forzar la recarga del mapa ante cualquier cambio de tamaño
-const MapResizer: React.FC = () => {
-  const map = useMap();
-
-  /*Funcion para renderizar constantemente el mapa, y no tener problemas de visualizacion.*/
-  React.useEffect(() => {
-
-      const t1 = setTimeout(() => map.invalidateSize(), 100);
-      const t2 = setTimeout(() => map.invalidateSize(), 300);
-      const t3 = setTimeout(() => map.invalidateSize(), 700);
-      const t4 = setTimeout(() => map.invalidateSize(), 1500);
-
-      // Observa el contenedor del mapa para detectar cualquier cambio de dimensiones
-      const resizeObserver = new ResizeObserver(() => {
-        map.invalidateSize();
-      });
-      
-      const container = map.getContainer();
-      if (container) {
-        resizeObserver.observe(container);
-      }
-
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-        clearTimeout(t3);
-        clearTimeout(t4);
-        resizeObserver.disconnect();
-    };
-  }, [map]);
-
-  return null;
-};
+import { proyectosService } from '../services/proyectosService';
 
 const AgregarProyecto: React.FC = () => {
 
-  const {usuario} = useUsuario();
-  const nombreUsuario = usuario.nombre;
+  const { usuario } = useUsuario();
   const rol = usuario.tipo_rol;
+  const router = useIonRouter();
+  const [mandarAlerta] = useIonAlert();
+  const [mandarToast] = useIonToast();
 
-  // Estados para los campos del formulario de agregacion
+  // Estados para los campos del formulario de proyecto
   const [nombre, setNombre] = useState<string>('');
   const [fechaInicio, setFechaInicio] = useState<string>('');
   const [fechaTermino, setFechaTermino] = useState<string>('');
   const [presupuesto, setPresupuesto] = useState<string>('');
-  const [supervisor, setSupervisor] = useState<string>('');
-  
-  // Coordenadas de valparaiso
-  const position: [number, number] = [-33.0456, -71.6203];
+  const [cargando, setCargando] = useState<boolean>(false);
+
+  // Estados para almacenar la lista de puntos marcados en el mapa y el polígono WKT para el backend
+  const [puntosZona, setPuntosZona] = useState<PuntoMapa[]>([]);
+  const [zonaSeleccionadaWKT, setZonaSeleccionadaWKT] = useState<string>('');
+
+  // Función encargada de validar los campos y enviar la petición de creación al backend
+  const handleCrearProyecto = async () => {
+
+    if (!nombre.trim() || !fechaInicio || !fechaTermino || !presupuesto.trim()) {
+      mandarAlerta({
+        header: 'Campos incompletos',
+        message: 'Por favor, complete todos los campos del formulario del proyecto.',
+        buttons: ['Aceptar']
+      });
+      return;
+    }
+
+    const presupuestoNumero = Number(presupuesto);
+    if (isNaN(presupuestoNumero) || presupuestoNumero < 0) {
+      mandarAlerta({
+        header: 'Presupuesto inválido',
+        message: 'El presupuesto asignado debe ser un monto numérico válido.',
+        buttons: ['Aceptar']
+      });
+      return;
+    }
+
+    if (new Date(fechaTermino) < new Date(fechaInicio)) {
+      mandarAlerta({
+        header: 'Fechas inválidas',
+        message: 'La fecha de término debe ser igual o posterior a la fecha de inicio.',
+        buttons: ['Aceptar']
+      });
+      return;
+    }
+
+    if (puntosZona.length < 3 || !zonaSeleccionadaWKT) {
+      mandarAlerta({
+        header: 'Zona no seleccionada',
+        message: 'Debe marcar al menos 3 puntos en el mapa para delimitar el área del proyecto.',
+        buttons: ['Aceptar']
+      });
+      return;
+    }
+
+    try {
+      setCargando(true);
+
+      await proyectosService.crearProyecto({
+        nombre_proyecto: nombre.trim(),
+        nombre_sector: nombre.trim(),
+        presupuesto: presupuestoNumero,
+        fecha_inicio: fechaInicio,
+        fecha_termino: fechaTermino,
+        zona_seleccionada: zonaSeleccionadaWKT
+      });
+
+      mandarToast({
+        message: '¡Proyecto creado correctamente!',
+        duration: 3000,
+        position: 'bottom',
+        color: 'success'
+      });
+
+      router.push('/admin/inicio', 'back');
+
+    } catch (error: any) {
+      mandarAlerta({
+        header: 'Error al crear proyecto',
+        message: error.response?.data?.message || 'No fue posible crear el proyecto.',
+        buttons: ['Aceptar']
+      });
+    } finally {
+      setCargando(false);
+    }
+  };
 
   return (
     <IonPage>
@@ -91,102 +121,48 @@ const AgregarProyecto: React.FC = () => {
         <IonGrid className="ion-padding custom-container">
           <IonRow>
             
+            {/* Columna izquierda: Formulario del proyecto */}
             <IonCol size="12" sizeMd="6" className="form-column">
               <IonText className="section-title">
                 <h2>Agregar Proyecto</h2>
               </IonText>
               
-              {/*Input de texto para indicar el nombre del proyecto.*/}
-              <IonLabel className="label-text">Nombre proyecto</IonLabel>
-              <IonInput 
-                className="custom-input full-width" 
-                value={nombre} 
-                onIonInput={e => setNombre(e.detail.value!)} 
+              <FormularioProyecto
+                nombre={nombre}
+                setNombre={setNombre}
+                fechaInicio={fechaInicio}
+                setFechaInicio={setFechaInicio}
+                fechaTermino={fechaTermino}
+                setFechaTermino={setFechaTermino}
+                presupuesto={presupuesto}
+                setPresupuesto={setPresupuesto}
               />
-
-              {/*Input de fecha para indicar el inicio del proyecto.*/}
-              <IonRow className="date-row">
-                <IonLabel className="label-text date-label">Fecha inicio:</IonLabel>
-                <IonInput 
-                  type="date" 
-                  className="custom-input date-input" 
-                  value={fechaInicio} 
-                  onIonInput={e => setFechaInicio(e.detail.value!)} 
-                />
-              </IonRow>
-              {/*Input de fecha para indicar el termino del proyecto.*/}
-              <IonRow className="date-row">
-                <IonLabel className="label-text date-label">Fecha termino:</IonLabel>
-                <IonInput 
-                  type="date" 
-                  className="custom-input date-input" 
-                  value={fechaTermino} 
-                  onIonInput={e => setFechaTermino(e.detail.value!)} 
-                />
-              </IonRow>
-
-              {/*Input numerico para el presupuesto asignado al proyecto.*/}
-              <IonLabel className="label-text">Presupuesto asignado:</IonLabel>
-              <IonInput 
-                type="number" 
-                className="custom-input full-width" 
-                value={presupuesto} 
-                onIonInput={e => setPresupuesto(e.detail.value!)} 
-              />
-
-              {/*Lista desplegable de supervisores.*/}
-              <IonLabel className="label-text">Supervisor encargado:</IonLabel>
-              <IonSelect 
-                className="custom-select full-width" 
-                value={supervisor} 
-                onIonChange={e => setSupervisor(e.detail.value)}
-              >
-                <IonSelectOption value="juan">Juan Pérez</IonSelectOption>
-                <IonSelectOption value="maria">María Gómez</IonSelectOption>
-                <IonSelectOption value="carlos">Carlos López</IonSelectOption>
-              </IonSelect>
-
-              {/*Conjunto de patrulleros que trabajaran en el sistema.*/}
-              <IonLabel className="label-text">Agregar Patrullero</IonLabel>
-              <IonRow className="patrulleros-container ion-no-padding">
-                {/*Patrulleros ya agregados.*/}
-                <IonCol size="auto" className="patrullero-box ion-no-padding">
-                  <IonImg src="/assets/fotoPerfil.png" alt="Patrullero" />
-                </IonCol>
-                <IonCol size="auto" className="patrullero-box ion-no-padding">
-                  <IonImg src="/assets/fotoPerfil.png" alt="Patrullero" />
-                </IonCol>
-                {/*Boton para agregar mas patrulleros.*/}
-                <IonCol size="auto" className="patrullero-add-box ion-no-padding" onClick={() => {}}>
-                  <IonIcon icon={addOutline} className="add-icon" />
-                </IonCol>
-                <IonCol className="patrullero-empty-box ion-no-padding"></IonCol>
-              </IonRow>
             </IonCol>
 
-            {/*Mapa interactivo.*/}
+            {/* Columna derecha: Mapa interactivo de selección de polígono */}
             <IonCol size="12" sizeMd="6" className="map-column">
               <IonText className="section-title ion-text-center">
                 <h2>Seleccione area del proyecto:</h2>
               </IonText>
               
-              <MapContainer 
-                center={position} 
-                zoom={13} 
-                style={{ height: '350px', width: '100%', zIndex: 1 }}
-              >
-                 <MapResizer />
-                 <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution="&copy; OpenStreetMap contributors"
-                />
-              </MapContainer>
+              {/* Componente MapaPoligono para marcar vértices y deshacer con el botón lateral */}
+              <MapaPoligono
+                puntos={puntosZona}
+                onChangePuntos={(nuevosPuntos, zonaWKT) => {
+                  setPuntosZona(nuevosPuntos);
+                  setZonaSeleccionadaWKT(zonaWKT);
+                }}
+              />
 
-              {/*Boton para crear el proyecto*/}
+              {/* Botón para crear el proyecto */}
               <IonRow className="ion-justify-content-center ion-margin-top">
                 <IonCol size="auto">
-                  <IonButton className="crear-proyecto-btn" onClick={() => {}}>
-                    Crear Proyecto
+                  <IonButton
+                    className="crear-proyecto-btn"
+                    onClick={handleCrearProyecto}
+                    disabled={cargando}
+                  >
+                    {cargando ? 'Creando...' : 'Crear Proyecto'}
                   </IonButton>
                 </IonCol>
               </IonRow>

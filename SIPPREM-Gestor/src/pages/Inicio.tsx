@@ -30,16 +30,13 @@ import { proyectosService } from '../services/proyectosService';
 
 const Inicio: React.FC = () => {
   
-  /* ==========================================================================
-     INICIO SECCIÓN MODIFICADA: Obtención de proyectos mediante proyectosService
-     ========================================================================== */
   // Obtenemos los datos del usuario en sesion mediante el hook useUsuario
   const { usuario } = useUsuario();
   const nombreUsuario = usuario.nombre;
   const rol = usuario.tipo_rol;
   const foto = usuario.foto;
 
-  // Hook de Ionic para mostrar alertas en caso de fallo al consultar la API
+  // Hook de Ionic para mostrar alertas
   const [mandarAlerta] = useIonAlert();
 
   // Estado para guardar la lista de proyectos obtenidos desde el backend
@@ -77,14 +74,11 @@ const Inicio: React.FC = () => {
     cargarProyectos();
   }, []);
 
-  // Uso de hook useIonViewWillEnter para recargar la lista de proyectos cada vez que se entra a la ventana,
-  // manteniendo siempre la informacion actualizada.
+  // Uso de hook useIonViewWillEnter para recargar la lista de proyectos cada vez que se entra a la 
+  // ventana, manteniendo siempre la informacion actualizada.
   useIonViewWillEnter(() => {
     cargarProyectos();
   });
-  /* ==========================================================================
-     FIN SECCIÓN MODIFICADA
-     ========================================================================== */
 
   const router = useIonRouter();
 
@@ -119,9 +113,6 @@ const Inicio: React.FC = () => {
                 </IonCol>
               </IonRow>
 
-              {/* ==========================================================================
-                 INICIO SECCIÓN MODIFICADA: Renderizado dinámico de proyectos del backend
-                 ========================================================================== */}
               {/* Spinner que se muestra mientras se obtienen los proyectos desde el backend */}
               {cargando && (
                 <IonRow className="ion-justify-content-center ion-margin-top">
@@ -129,13 +120,20 @@ const Inicio: React.FC = () => {
                 </IonRow>
               )}
 
-              {/* Lista de proyectos obtenidos desde el endpoint /proyectos */}
+              {/* Lista de proyectos obtenidos*/}
               {!cargando && (
                 <IonRow>
                   <IonCol size="12">
                     {proyectos.length > 0 ? (
                       proyectos.map((proyecto) => (
-                        <ProyectoPatrullajeCard key={proyecto.id_proyecto} proyecto={proyecto} rolUsuario={rol}/>
+                        <ProyectoPatrullajeCard
+                          key={proyecto.id_proyecto}
+                          proyecto={proyecto}
+                          rolUsuario={rol}
+                          onProyectoEliminado={(idEliminado) => {
+                            setProyectos((prev) => prev.filter((p) => p.id_proyecto !== idEliminado));
+                          }}
+                        />
                       ))
                     ) : (
                       <IonText style={{ color: 'white' }}>
@@ -145,9 +143,6 @@ const Inicio: React.FC = () => {
                   </IonCol>
                 </IonRow>
               )}
-              {/* ==========================================================================
-                 FIN SECCIÓN MODIFICADA
-                 ========================================================================== */}
 
             </IonCol>
 
@@ -161,16 +156,12 @@ const Inicio: React.FC = () => {
                 </IonCardHeader>
                 <IonCardContent className="dashboard-content">
                   <IonText className="dashboard-text">
-                    {rol === 'admin' && (<p>Proyectos activos: 1</p>)}
-                    {rol === 'supervisor' && (<p>Proyectos asignados: 1</p>)}
+                    {rol === 'admin' && (<p>Proyectos activos: {proyectos.length}</p>)}
+                    {rol === 'supervisor' && (<p>Proyectos asignados: {proyectos.length}</p>)}
                   </IonText>
                   <IonText className="dashboard-text">
                     {rol === 'admin' && (<p>Proyectos cerrados: 0</p>)}
                     
-                  </IonText>
-                  <IonText className="dashboard-text">
-                    
-                    {rol === 'admin' && (<p>Usuarios registrados: 2</p>)}
                   </IonText>
                 </IonCardContent>
               </IonCard>

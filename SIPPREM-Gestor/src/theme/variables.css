@@ -1,2 +1,9 @@
 /* For information on how to create your own theme, please refer to:
 http://ionicframework.com/docs/theming/ */
+:root {
+  --ion-font-family: 'Montserrat', sans-serif;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
