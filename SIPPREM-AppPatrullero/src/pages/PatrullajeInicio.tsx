@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   IonContent,
   IonPage,
@@ -8,15 +8,58 @@ import {
   IonButton,
   IonIcon,
   IonTabBar,
-  IonTabButton
+  IonTabButton,
+  useIonRouter,
+  useIonViewWillEnter,
+  useIonAlert
 } from '@ionic/react';
-import { homeOutline, calendarOutline, personOutline } from 'ionicons/icons';
+import { homeOutline, calendarOutline, personOutline, navigateOutline } from 'ionicons/icons';
 import './PatrullajeInicio.css';
+import { useUsuario } from '../hooks/obtenerUsuario';
+import { usuarioService } from '../services/UsuarioService';
 
 const PatrullajeInicio: React.FC = () => {
+  const { usuario } = useUsuario();
+  const nombreUsuario = usuario.nombre;
+  const router = useIonRouter();
+  const [mandarAlerta] = useIonAlert();
+
+  const [listaPatrullajes, setListaPatrullajes] = useState<any[]>([]);
+
+  // Cargar todos los patrullajes del usuario autenticado al entrar a la vista
+  useIonViewWillEnter(() => {
+    const cargarPatrullajesDelUsuario = async () => {
+      try {
+        const patrullajes = await usuarioService.obtenerPatrullajesUsuario();
+        if (patrullajes && patrullajes.length > 0) {
+          setListaPatrullajes(patrullajes);
+        }
+      } catch (error) {
+        console.error("Error al cargar los patrullajes del usuario:", error);
+        mandarAlerta({
+          header: 'Aviso',
+          message: 'No se pudieron cargar tus patrullajes asignados.',
+          buttons: ['Aceptar']
+        });
+      }
+    };
+
+    if (usuario) {
+      cargarPatrullajesDelUsuario();
+    }
+  });
+
+  const formatearHora = (fechaIso: string) => {
+    if (!fechaIso) return '--:--';
+    const fecha = new Date(fechaIso);
+    return !isNaN(fecha.getTime()) 
+      ? fecha.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) 
+      : '--:--';
+  };
+
   return (
     <IonPage>
-      {/* Contenido principal con el color de fondo personalizado */}
+      {/* Contenedor principal fijo que evita desbordamientos globales */}
       <IonContent fullscreen className="patrullaje-content">
         <div className="patrullaje-container">
           
@@ -25,35 +68,67 @@ const PatrullajeInicio: React.FC = () => {
             <IonImg src="/assets/logoSIPPREM.png" alt="SIPPREM Logo" className="patrullaje-logo" />
           </div>
 
-          {/* Saludo y Nombre Estático */}
+          {/* Saludo y Nombre */}
           <div className="saludo-section">
             <h2>¡Bienvenido!</h2>
-            <h1>Nombre Usuario</h1>
+            <h1>{nombreUsuario !== 'NotData' && nombreUsuario ? nombreUsuario.toUpperCase() : 'USUARIO'}</h1>
           </div>
 
-          {/* Etiqueta de sección */}
+          {/* Título de sección */}
           <div className="seccion-titulo">
-            <p>Siguiente Patrullaje:</p>
+            <p>Tus Patrullajes Asignados:</p>
           </div>
 
-          {/* Tarjeta con los detalles del patrullaje */}
-          <IonCard className="patrullaje-card">
-            <IonCardContent className="card-content-flex">
-              <div className="mapa-container">
-                <IonImg src="/assets/fotoPerfil.jpg" alt="Mapa de patrullaje" className="mapa-img" />
-              </div>
-              <div className="info-patrullaje">
-                <p><strong>Hora inicio:</strong> 9:00</p>
-                <p><strong>Hora termino :</strong> 7:00</p>
-              </div>
-            </IonCardContent>
-          </IonCard>
+          {/* CONTENEDOR CON SCROLL INTERNO (Fijo en la interfaz pero scrolleable) */}
+          <div className="lista-patrullajes-scroll">
+            {listaPatrullajes.length > 0 ? (
+              listaPatrullajes.map((patrullaje) => (
+                <IonCard className="patrullaje-card-item" key={patrullaje.id_patrullaje}>
+                  <IonCardContent className="card-content-flex">
+                    <div className="mapa-container">
+                      <IonImg src="/assets/fotoMapa.png" alt="Zona de patrullaje" className="mapa-img" />
+                    </div>
+                    <div className="info-patrullaje">
+                      <p className="proyecto-nombre"><strong>Proyecto:</strong> {patrullaje.nombre_proyecto}</p>
+                      <p><strong>Inicio:</strong> {formatearHora(patrullaje.hora_inicio)}</p>
+                      <p><strong>Término:</strong> {formatearHora(patrullaje.hora_termino)}</p>
+                      
+                      {/* Estado con etiqueta dinámica */}
+                      <p className="estado-container">
+                        <strong>Estado:</strong> 
+                        <span className={`badge-estado ${patrullaje.estado.toLowerCase().replace(' ', '-')}`}>
+                          {patrullaje.estado}
+                        </span>
+                      </p>
+                    </div>
+                  </IonCardContent>
 
-          {/* Botón de acción */}
-          <div className="boton-container">
-            <IonButton expand="block" shape="round" className="btn-iniciar">
-              Iniciar patrullaje
-            </IonButton>
+                  {/* Botón de acción rápido si está planificado o en curso */}
+                  {patrullaje.estado !== 'Finalizado' && (
+                    <div className="ion-padding-horizontal ion-padding-bottom">
+                      <IonButton 
+                        expand="block" 
+                        shape="round" 
+                        size="small"
+                        className="btn-iniciar-item"
+                        onClick={() => {
+                          router.push(
+                            `/patrullero/proyecto/${patrullaje.id_proyecto}/preparacion?id_patrullaje=${patrullaje.id_patrullaje}`, 
+                            "forward"
+                          );
+                        }}
+                      >
+  Preparar / Iniciar
+</IonButton>
+                    </div>
+                  )}
+                </IonCard>
+              ))
+            ) : (
+              <div className="sin-patrullajes">
+                <p>No tienes patrullajes asignados actualmente.</p>
+              </div>
+            )}
           </div>
 
         </div>

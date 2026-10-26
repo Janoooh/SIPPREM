@@ -4,7 +4,8 @@ import { IonReactRouter } from '@ionic/react-router';
 import { RutaProtegida } from './routes/rutaProtegida'; 
 import Login from './pages/Login';                       
 import CambiarClaveInicial from './pages/CambiarClaveInicial'; 
-import PatrullajeInicio from './pages/PatrullajeInicio';   
+import PatrullajeInicio from './pages/PatrullajeInicio'; 
+import PreparacionPatrullaje from './pages/PreparacionPatrullaje';  
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -47,6 +48,14 @@ const App: React.FC = () => {
           <Route path="/patrullero/inicio" element={
             <RutaProtegida rolesPermitidos={["patrullero"]}>
               <PatrullajeInicio />
+            </RutaProtegida>
+          } />
+
+
+          {/* Panel principal del patrullero en la app móvil */}
+          <Route path="/patrullero/proyecto/:id_proyecto/preparacion" element={
+            <RutaProtegida rolesPermitidos={["patrullero"]}>
+              <PreparacionPatrullaje />
             </RutaProtegida>
           } />
 
