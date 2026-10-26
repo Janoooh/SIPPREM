@@ -34,6 +34,52 @@ Pruebas para el funcionamiento de la API REST con Postman
 La API está desarrollada con Node.js, Express y TypeScript, conectándose a una base de datos PostgreSQL.
 URL Base: `http://localhost:3000/api/v1`
 
+### Como crear la base de datos
+
+En este documento markdown se procede a explicar paso a paso como crear la base de datos con el archivo schema.sql presente en la carpeta database.
+
+#### Proceso paso a paso
+
+Para poder instalar y correr la base de datos necesitaremos tener instalado postgreSQL, idealmente en la version 18, pues con esa se trabajo en el desarrollo del proyecto. Si ya tenemos instalado el postgreSQL deberemos asegurarnos de que la ruta de la carpeta con los archivos del programa esten en una variable PATH. Para lo anterior podemos usar el siguiente comando en la CMD:
+```
+set PATH=%PATH%;C:\Program Files\PostgreSQL\18\bin
+```
+Dicho comando asocia la ruta a la variable PATH para esa instancia de la CMD (Lo que significa que si abrimos otra tenemos que usar el comando nuevamente). Considere que la ruta de la carpeta con los archivos de postgreSQL puede estan en otra ubicacion, por lo que debe comprobar en su computadora donde lo instalo exactamente.
+
+Tras ejecutar lo anterior estamos asegurados de que podemos usar comandos de psql (El cliente CLI de postgreSQL). Para usar comandos de psql tendremos que utilizar un usuario de postgreSQL, el cual se detalla despues de poner el indicador "-U" en el comando. Para este caso se utilizara el usuario default postgres. Necesitaremos saber la clave del usuario seleccionado (En caso de no saber la clave del usuario postgres se puede cambiar por medio del software pgAdmin, un cliente GUI para postgreSQL. El cambio de clave se realiza con el comando "ALTER USER nombre_de_usuario WITH PASSWORD 'nueva_contrasena';").
+
+Ahora, procedemos a crear la base de datos con el comando:
+```
+psql -U postgres -c "CREATE DATABASE sipprem_db;"
+```
+
+Tras tener la base de datos creada procederemos a ejecutar el script de schema.sql, usando el comando:
+```
+psql -U postgres -d sipprem_db -f database/schema.sql
+```
+Para lo anterior tenemos que asegurarnos de estar en la carpeta de SIPPREM-Backend del proyecto.
+
+Tras la ejecucion correcta de los comandos anteriores tendremos nuestra base de datos creada, con los datos de prueba iniciales.
+
+Considere que dependiendo del nombre que haya asignado a la base de datos tendra que configurar el archivo .env
+
+### Configuracion del .env
+
+Para el correcto funcionamiento de la API, tendremos que crear un archivo llamado ".env", el
+cual debera tener el formato que tiene el archiv ".env.prueba". Se recomienda copiar el contenido
+del archivo ".env.prueba" y copiarlo en el nuevo archivo creado ".env", ahi debera modificar el valor
+de cada variable de entorno por lo que le indica el texto. 
+
+**PONGA EL PUERTO 3000 EN BACKEND_PORT, para que la conexion del frontend sea exitosa.**
+
+**En el desarrollo se utilizo el mismo texto CODIGOGENERADORDEJWT en la variable de entorno de JWT_SECRET, puede usar el mismo.**
+
+**En la variable DB_USER se coloca el nombre del usuario que utilizara para conectarse a la base de datos, se recomienda poner el usuario postgres. La variable DB_PASSWORD es la clave de dicho usuario seleccionado.**
+
+**La variable DB_HOST se debe dejar localhost para el correcto funcionamiento del frontend y backend.**
+
+**Como el instructivo para crear la base de datos pone de nombre sipprem_db, se recomienda poner ese valor para la variable de entorno DB_NAME.**
+
 ### Pruebas de Endpoints (Postman)
 
 Se recomienda utilizar **Postman** para realizar las pruebas de forma rápida y visual. La colección incluye todos los casos de éxito y los principales casos de error y validaciones de negocio.  
