@@ -8,27 +8,50 @@ interface ActividadFuturaCardProps {
 }
 
 const ActividadFuturaCard: React.FC<ActividadFuturaCardProps> = ({ actividad }) => {
-  // Función sencilla para formatear fecha a DD/MM/YY HH:MM
-  const formatFechaHora = (date: Date) => {
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    const DD = pad(date.getDate());
-    const MM = pad(date.getMonth() + 1);
-    const YY = date.getFullYear().toString().slice(-2);
-    const HH = pad(date.getHours());
-    const MIN = pad(date.getMinutes());
-    return `${DD}/${MM}/${YY} ${HH}:${MIN}`;
+  
+  // Función para formatear la fecha proveniente del backend (YYYY-MM-DD / ISO) o objeto Date
+  const formatFecha = (fechaInput?: Date | string) => {
+    if (!fechaInput) return 'Sin fecha';
+
+    // Si es un string en formato ISO o YYYY-MM-DD, extraemos la parte de la fecha para evitar desfases de zona horaria
+    if (typeof fechaInput === 'string') {
+      const soloFecha = fechaInput.split('T')[0];
+      const partes = soloFecha.split('-');
+      if (partes.length === 3) {
+        const [anio, mes, dia] = partes;
+        return `${dia}/${mes}/${anio}`;
+      }
+    }
+
+    const d = new Date(fechaInput);
+    if (isNaN(d.getTime())) return String(fechaInput);
+
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const year = d.getFullYear();
+
+    return `${day}/${month}/${year}`;
   };
+
+  const tituloMostrar = actividad.titulo || actividad.tipoActividad || 'Actividad';
+  const fechaMostrar = actividad.fecha || actividad.fechaHoraInicio;
 
   return (
     <IonRow className="actividad-card ion-align-items-center">
       <IonCol size="8">
         <IonLabel className="actividad-tipo">
-          {actividad.tipoActividad}
+          {tituloMostrar}
         </IonLabel>
+        {actividad.descripcion && (
+          <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: '#555' }}>
+            {actividad.descripcion}
+          </p>
+        )}
       </IonCol>
+      
       <IonCol size="4" className="ion-text-end">
         <IonLabel className="actividad-fecha">
-          {formatFechaHora(actividad.fechaHoraInicio)}
+          {formatFecha(fechaMostrar)}
         </IonLabel>
       </IonCol>
     </IonRow>

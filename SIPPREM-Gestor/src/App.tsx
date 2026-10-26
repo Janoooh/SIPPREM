@@ -7,6 +7,8 @@ import Inicio from './pages/Inicio';
 import AgregarProyecto from './pages/AgregarProyecto';
 import ModificarProyecto from './pages/ModificarProyecto';
 import InicioProyecto from './pages/InicioProyecto';
+import Cronograma from './pages/Cronograma';
+import AgregarPatrullaje from './pages/AgregarPatrullaje';
 import CambiarClaveInicial from './pages/CambiarClaveInicial';
 import Usuarios from './pages/Usuarios';
 import AgregarUsuario from './pages/AgregarUsuario';
@@ -14,6 +16,7 @@ import ModificarUsuario from './pages/ModificarUsuario';
 import Inventario from './pages/Inventario';
 import AgregarVehiculo from './pages/AgregarVehiculo';
 import AgregarArticulo from './pages/AgregarArticulo';
+import Personal from './pages/Personal';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -83,10 +86,21 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
-          {/* Se unifica el parametro :id_proyecto para que coincida con las subrutas e InicioProyecto */}
           <Route path="/admin/proyecto/:id_proyecto" element={
             <RutaProtegida rolesPermitidos={["admin"]}>
                 <InicioProyecto />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto/cronograma" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <Cronograma />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto/cronograma/registrar-patrullaje" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <AgregarPatrullaje />
             </RutaProtegida>
           } />
 
@@ -126,6 +140,12 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
+          <Route path="/admin/proyecto/:id_proyecto/personal" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+              <Personal />
+            </RutaProtegida>
+          } />
+
 
           {/*Rutas de supervisor*/}
 
@@ -138,6 +158,18 @@ const App: React.FC = () => {
           <Route path="/supervisor/proyecto/:id_proyecto" element={
             <RutaProtegida rolesPermitidos={["supervisor"]}>
                 <InicioProyecto />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/cronograma" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <Cronograma />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/cronograma/registrar-patrullaje" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <AgregarPatrullaje />
             </RutaProtegida>
           } />
 
@@ -156,6 +188,12 @@ const App: React.FC = () => {
           <Route path="/supervisor/proyecto/:id_proyecto/inventario/articulos/registrar" element={
             <RutaProtegida rolesPermitidos={["supervisor"]}>
               <AgregarArticulo />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/personal" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+              <Personal />
             </RutaProtegida>
           } />
 

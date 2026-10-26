@@ -17,29 +17,16 @@ import './mapaPoligono.css';
 export type PuntoMapa = [number, number];
 
 export interface MapaPoligonoProps {
-  /** Lista de puntos controlada desde el componente padre (opcional) */
   puntos?: PuntoMapa[];
-  /**
-   * Callback que se ejecuta cada vez que se agrega o elimina un vértice.
-   * Entrega tanto el arreglo de puntos [lat, lng] como el string WKT POLYGON((...)) para el backend.
-   */
+  puntosReferencia?: PuntoMapa[];
   onChangePuntos?: (puntos: PuntoMapa[], zonaWKT: string) => void;
-  /** Coordenadas iniciales para centrar el mapa (por defecto Valparaíso) */
   centroInicial?: PuntoMapa;
-  /** Nivel de zoom inicial del mapa */
   zoomInicial?: number;
-  /** Altura del contenedor del mapa */
   altura?: string;
-  /** Si es true, bloquea la edición del polígono (modo solo lectura) */
   soloLectura?: boolean;
 }
 
-/**
- * Función utilitaria que transforma la lista de vértices [latitud, longitud]
- * al formato WKT requerido por PostGIS y el validador del backend:
- * "POLYGON((lng1 lat1, lng2 lat2, lng3 lat3, lng1 lat1))"
- * Cierra automáticamente el polígono repitiendo el primer punto al final.
- */
+
 export const convertirPuntosAPoligonoWKT = (puntos: PuntoMapa[]): string => {
   // Un polígono requiere como mínimo 3 vértices distintos
   if (!puntos || puntos.length < 3) {
@@ -56,10 +43,7 @@ export const convertirPuntosAPoligonoWKT = (puntos: PuntoMapa[]): string => {
   return `POLYGON((${coordenadasTexto.join(', ')}))`;
 };
 
-/**
- * Función utilitaria para convertir un objeto GeoJSON Polygon proveniente del backend
- * (ST_AsGeoJSON) a una lista de vértices [latitud, longitud] para el componente MapaPoligono.
- */
+
 export const convertirGeoJSONAPuntos = (geoJson: any): PuntoMapa[] => {
   if (!geoJson) return [];
 
@@ -89,11 +73,8 @@ export const convertirGeoJSONAPuntos = (geoJson: any): PuntoMapa[] => {
   return [];
 };
 
-/**
- * Subcomponente encargado de recalcular el tamaño del mapa de Leaflet
- * cuando se monta o cambia las dimensiones de la vista en Ionic.
- */
-const MapResizer: React.FC<{ puntos?: PuntoMapa[] }> = ({ puntos }) => {
+
+const MapResizer: React.FC<{ puntosCentrar?: PuntoMapa[] }> = ({ puntosCentrar }) => {
   const map = useMap();
 
   useEffect(() => {
@@ -120,20 +101,21 @@ const MapResizer: React.FC<{ puntos?: PuntoMapa[] }> = ({ puntos }) => {
     };
   }, [map]);
 
-  // Si se cargan puntos iniciales (por ejemplo al modificar un proyecto), centra el mapa en el primer vértice
+  // Si se cargan puntos iniciales o un polígono de referencia (ej. zona del proyecto), centra el mapa en él
   useEffect(() => {
-    if (puntos && puntos.length > 0) {
-      map.setView(puntos[0], map.getZoom());
+    if (puntosCentrar && puntosCentrar.length > 0) {
+      const latProm =
+        puntosCentrar.reduce((acc, p) => acc + p[0], 0) / puntosCentrar.length;
+      const lngProm =
+        puntosCentrar.reduce((acc, p) => acc + p[1], 0) / puntosCentrar.length;
+      map.setView([latProm, lngProm], map.getZoom());
     }
-  }, [puntos, map]);
+  }, [puntosCentrar, map]);
 
   return null;
 };
 
-/**
- * Subcomponente que escucha los clicks sobre el mapa y agrega cada click
- * como un nuevo vértice del polígono (solo cuando no está en modo soloLectura).
- */
+
 const CapturadorClicksMapa: React.FC<{
   onAgregarPunto: (nuevoPunto: PuntoMapa) => void;
   soloLectura: boolean;
@@ -149,17 +131,13 @@ const CapturadorClicksMapa: React.FC<{
   return null;
 };
 
-/**
- * Componente MapaPoligono:
- * Muestra un mapa interactivo con un botón lateral de flecha "volver/deshacer".
- * Cada click en el mapa añade un vértice al polígono y lo guarda en una lista de puntos
- * lista para enviarse al backend como zona del proyecto.
- */
+
 const MapaPoligono: React.FC<MapaPoligonoProps> = ({
   puntos,
+  puntosReferencia,
   onChangePuntos,
   centroInicial = [-33.0456, -71.6203],
-  zoomInicial = 13,
+  zoomInicial = 14,
   altura = '350px',
   soloLectura = false
 }) => {
@@ -195,6 +173,14 @@ const MapaPoligono: React.FC<MapaPoligonoProps> = ({
     actualizarListaPuntos(nuevosPuntos);
   };
 
+  // Determinamos qué polígono usar para centrar la cámara inicialmente
+  const puntosParaCentrar =
+    puntosReferencia && puntosReferencia.length > 0
+      ? puntosReferencia
+      : soloLectura
+      ? listaPuntos
+      : undefined;
+
   return (
     <div>
       <div className="mapa-poligono-wrapper">
@@ -205,7 +191,7 @@ const MapaPoligono: React.FC<MapaPoligonoProps> = ({
             zoom={zoomInicial}
             style={{ height: altura, width: '100%', zIndex: 1 }}
           >
-            <MapResizer puntos={soloLectura ? listaPuntos : undefined} />
+            <MapResizer puntosCentrar={puntosParaCentrar} />
             <CapturadorClicksMapa onAgregarPunto={handleAgregarPunto} soloLectura={soloLectura} />
 
             <TileLayer
@@ -213,12 +199,28 @@ const MapaPoligono: React.FC<MapaPoligonoProps> = ({
               attribution="&copy; OpenStreetMap contributors"
             />
 
-            {/* Dibuja cada vértice marcado en el mapa */}
+            {/* Polígono de referencia (ej. zona delimitada del proyecto) para guiar al usuario */}
+            {puntosReferencia && puntosReferencia.length >= 3 && (
+              <Polygon
+                positions={puntosReferencia}
+                interactive={false}
+                pathOptions={{
+                  color: '#16a34a',
+                  fillColor: '#22c55e',
+                  fillOpacity: 0.2,
+                  weight: 3,
+                  dashArray: '6, 6'
+                }}
+              />
+            )}
+
+            {/* Dibuja cada vértice marcado por el usuario en el mapa */}
             {listaPuntos.map((punto, index) => (
               <CircleMarker
                 key={`vertice-${index}-${punto[0]}-${punto[1]}`}
                 center={punto}
                 radius={6}
+                interactive={false}
                 pathOptions={{
                   color: '#121c27',
                   fillColor: index === 0 ? '#38bdf8' : '#48D1E6',
@@ -232,7 +234,8 @@ const MapaPoligono: React.FC<MapaPoligonoProps> = ({
             {listaPuntos.length === 2 && (
               <Polyline
                 positions={listaPuntos}
-                pathOptions={{ color: '#48D1E6', weight: 3 }}
+                interactive={false}
+                pathOptions={{ color: '#0284c7', weight: 3 }}
               />
             )}
 
@@ -240,10 +243,11 @@ const MapaPoligono: React.FC<MapaPoligonoProps> = ({
             {listaPuntos.length >= 3 && (
               <Polygon
                 positions={listaPuntos}
+                interactive={false}
                 pathOptions={{
-                  color: '#48D1E6',
-                  fillColor: '#48D1E6',
-                  fillOpacity: 0.35,
+                  color: '#0284c7',
+                  fillColor: '#38bdf8',
+                  fillOpacity: 0.4,
                   weight: 3
                 }}
               />
@@ -271,9 +275,14 @@ const MapaPoligono: React.FC<MapaPoligonoProps> = ({
             'Área del proyecto (bloqueada para modificación)'
           ) : (
             <>
+              {puntosReferencia && puntosReferencia.length >= 3 && (
+                <span style={{ display: 'block', color: '#bbf7d0', marginBottom: '2px' }}>
+                  ● Área verde punteada: Límite permitido del proyecto
+                </span>
+              )}
               Vértices marcados: <strong>{listaPuntos.length}</strong>{' '}
               {listaPuntos.length < 3
-                ? '(mínimo 3 puntos para formar el polígono)'
+                ? '(mínimo 3 puntos dentro del área del proyecto)'
                 : '(polígono válido)'}
             </>
           )}

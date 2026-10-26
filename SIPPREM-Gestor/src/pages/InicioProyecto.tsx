@@ -18,37 +18,35 @@ import ActividadFuturaCard from '../components/ActividadFuturaCard';
 import { ActividadFutura } from '../interfaces/actividadFutura';
 import { proyectoPatrullaje } from '../interfaces/proyectoPatrullaje';
 import { proyectosService } from '../services/proyectosService';
+import { actividadesService } from '../services/actividadesService';
 import './InicioProyecto.css';
 import { useUsuario } from '../hooks/obtenerUsuario';
 
 const InicioProyecto: React.FC = () => {
-  // Datos de ejemplo de actividades futuras para el proyecto.
-  const actividades: ActividadFutura[] = [
-    { id: 1, tipoActividad: 'Patrullaje', fechaHoraInicio: new Date(2023, 9, 15, 14, 30) },
-    { id: 2, tipoActividad: 'Firmar Contrato', fechaHoraInicio: new Date(2023, 9, 18, 10, 0) },
-    { id: 3, tipoActividad: 'Campaña', fechaHoraInicio: new Date(2023, 9, 20, 16, 45) },
-    { id: 4, tipoActividad: 'Patrullaje', fechaHoraInicio: new Date(2023, 9, 21, 16, 45) },
-    { id: 5, tipoActividad: 'Patrullaje', fechaHoraInicio: new Date(2023, 9, 22, 16, 45) }
-  ];
-
   const { usuario } = useUsuario();
   const { id_proyecto } = useParams<{ id_proyecto: string }>();
   const rol = usuario.tipo_rol;
   const [mandarAlerta] = useIonAlert();
 
-  // Estado para almacenar la información del proyecto obtenida del backend
+  // Estado para almacenar la información del proyecto y sus actividades obtenidas del backend
   const [proyecto, setProyecto] = useState<proyectoPatrullaje | null>(null);
+  const [actividades, setActividades] = useState<ActividadFutura[]>([]);
   const [cargando, setCargando] = useState<boolean>(false);
 
-  // Función encargada de consultar GET /proyectos/:id_proyecto mediante proyectosService
+  // Función encargada de consultar GET /proyectos/:id_proyecto y GET /proyectos/:id_proyecto/actividades
   const cargarInformacionProyecto = async () => {
     if (!id_proyecto) return;
     try {
       setCargando(true);
-      const datosProyecto = await proyectosService.obtenerProyectoPorId(String(id_proyecto));
+      const [datosProyecto, datosActividades] = await Promise.all([
+        proyectosService.obtenerProyectoPorId(String(id_proyecto)),
+        actividadesService.obtenerActividadesProyecto(String(id_proyecto))
+      ]);
+
       setProyecto(datosProyecto);
+      setActividades(datosActividades);
     } catch (error: any) {
-      console.error('Error al obtener la información del proyecto:', error);
+      console.error('Error al obtener la información o actividades del proyecto:', error);
       mandarAlerta({
         header: 'Error',
         message:
@@ -143,12 +141,21 @@ const InicioProyecto: React.FC = () => {
 
                   <IonLabel className="titulo-actividades">Actividades futuras :</IonLabel>
                   
-                  {/* Lista de actividades futuras para el proyecto.*/}
+                  {/* Lista de actividades para el proyecto obtenidas desde el backend */}
                   <IonRow className="actividades-list">
                     <IonCol size="12" sizeMd="10" sizeLg="8" className="ion-no-padding">
-                      {actividades.map(actividad => (
-                        <ActividadFuturaCard key={actividad.id} actividad={actividad} />
-                      ))}
+                      {actividades.length === 0 ? (
+                        <IonLabel style={{ color: '#e0e6ed', fontStyle: 'italic' }}>
+                          No hay actividades futuras registradas para este proyecto.
+                        </IonLabel>
+                      ) : (
+                        actividades.map((actividad, index) => (
+                          <ActividadFuturaCard
+                            key={actividad.id_actividad ?? actividad.id ?? index}
+                            actividad={actividad}
+                          />
+                        ))
+                      )}
                     </IonCol>
                   </IonRow>
                 </>

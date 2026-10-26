@@ -79,11 +79,12 @@ const MenuLateralProyecto: React.FC<MenuLateralProyectoProps> = ({
         </IonButton>
         <IonRow className="menu-divider"></IonRow>
 
-        {/* Botón Cronograma*/}
+        {/* Botón Cronograma del proyecto */}
         <IonButton
           className={`menu-btn ${seccionActiva === 'cronograma' ? 'menu-btn-activo' : ''}`}
           expand="block"
           fill={seccionActiva === 'cronograma' ? 'solid' : 'clear'}
+          onClick={() => irARuta('/cronograma')}
         >
           Cronograma
         </IonButton>
@@ -125,6 +126,7 @@ const MenuLateralProyecto: React.FC<MenuLateralProyectoProps> = ({
           className={`menu-btn ${seccionActiva === 'personal' ? 'menu-btn-activo' : ''}`}
           expand="block"
           fill={seccionActiva === 'personal' ? 'solid' : 'clear'}
+          onClick={() => irARuta('/personal')}
         >
           Personal
         </IonButton>
