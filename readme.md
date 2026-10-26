@@ -762,6 +762,9 @@ Si quisieramos obtener el dist y ejecutarlo, se puede usar:
 ionic build
 npm run preview
 ```
+
+El proceso es el mismo si queremos correr el SIPPREM-AppPatrullero, solo que cambiando la ubicacion en la ruta.
+
 **IMPORTANTE**
 El sistema actualmente gestor cuenta actualmente con conexión al backend, pues se puede cumplir los flujos principales de tarea de manera exitosa. Para poder utilizar correctamente el sistema tendremos que tener activado el backend en el puerto 3000, usando en la carpeta SIPPREM el comando cmd: node SIPPREM-Backend/dist/app.js
 
