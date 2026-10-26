@@ -1,3 +1,50 @@
+# Requisitos Previos
+Cuenta con las siguientes herramientas instaladas en tu sistema antes de comenzar:
+- Git (para clonar y gestionar el repositorio)
+- Node.js (v18 o superior) y npm
+- PostgreSQL con la extensión PostGIS habilitada (necesaria para el almacenamiento de zonas geográficas)
+- Ionic CLI (para el desarrollo y ejecución del frontend: `npm install -g @ionic/cli`)
+
+## Guía de instalación y ejecución  
+Clonar el repositorio  
+Abre la CMD y ejecuta los siguientes comandos:
+
+```
+git clone https://github.com/Janoooh/SIPPREM.git
+cd SIPPREM
+cd SIPPREM-Gestor
+npm install
+```
+
+### Backend (Servidor y API REST)
+
+Compilar y Ejecutar
+Abre tu terminal (CMD) en la raíz del proyecto y ejecuta:
+```
+cd siprem-backend
+npm install
+npx tsc
+node dist/index.js
+```
+El servidor quedará escuchando en `http://localhost:3000`
+
+Pruebas para el funcionamiento de la API REST con Postman
+La API está desarrollada con Node.js, Express y TypeScript, conectándose a una base de datos PostgreSQL.
+URL Base: `http://localhost:3000/api/v1`
+
+### Pruebas de Endpoints (Postman)
+
+Se recomienda utilizar **Postman** para realizar las pruebas de forma rápida y visual. La colección incluye todos los casos de éxito y los principales casos de error y validaciones de negocio.  
+Sigue estos pasos para configurar el entorno:  
+1. Importar la colección:  
+   * Carga el archivo `pruebas_sipprem.postman_collection.json` dentro de Postman.
+
+2. Autenticación (JWT):  
+   * Utiliza ambas peticiones de login disponibles (`Obtener Token Admin` u `Obtener Token Patrullero`).
+   * Copia el token obtenido y guárdalo en su respectiva variable global (`TokenAdmin` o `TokenPatrullero`).
+
+3. Ejecución de operaciones:  
+   * Con las variables listas, se puede realizar una ejecución masiva haciendo clic en los tres puntos (`...`) al lado de `My Collection`, seleccionando `Run` y ejecutando el flujo completo.
 
 # Módulo de proyectos
 Módulo encargado de la gestión completa de proyectos de patrullaje. Incluyendo operaciones de creación, listado, obtención por ID, actualización y eliminación.
