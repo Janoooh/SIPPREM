@@ -35,12 +35,10 @@ create table proyecto_patrullaje(
 	activo bool default true not null, -- este es para el estado de un proyecto (activo o cerrado).
 	eliminado bool default false not null, --este es para ver si fue eliminado. 
 	
-	constraint pk_proyecto_patrullaje primary key (id_proyecto)
-	/* No se si es necesario hacer check o si me manejaran en el frontend
-		Asi que los pongo porsiaca				
-	*/,
+	constraint pk_proyecto_patrullaje primary key (id_proyecto),
 	constraint chk_fechas check (fecha_termino >= fecha_inicio),
-	constraint chk_presupuesto check (presupuesto > 0)
+	constraint chk_presupuesto check (presupuesto > 0),
+    constraint chk_zona_valida check (ST_IsValid(zona_seleccionada))
 );
 
 create table acceso_proyecto(
@@ -135,7 +133,8 @@ create table planificacion_patrullaje(
 	id_proyecto integer not null,
 
 	constraint pk_plan_patrullaje primary key (id_patrullaje),
-	constraint fk_proyecto_patrullaje foreign key (id_proyecto) references proyecto_patrullaje(id_proyecto)
+	constraint fk_proyecto_patrullaje foreign key (id_proyecto) references proyecto_patrullaje(id_proyecto),
+    constraint chk_zona_patrullaje_valida check (ST_IsValid(zona))
 );
 
 create table realizacion_patrullaje(

@@ -17,7 +17,7 @@ export const iniciarSesion = async (idIngresado : string, claveIngresada: string
     if (resConsulta.rows.length === 0){
         return {
             exito: false, 
-            codHTTP: 400,
+            codHTTP: 401,
             explicacion : "Las credenciales de acceso son incorrectas.",
             datos : null
         };
