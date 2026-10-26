@@ -300,7 +300,7 @@ Obtiene un listado de todos los vehículos activos asociados a un proyecto espec
 Método: `GET`  
 Ruta: `/api/v1/proyectos/:id_proyecto/vehiculos`  
 Autenticación: Requiere Token JWT  
-Roles permitidos: `admin`, `supervisor`  
+Roles permitidos: `admin`, `supervisor`, `patrullero`   
 Parámetros de ruta (Path Params):  
 - `id_proyecto` (number): ID único del proyecto.
 
@@ -494,7 +494,7 @@ Obtiene un listado de todos los equipamientos personales activos asociados a un 
 Método: `GET`  
 Ruta: `/api/v1/proyectos/:id_proyecto/eq_personal`  
 Autenticación: Requiere Token JWT  
-Roles permitidos: `admin`, `supervisor`  
+Roles permitidos: `admin`, `supervisor`, `patrullero`  
 Parámetros de ruta (Path Params):
 - `id_proyecto` (number): ID único del proyecto.  
 
