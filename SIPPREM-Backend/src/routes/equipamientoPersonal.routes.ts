@@ -10,7 +10,7 @@ const router = Router({ mergeParams: true });
 router.use('/tipos', tipoEqPersonalRutas);
 
 // Se utiliza el GET (para todos y para uno en especifico), POST, PATCH y DELETE
-router.get('/', verificarRol(["admin","supervisor"]), mostrarEquipamientosPersonalesControlador);
+router.get('/', verificarRol(["admin","supervisor", "patrullero"]), mostrarEquipamientosPersonalesControlador);
 router.get('/:id_eq_personal', verificarRol(["admin","supervisor"]), mostrarUNequipamientoPersonalControlador);
 router.post('/', verificarRol(["admin","supervisor"]), agregarEquipamientoPersonalControlador);
 router.patch('/:id_eq_personal', verificarRol(["admin","supervisor"]), actualizarEquipamientoPersonalControlador);
