@@ -5,6 +5,7 @@ Cuenta con las siguientes herramientas instaladas en tu sistema antes de comenza
 - PostgreSQL con la extensión PostGIS habilitada (necesaria para el almacenamiento de zonas geográficas)
 - Ionic CLI (para el desarrollo y ejecución del frontend: `npm install -g @ionic/cli`)
 
+
 ## Guía de instalación y ejecución  
 Clonar el repositorio  
 Abre la CMD y ejecuta los siguientes comandos:
@@ -24,9 +25,10 @@ Abre tu terminal (CMD) en la raíz del proyecto y ejecuta:
 cd siprem-backend
 npm install
 npx tsc
-node dist/index.js
+node dist/app.js
 ```
 El servidor quedará escuchando en `http://localhost:3000`
+
 
 Pruebas para el funcionamiento de la API REST con Postman
 La API está desarrollada con Node.js, Express y TypeScript, conectándose a una base de datos PostgreSQL.
@@ -1168,3 +1170,816 @@ Casos de Error:
 
 ### Evidencia de pruebas en Postman
 ![Evidencia trabajadores](./pruebas/capturas/evidencia-trabajadores.png)
+
+---
+title: EstosSonMisEndpoints
+
+---
+
+# Modulo de Auth
+
+Modulo encargado de gestionar los accesos de usuarios registrados al sistema, entregando metodos para poder iniciar sesion, y para cambiar la contraseña (Siempre y cuando el usuario tenga disponible esa accion).
+
+## 1. Iniciar sesion en el sistema.
+
+Valida las credenciales de acceso ingresadas, y genera el token JWT para darle una sesion activa al usuario.
+
+Método: POST
+Ruta: /api/v1/auth
+Autenticación: No requiere
+Roles permitidos: admin, supervisor, patrullero
+Body requerido (JSON):
+
+```
+{
+    "idIngresado": "string (RUT o correo)",
+    "claveIngresada": "string (clave)"
+}
+```
+
+Respuestas esperadas:
+
+200 OK: El inicio de sesion se realizo correctamente.
+```
+{
+    "ok": true,
+    "message": "El inicio de sesion se realizo correctamente.",
+    "data": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJydXRVc3VhcmlvIjoiMjE1NTU2NjYtOCIsImNvcnJlb1VzdWFyaW8iOiJhbmEubW9yYWxlc0BzaXBwcmVtLmNvbSIsInJvbCI6IlBhdHJ1bGxlcm8iLCJpYXQiOjE3OTI5NjMwMjUsImV4cCI6MTc5MzAwNjIyNX0.jQbfP1-DpmlN16f-ZJM1FvvdZ3cEloV0GEqZNFaiI08",
+        "datosUsuario": {
+            "rut": "21555666-8",
+            "nombre": "Ana Morales",
+            "correo": "ana.morales@sipprem.com",
+            "foto": null,
+            "nuevo_user": true,
+            "id_rol": 3,
+            "tipo_rol": "Patrullero"
+        }
+    }
+}
+```
+
+Casos de error:
+
+401: Las credenciales de acceso son incorrectas.
+
+## 2. Cambiar clave de un usuario con nuevo_user = true
+
+Permite cambiar la clave de un usuario que en los registros de la base de datos tiene la columna nuevo_user en true, usandose principalmente para cambiar la clave generada aleatoriamente cuando se crea un usuario.
+
+Método: PATCH
+Ruta: /api/v1/auth
+Autenticación: Requiere Token JWT
+Roles permitidos: admin, supervisor, patrullero
+Body requerido (JSON):
+
+```
+{ 
+    "idIngresado": "string (RUT o correo)",
+    "claveNuevaIng": "string (clave nueva)"
+}
+```
+
+Respuestas esperadas:
+
+200 OK: La clave se cambio correctamente.
+
+```
+{
+    "ok": true,
+    "message": "La clave se cambio correctamente.",
+    "data": null
+}
+```
+
+Casos de error:
+
+400: No se encontro el usuario con rut/correo ingresado, o el usuario no tiene nuevo_user en true.
+
+## Evidencia de pruebas en postman
+
+### Evidencia de pruebas en Postman
+![Evidencia auth](./pruebas/capturas/evidencia-auth.png)
+
+---
+title: EstosSonMisEndpointsPatrullajes
+
+---
+
+# Modulo de patrullajes
+
+Modulo encargado de gestionar los patrullajes de cada proyecto del sistema. Cuenta con metodos tanto para gestionar las planificaciones de patrullaje, como para ejecutar los patrullajes que se encuentran planificados.
+
+## 1. Crear una planificacion de patrullaje.
+
+Nos permite planificar un patrullaje para un dia especifico, con una duracion especifica. Tambien se debe indicar la zona donde sera, y quien/es lo realizaran.
+
+Método: POST
+Ruta: /api/v1/proyectos/:id_proyecto/patrullajes
+Autenticación: Requiere Token JWT
+Roles permitidos: admin, supervisor
+Parámetros de ruta (Path Params):
+- id_proyecto: number (Identificador del proyecto)
+
+Body requerido (JSON):
+
+```json
+{
+  "hora_inicio": "2026-11-20 09:00:00",
+  "hora_termino": "2026-11-20 17:00:00",
+  "zona": "POLYGON((-71.625 -33.035, -71.615 -33.035, -71.615 -33.045, -71.625 -33.045, -71.625 -33.035))",
+  "patrulleros": [
+    "18222333-k"
+  ]
+}
+```
+
+Respuestas esperadas:
+
+201 Created: Planificacion de patrullaje creada correctamente.
+```json
+{
+    "ok": true,
+    "message": "Planificacion de patrullaje creada correctamente.",
+    "data": {
+        "id_patrullaje": 13,
+        "hora_inicio": "2026-11-20T12:00:00.000Z",
+        "hora_termino": "2026-11-20T20:00:00.000Z",
+        "zona": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [
+                        -71.625,
+                        -33.035
+                    ],
+                    [
+                        -71.615,
+                        -33.035
+                    ],
+                    [
+                        -71.615,
+                        -33.045
+                    ],
+                    [
+                        -71.625,
+                        -33.045
+                    ],
+                    [
+                        -71.625,
+                        -33.035
+                    ]
+                ]
+            ]
+        },
+        "id_proyecto": 1,
+        "patrulleros": [
+            "18222333-k"
+        ]
+    }
+}
+```
+
+Casos de error:
+
+400 Bad request: Faltan campos obligatorios, se asignaron mas de dos patrulleros, los ruts de los patrulleros no tienen formato valido, se ingreso el mismo rut para el encargado y el acompañante, o la zona del patrullaje no es valida.
+500 Internal server error: Error interno del servidor al procesar la peticion.
+
+## 2. Obtener las planificaciones de patrullaje de un proyecto.
+
+Permite listar todos los patrullajes planificados, en curso o finalizados de un proyecto específico, indicando su estado actual, horario, zona delimitada en formato GeoJSON y los patrulleros asignados.
+
+Método: GET
+Ruta: /api/v1/proyectos/:id_proyecto/patrullajes
+Autenticación: Requiere Token JWT
+Roles permitidos: admin, supervisor
+Parámetros de ruta (Path Params):
+- id_proyecto: number (Identificador del proyecto a consultar)
+
+Respuestas esperadas:
+
+200 OK: Patrullajes obtenidos correctamente.
+```json
+{
+    "ok": true,
+    "message": "Patrullajes obtenidos correctamente.",
+    "data": [
+        {
+            "id_patrullaje": 1,
+            "hora_inicio": "2026-06-05T08:00:00.000Z",
+            "hora_termino": "2026-06-05T16:00:00.000Z",
+            "zona": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [-71.625, -33.035],
+                        [-71.615, -33.035],
+                        [-71.615, -33.045],
+                        [-71.625, -33.045],
+                        [-71.625, -33.035]
+                    ]
+                ]
+            },
+            "estado": "Finalizado",
+            "patrulleros": [
+                {
+                    "rut": "18222333-k",
+                    "nombre": "Carlos Gomez"
+                }
+            ]
+        }
+    ]
+}
+```
+
+Casos de error:
+
+400 Bad request: El ID del proyecto debe ser un número válido.
+403 Forbidden: No tienes acceso a este proyecto.
+404 Not found: El proyecto no existe o ha sido eliminado.
+500 Internal server error: Error interno del servidor al procesar la petición.
+
+## 3. Actualizar una planificación de patrullaje.
+
+Permite modificar los datos de horario, zona o personal asignado a una planificación de patrullaje existente, siempre y cuando el patrullaje aún no haya sido iniciado.
+
+Método: PUT
+Ruta: /api/v1/proyectos/:id_proyecto/patrullajes/:id_patrullaje
+Autenticación: Requiere Token JWT
+Roles permitidos: admin, supervisor
+Parámetros de ruta (Path Params):
+- id_proyecto: number (Identificador del proyecto)
+- id_patrullaje: number (Identificador de la planificación de patrullaje a actualizar)
+
+Body requerido (JSON):
+
+```json
+{
+  "hora_inicio": "2026-11-20 10:00:00",
+  "hora_termino": "2026-11-20 18:00:00",
+  "zona": "POLYGON((-71.625 -33.035, -71.615 -33.035, -71.615 -33.045, -71.625 -33.045, -71.625 -33.035))",
+  "patrulleros": [
+    "18222333-k",
+    "21555666-8"
+  ]
+}
+```
+
+Respuestas esperadas:
+
+200 OK: Planificación de patrullaje actualizada correctamente.
+```json
+{
+    "ok": true,
+    "message": "Planificación de patrullaje actualizada correctamente.",
+    "data": {
+        "id_patrullaje": 13,
+        "hora_inicio": "2026-11-20T13:00:00.000Z",
+        "hora_termino": "2026-11-20T21:00:00.000Z",
+        "zona": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [-71.625, -33.035],
+                    [-71.615, -33.035],
+                    [-71.615, -33.045],
+                    [-71.625, -33.045],
+                    [-71.625, -33.035]
+                ]
+            ]
+        },
+        "id_proyecto": 1,
+        "patrulleros": [
+            "18222333-k",
+            "21555666-8"
+        ]
+    }
+}
+```
+
+Casos de error:
+
+400 Bad request: Faltan campos obligatorios, IDs inválidos, zona con formato inválido, o RUTs duplicados/inválidos.
+403 Forbidden: No tienes acceso a este proyecto.
+404 Not found: El patrullaje o proyecto solicitado no existe.
+409 Conflict: Este patrullaje ya fue iniciado o finalizado.
+500 Internal server error: Error interno del servidor al procesar la petición.
+
+## 4. Iniciar ejecución de un patrullaje.
+
+Permite a un patrullero asignado dar inicio a un patrullaje planificado, registrando la hora real de inicio, el vehículo que utilizará y el equipamiento personal que portará durante el turno.
+
+Método: POST
+Ruta: /api/v1/proyectos/:id_proyecto/patrullajes/:id_patrullaje/iniciar
+Autenticación: Requiere Token JWT
+Roles permitidos: patrullero
+Parámetros de ruta (Path Params):
+- id_proyecto: number (Identificador del proyecto)
+- id_patrullaje: number (Identificador del patrullaje planificado a iniciar)
+
+Body requerido (JSON):
+
+```json
+{
+  "id_vehiculo": "VEH-001",
+  "eq_personal": [
+    "EQP-001",
+    "EQP-002"
+  ]
+}
+```
+
+Respuestas esperadas:
+
+201 Created: Patrullaje iniciado correctamente.
+```json
+{
+    "ok": true,
+    "message": "Patrullaje iniciado correctamente.",
+    "data": {
+        "id_patrullaje": 13,
+        "hora_real_inicio": "2026-11-20T12:05:00.000Z",
+        "hora_real_termino": null,
+        "id_vehiculo": "VEH-001",
+        "eq_personal": [
+            "EQP-001",
+            "EQP-002"
+        ]
+    }
+}
+```
+
+Casos de error:
+
+400 Bad request: ID inválido, no se especificó vehículo, o el equipamiento personal tiene elementos duplicados/inválidos.
+403 Forbidden: No tienes permiso para iniciar este patrullaje porque no estás asignado a él.
+404 Not found: El patrullaje solicitado no existe en este proyecto.
+409 Conflict: Este patrullaje ya fue iniciado o finalizado.
+500 Internal server error: Error interno del servidor al procesar la petición.
+
+## 5. Finalizar ejecución de un patrullaje.
+
+Permite a un patrullero asignado marcar el término del patrullaje que se encuentra actualmente en curso, registrando automáticamente la hora real de término en la base de datos.
+
+Método: PATCH
+Ruta: /api/v1/proyectos/:id_proyecto/patrullajes/:id_patrullaje/finalizar
+Autenticación: Requiere Token JWT
+Roles permitidos: patrullero
+Parámetros de ruta (Path Params):
+- id_proyecto: number (Identificador del proyecto)
+- id_patrullaje: number (Identificador del patrullaje en curso a finalizar)
+
+Body requerido (JSON):
+No requiere body.
+
+Respuestas esperadas:
+
+200 OK: Patrullaje finalizado correctamente.
+```json
+{
+    "ok": true,
+    "message": "Patrullaje finalizado correctamente.",
+    "data": {
+        "id_patrullaje": 13,
+        "hora_real_inicio": "2026-11-20T12:05:00.000Z",
+        "hora_real_termino": "2026-11-20T20:00:00.000Z",
+        "id_vehiculo": "VEH-001"
+    }
+}
+```
+
+Casos de error:
+
+400 Bad request: El ID del patrullaje debe ser un número válido.
+403 Forbidden: No tienes permiso para finalizar este patrullaje porque no estás asignado a él.
+404 Not found: El patrullaje solicitado no existe en este proyecto.
+409 Conflict: No se puede finalizar un patrullaje que aún no ha sido iniciado, o que ya fue finalizado anteriormente.
+500 Internal server error: Error interno del servidor al procesar la petición.
+
+## 6. Eliminar una planificación de patrullaje.
+
+Permite eliminar una planificación de patrullaje del sistema, siempre y cuando no haya sido iniciada ni finalizada previamente.
+
+Método: DELETE
+Ruta: /api/v1/proyectos/:id_proyecto/patrullajes/:id_patrullaje
+Autenticación: Requiere Token JWT
+Roles permitidos: admin, supervisor
+Parámetros de ruta (Path Params):
+- id_proyecto: number (Identificador del proyecto)
+- id_patrullaje: number (Identificador del patrullaje planificado a eliminar)
+
+Body requerido (JSON):
+No requiere body.
+
+Respuestas esperadas:
+
+200 OK: Planificación de patrullaje eliminada exitosamente.
+```json
+{
+    "ok": true,
+    "message": "Planificación de patrullaje eliminada exitosamente.",
+    "data": {
+        "id_patrullaje": 13
+    }
+}
+```
+
+Casos de error:
+
+400 Bad request: El ID del patrullaje debe ser un número válido.
+403 Forbidden: No tienes acceso a este proyecto.
+404 Not found: El patrullaje solicitado no existe en este proyecto.
+409 Conflict: No se puede eliminar un patrullaje que ya fue iniciado o finalizado.
+500 Internal server error: Error interno del servidor al procesar la petición.
+
+## Evidencia de pruebas en postman
+
+### Evidencia de pruebas en Postman
+![Evidencia patrulleros](./pruebas/capturas/evidencia-patrulleros.png)
+![Evidencia patrulleros](./pruebas/capturas/evidencia-patrulleros2.png)
+
+---
+title: EstosSonMisEndpointsUsuarios
+
+---
+
+# Modulo de Usuarios
+
+Modulo encargado de la administracion y gestion de usuarios en el sistema SIPPREM. Permite registrar nuevos colaboradores, consultar la lista y detalles de usuarios, gestionar su perfil personal, ver sus patrullajes y proyectos asignados, actualizar su informacion, restablecer sus credenciales de acceso y realizar el borrado o restauracion logica de sus cuentas.
+
+## 1. Listar usuarios del sistema.
+
+Permite al administrador obtener una lista de los usuarios registrados en el sistema, permitiendo filtrar opcionalmente por su estado (activos, eliminados o todos).
+
+Método: GET
+Ruta: /api/v1/usuarios
+Autenticación: Requiere Token JWT
+Roles permitidos: admin
+Parámetros de consulta (Query Params):
+- estado: string (Opcional: 'activos', 'eliminados' o 'todos'. Por defecto filtra solo activos)
+
+Respuestas esperadas:
+
+200 OK: Usuarios obtenidos correctamente.
+```json
+{
+    "ok": true,
+    "message": "Usuarios obtenidos correctamente.",
+    "data": [
+        {
+            "rut": "12345678-9",
+            "nombre": "Edgar De La Cruz",
+            "correo": "lil.crux@procasting.cl",
+            "telefono": "912345678",
+            "foto": null,
+            "tipo_rol": "Admin",
+            "eliminado": false
+        },
+        {
+            "rut": "98765432-1",
+            "nombre": "Fernanda Barraza",
+            "correo": "fer.barra@procasting.cl",
+            "telefono": "987654321",
+            "foto": null,
+            "tipo_rol": "Supervisor",
+            "eliminado": false
+        }
+    ]
+}
+```
+
+Casos de error:
+
+401 Unauthorized: Token JWT no proporcionado o invalido.
+403 Forbidden: No tienes permisos para acceder a este recurso.
+500 Internal server error: Error interno del servidor al procesar la peticion.
+
+## 2. Obtener mi perfil autenticado.
+
+Permite a cualquier usuario autenticado en la plataforma consultar su propia informacion de perfil a traves de los datos contenidos en su token JWT.
+
+Método: GET
+Ruta: /api/v1/usuarios/me
+Autenticación: Requiere Token JWT
+Roles permitidos: admin, supervisor, patrullero
+
+Respuestas esperadas:
+
+200 OK: Se encontraron los datos del usuario.
+```json
+{
+    "ok": true,
+    "message": "Se encontraron los datos del usuario.",
+    "data": {
+        "rut": "12345678-9",
+        "nombre": "Edgar De La Cruz",
+        "correo": "lil.crux@procasting.cl",
+        "telefono": "912345678",
+        "foto": null,
+        "id_rol": 1,
+        "tipo_rol": "Admin",
+        "fecha_registro": "2026-10-25T03:00:00.000Z"
+    }
+}
+```
+
+Casos de error:
+
+401 Unauthorized: Token JWT no proporcionado o invalido.
+404 Not found: El usuario autenticado no existe en la base de datos.
+500 Internal server error: Error interno del servidor al procesar la peticion.
+
+## 3. Obtener mis patrullajes asignados.
+
+Permite a un patrullero autenticado consultar todos los patrullajes a los que ha sido asignado a lo largo de los diferentes proyectos, detallando el estado, el horario planificado y la zona delimitada.
+
+Método: GET
+Ruta: /api/v1/usuarios/me/patrullajes
+Autenticación: Requiere Token JWT
+Roles permitidos: patrullero
+
+Respuestas esperadas:
+
+200 OK: Patrullajes del usuario obtenidos correctamente.
+```json
+{
+    "ok": true,
+    "message": "Patrullajes del usuario obtenidos correctamente.",
+    "data": [
+        {
+            "nombre_proyecto": "Patrullaje Preventivo Plan Valparaíso",
+            "id_proyecto": 1,
+            "id_patrullaje": 1,
+            "hora_inicio": "2026-06-05T08:00:00.000Z",
+            "hora_termino": "2026-06-05T16:00:00.000Z",
+            "zona": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [-71.625, -33.035],
+                        [-71.615, -33.035],
+                        [-71.615, -33.045],
+                        [-71.625, -33.045],
+                        [-71.625, -33.035]
+                    ]
+                ]
+            },
+            "estado": "Finalizado"
+        }
+    ]
+}
+```
+
+Casos de error:
+
+401 Unauthorized: Token JWT no proporcionado o invalido.
+403 Forbidden: No tienes rol de patrullero para realizar esta consulta.
+500 Internal server error: Error interno del servidor al procesar la peticion.
+
+## 4. Obtener un usuario por ID (RUT o Correo).
+
+Permite al administrador consultar los datos completos de un usuario registrado en el sistema mediante su RUT o su correo electronico.
+
+Método: GET
+Ruta: /api/v1/usuarios/:id_user
+Autenticación: Requiere Token JWT
+Roles permitidos: admin
+Parámetros de ruta (Path Params):
+- id_user: string (RUT o correo electronico del usuario a consultar)
+
+Respuestas esperadas:
+
+200 OK: Se encontraron los datos del usuario.
+```json
+{
+    "ok": true,
+    "message": "Se encontraron los datos del usuario.",
+    "data": {
+        "rut": "18222333-k",
+        "nombre": "Carlos Gomez",
+        "correo": "carlos.gomez@sipprem.com",
+        "telefono": "999999999",
+        "foto": null,
+        "id_rol": 3,
+        "tipo_rol": "Patrullero",
+        "fecha_registro": "2026-10-25T03:00:00.000Z"
+    }
+}
+```
+
+Casos de error:
+
+401 Unauthorized: Token JWT no proporcionado o invalido.
+403 Forbidden: No tienes permisos para acceder a este recurso.
+404 Not found: El usuario con id :id_user no se encontro.
+500 Internal server error: Error interno del servidor al procesar la peticion.
+
+## 5. Obtener los proyectos a los que pertenece un usuario.
+
+Permite al administrador consultar todos los proyectos a los que un determinado usuario tiene acceso o en los que se encuentra asignado como personal.
+
+Método: GET
+Ruta: /api/v1/usuarios/:id_user/proyectos
+Autenticación: Requiere Token JWT
+Roles permitidos: admin
+Parámetros de ruta (Path Params):
+- id_user: string (RUT del usuario a consultar)
+
+Respuestas esperadas:
+
+200 OK: Se encontraron los proyectos del usuario.
+```json
+{
+    "ok": true,
+    "message": "Se encontraron los proyectos del usuario.",
+    "data": [
+        {
+            "id_proyecto": 1,
+            "nombre_proyecto": "Patrullaje Preventivo Plan Valparaíso"
+        }
+    ]
+}
+```
+
+Casos de error:
+
+401 Unauthorized: Token JWT no proporcionado o invalido.
+403 Forbidden: No tienes permisos para acceder a este recurso.
+404 Not found: El usuario con id :id_user no se encontro.
+500 Internal server error: Error interno del servidor al procesar la peticion.
+
+## 6. Crear un nuevo usuario en el sistema.
+
+Permite al administrador registrar un nuevo usuario (supervisor, patrullero o administrador). El sistema genera de forma segura una clave temporal aleatoria de 12 caracteres hexadecimales, la cual es encriptada con bcrypt antes de ser almacenada, y deja la columna nuevo_user en true para forzar el cambio de clave en el primer inicio de sesion.
+
+Método: POST
+Ruta: /api/v1/usuarios
+Autenticación: Requiere Token JWT
+Roles permitidos: admin
+Body requerido (JSON):
+
+```json
+{
+  "rut": "15444333-2",
+  "nombre": "Roberto Fuentes",
+  "correo": "roberto.fuentes@sipprem.com",
+  "telefono": "977889900",
+  "foto": null,
+  "id_rol": 3
+}
+```
+
+Respuestas esperadas:
+
+201 Created: El usuario se creo exitosamente.
+```json
+{
+    "ok": true,
+    "message": "El usuario se creo exitosamente.",
+    "data": "a3f89c42b10e"
+}
+```
+*(El campo data retorna la clave temporal generada en texto plano para que el administrador pueda entregarsela al usuario)*
+
+Casos de error:
+
+400 Bad request: Faltan campos obligatorios (rut, nombre, correo, id_rol), formato de RUT invalido, formato de correo invalido, o rol inexistente.
+409 Conflict: El RUT, correo o telefono ingresado ya pertenece a otro usuario registrado.
+500 Internal server error: Error interno del servidor al procesar la peticion.
+
+## 7. Actualizar datos de un usuario.
+
+Permite al administrador modificar los datos basicos de un usuario registrado (nombre, correo, telefono, foto e id_rol).
+
+Método: PUT
+Ruta: /api/v1/usuarios/:id_user
+Autenticación: Requiere Token JWT
+Roles permitidos: admin
+Parámetros de ruta (Path Params):
+- id_user: string (RUT actual del usuario que se va a modificar)
+
+Body requerido (JSON):
+
+```json
+{
+  "nombre": "Roberto Fuentes Actualizado",
+  "correo": "roberto.actualizado@sipprem.com",
+  "telefono": "977889911",
+  "foto": null,
+  "id_rol": 2
+}
+```
+
+Respuestas esperadas:
+
+200 OK: El usuario se modifico exitosamente.
+```json
+{
+    "ok": true,
+    "message": "El usuario se modifico exitosamente.",
+    "data": null
+}
+```
+
+Casos de error:
+
+400 Bad request: Campos obligatorios vacios, formato de correo invalido o rol no valido.
+404 Not found: El usuario a modificar no se encontro o se encuentra eliminado.
+409 Conflict: El nuevo correo o telefono ya se encuentra en uso por otra persona.
+500 Internal server error: Error interno del servidor al procesar la peticion.
+
+## 8. Eliminar un usuario (Eliminación lógica).
+
+Realiza el borrado logico de un usuario del sistema cambiando su campo eliminado a true. El sistema impide que un administrador elimine su propia cuenta activa o al Administrador root predefinido.
+
+Método: DELETE
+Ruta: /api/v1/usuarios/:id_user
+Autenticación: Requiere Token JWT
+Roles permitidos: admin
+Parámetros de ruta (Path Params):
+- id_user: string (RUT o correo del usuario a eliminar)
+
+Body requerido (JSON):
+No requiere body.
+
+Respuestas esperadas:
+
+200 OK: El usuario se elimino exitosamente.
+```json
+{
+    "ok": true,
+    "message": "El usuario se elimino exitosamente.",
+    "data": null
+}
+```
+
+Casos de error:
+
+400 Bad request: Intento de eliminar la propia cuenta de usuario o intento de eliminar al Administrador root (00000000-0).
+404 Not found: El usuario con id :id_user no se encontro.
+500 Internal server error: Error interno del servidor al procesar la peticion.
+
+## 9. Restablecer contraseña de un usuario.
+
+Permite al administrador resetear la contraseña de un usuario cuando este la ha olvidado. Genera una nueva clave aleatoria de 12 caracteres, actualiza el hash encriptado y coloca la columna nuevo_user en true para exigirle cambiarla al iniciar sesion.
+
+Método: PATCH
+Ruta: /api/v1/usuarios/:id_user/reestablecer-clave
+Autenticación: Requiere Token JWT
+Roles permitidos: admin
+Parámetros de ruta (Path Params):
+- id_user: string (RUT o correo del usuario)
+
+Body requerido (JSON):
+No requiere body.
+
+Respuestas esperadas:
+
+200 OK: Se reestablecio correctamente la clave del usuario.
+```json
+{
+    "ok": true,
+    "message": "Se reestablecio correctamente la clave del usuario.",
+    "data": "7e49c1b3f92d"
+}
+```
+*(El campo data entrega la nueva clave temporal generada)*
+
+Casos de error:
+
+404 Not found: El usuario no se encontro o se encuentra eliminado.
+500 Internal server error: Error interno del servidor al procesar la peticion.
+
+## 10. Restaurar un usuario eliminado.
+
+Permite al administrador reactivar una cuenta de usuario que habia sido eliminada previamente (soft delete), cambiando su campo eliminado nuevamente a false.
+
+Método: PATCH
+Ruta: /api/v1/usuarios/:id_user/restaurar
+Autenticación: Requiere Token JWT
+Roles permitidos: admin
+Parámetros de ruta (Path Params):
+- id_user: string (RUT o correo del usuario a restaurar)
+
+Body requerido (JSON):
+No requiere body.
+
+Respuestas esperadas:
+
+200 OK: Se restauro correctamente el usuario.
+```json
+{
+    "ok": true,
+    "message": "Se restauro correctamente el usuario.",
+    "data": null
+}
+```
+
+Casos de error:
+
+404 Not found: El usuario no se encontro en el sistema.
+500 Internal server error: Error interno del servidor al procesar la peticion.
+
+### Evidencia de pruebas en Postman
+![Evidencia usuarios](./pruebas/capturas/evidencia-usuarios.png)
+![Evidencia usuarios](./pruebas/capturas/evidencia-usuarios2.png)
