@@ -1,0 +1,309 @@
+.cronograma-grid {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.cronograma-contenido-col {
+  padding-left: 15px;
+}
+
+/* Barra superior del calendario: Leyenda + Navegación de meses */
+.calendario-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background-color: #ffffff;
+  padding: 12px 18px;
+  border-radius: 10px 10px 0 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.leyenda-calendario {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.leyenda-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.leyenda-patrullaje {
+  color: #0ea5e9;
+}
+
+.leyenda-actividad {
+  color: #22c55e;
+}
+
+.punto-leyenda {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.punto-azul {
+  background-color: #0ea5e9;
+}
+
+.punto-verde {
+  background-color: #22c55e;
+}
+
+/* Controles para navegar entre meses */
+.navegacion-mes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.titulo-mes-anio {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #1e293b;
+  min-width: 165px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.btn-nav-mes {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --color: #1e293b;
+  margin: 0;
+}
+
+/* Contenedor de la grilla del calendario */
+.calendario-wrapper {
+  background-color: #ffffff;
+  border-radius: 0 0 10px 10px;
+  padding: 0 12px 14px 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.calendario-dias-semana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  padding: 10px 0 6px 0;
+  border-bottom: 2px solid #cbd5e1;
+}
+
+.dia-semana-header {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.calendario-grilla {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-left: 1px solid #e2e8f0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.celda-dia {
+  min-height: 78px;
+  border-right: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  background-color: #ffffff;
+  transition: background-color 0.15s ease;
+  position: relative;
+}
+
+.celda-dia:hover {
+  background-color: #f1f5f9;
+}
+
+.celda-otro-mes {
+  background-color: #f8fafc;
+}
+
+.celda-otro-mes .numero-dia {
+  color: #94a3b8;
+}
+
+/* Día seleccionado en el calendario (borde destacado como en el wireframe) */
+.celda-dia-seleccionada {
+  outline: 3px solid #ef4444;
+  outline-offset: -3px;
+  background-color: #fef2f2 !important;
+  z-index: 2;
+}
+
+.numero-dia {
+  align-self: flex-end;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.puntos-eventos-dia {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 4px;
+  align-items: center;
+}
+
+.punto-evento {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Bloque lateral derecho: Día seleccionado, detalles y botones */
+.panel-lateral-dia {
+  background-color: #ffffff;
+  border: 3px solid #1e293b;
+  border-radius: 26px;
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 460px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+.titulo-dia-seleccionado {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: #0f172a;
+  text-align: center;
+  text-transform: uppercase;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e2e8f0;
+  display: block;
+}
+
+/* Lista de detalles de actividades y patrullajes del día */
+.detalle-eventos-dia {
+  flex: 1;
+  margin: 14px 0;
+  max-height: 250px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 4px;
+}
+
+.sin-eventos-texto {
+  color: #64748b;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  text-align: center;
+  margin: auto 0;
+  font-style: italic;
+}
+
+.tarjeta-evento-dia {
+  border-radius: 10px;
+  padding: 10px 12px;
+  border-left: 5px solid transparent;
+  background-color: #f8fafc;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.tarjeta-patrullaje {
+  border-left-color: #0ea5e9;
+  background-color: #f0f9ff;
+}
+
+.tarjeta-actividad {
+  border-left-color: #22c55e;
+  background-color: #f0fdf4;
+}
+
+.evento-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.evento-tipo-badge {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.badge-patrullaje {
+  color: #0284c7;
+}
+
+.badge-actividad {
+  color: #16a34a;
+}
+
+.evento-hora-estado {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.evento-titulo {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 2px 0;
+}
+
+.evento-subtexto {
+  font-size: 0.8rem;
+  color: #475569;
+  margin: 2px 0 0 0;
+}
+
+/* Botones inferiores de acción dentro del bloque lateral */
+.botones-acciones-dia {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn-accion-cronograma {
+  --border-radius: 12px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  text-transform: none;
+  margin: 0;
+}
+
+.btn-registrar-patrullaje {
+  --background: #0ea5e9;
+  --background-hover: #0284c7;
+  --color: #ffffff;
+}
+
+.btn-registrar-actividad {
+  --background: #22c55e;
+  --background-hover: #16a34a;
+  --color: #ffffff;
+}

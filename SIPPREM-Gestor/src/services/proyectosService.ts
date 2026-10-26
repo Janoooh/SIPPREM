@@ -1,9 +1,6 @@
 import { apiClient } from './apiClient';
 import { nuevoProyectoData } from '../interfaces/proyectoPatrullaje';
 
-/* ==========================================================================
-   INICIO SECCIÓN CREADA: Servicio para gestionar las peticiones de proyectos
-   ========================================================================== */
 export const proyectosService = {
     /* Funcion obtenerProyectos: Encargada de traer los proyectos desde el backend
     utilizando apiClient mediante una peticion GET al endpoint /proyectos. */
@@ -50,6 +47,3 @@ export const proyectosService = {
         return resEliminarProyecto.data;
     }
 };
-/* ==========================================================================
-   FIN SECCIÓN CREADA
-   ========================================================================== */

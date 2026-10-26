@@ -1,0 +1,94 @@
+.agregar-patrullaje-grid {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.agregar-patrullaje-col {
+  padding-left: 20px;
+}
+
+.titulo-registro-patrullaje {
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.8rem;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  display: block;
+}
+
+.contenido-registro-patrullaje {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.mapa-seccion-patrullaje {
+  flex: 1 1 450px;
+  min-width: 320px;
+}
+
+.formulario-seccion-patrullaje {
+  flex: 1 1 350px;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.acciones-patrullaje-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.btn-registrar-submit {
+  --background: #ffffff;
+  --color: #1e293b;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  text-transform: none;
+  font-size: 1.1rem;
+  border: 2px solid #1e293b;
+  border-radius: 8px;
+  margin: 0;
+}
+
+.btn-cancelar-patrullaje {
+  --background: transparent;
+  --color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  text-transform: none;
+  margin: 0;
+}
+
+.campo-fecha-patrullaje {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.label-fecha-patrullaje {
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.input-fecha-patrullaje {
+  background-color: #ffffff;
+  color: #1e293b;
+  border: 2px solid #1e293b;
+  border-radius: 6px;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  max-width: 180px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+}

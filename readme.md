@@ -762,19 +762,27 @@ Si quisieramos obtener el dist y ejecutarlo, se puede usar:
 ionic build
 npm run preview
 ```
+**IMPORTANTE**
+El sistema actualmente gestor cuenta actualmente con conexión al backend, pues se puede cumplir los flujos principales de tarea de manera exitosa. Para poder utilizar correctamente el sistema tendremos que tener activado el backend en el puerto 3000, usando en la carpeta SIPPREM el comando cmd: node SIPPREM-Backend/dist/app.js
 
 ## Como acceder al sistema (EP1)
 
-Actualmente, el sistema se encuentra en una fase de desarrollo, por lo que para navegar por las interfaces disponibles tenemos que acceder como admin, o supervisor.
+Para acceder al sistema necesitamos utilizar las credenciales validas de algun usuario.
+A continuacion, se detallan las credenciales de los usuarios registrados en el sistema:
 
-- Para acceder como admin, tendremos que colocar "admin" en el campo de correo o rut, y cualquier contraseña.
+| Usuario (RUT / Correo) | Nombre | Rol | Clave |
+| :--- | :--- | :--- | :--- |
+| `00000000-0` / `admin@sipprem.com` | Administrador root | Administrador | `2pD7Api1Y8Wn` |
+| `12345678-9` / `lil.crux@procasting.cl` | Edgar De La Cruz | Administrador | `claveAdmin` |
+| `98765432-1` / `fer.barra@procasting.cl` | Fernanda Barraza | Supervisor | `claveSupervisor` |
+| `11223344-5` / `jano.ohh@procasting.cl` | Alejandro Orellana | Patrullero | `clavePatrullero` |
+| `11111111-1` / `juan.perez@example.com` | Juan Pérez | Supervisor | `1111111111` |
+| `18222333-k` / `carlos.gomez@sipprem.com` | Carlos Gomez | Patrullero | `dcf3239cde37` |
+| `19333444-5` / `maria.silva@sipprem.com` | Maria Silva | Supervisor | `ff8332d2050b` |
+| `20444555-k` / `juan.soto@sipprem.com` | Juan Soto | Patrullero | `d0691a1dbe47` |
+| `21555666-8` / `ana.morales@sipprem.com` | Ana Morales | Patrullero | `fe90573d9eeb` |
 
-- Para acceder como supervisor, tendremos que colocar "supervisor" en el campo de correo o rut, y cualquier contraseña.
-
-**IMPORTANTE**
-
-Actualmente la aplicacion no tiene el backend implementado, por lo que no estan operativas las funciones
-para agregar proyectos, u otros datos.
+Se puede utilizar cualquiera de esas credenciales para tener acceso al sistema, y a sus respectivas funciones segun corresponda por el rol.
 
 ## Distribucion de responsabilidades en el equipo (EP1)
 
