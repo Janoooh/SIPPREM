@@ -4,6 +4,7 @@ import rutasUsuario from "./routes/usuario.routes.js";
 import rutasProyecto from "./routes/proyecto.routes.js";
 import dotenv from "dotenv";
 import cors from "cors";
+import helmet from "helmet";
 import { verificarTokenJWT } from "./middleware/verificarTokenJWT.js";
 import { manejadorDeErrores } from "./middleware/manejadorDeErrores.js";
 import { detectarRutaNoEncontrada } from "./middleware/rutaNoEncontrada.js";
@@ -30,6 +31,8 @@ const opcionesCors: cors.CorsOptions = {
 };
 
 const app = express();
+
+app.use(helmet());
 
 app.use(cors(opcionesCors));
 
