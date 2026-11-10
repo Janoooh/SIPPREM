@@ -5,7 +5,7 @@ import type { respuestaServices } from "../interfaces/respuestaServices.js";
 
 export const iniciarSesion = async (idIngresado : string, claveIngresada: string) : Promise<respuestaServices> => {
     const queryBuscarUser = `
-        SELECT us.rut, us.nombre, us.correo, us.foto, us.nuevo_user, us.id_rol, r.tipo_rol
+        SELECT us.rut, us.nombre, us.correo, us.foto, us.hash_contrasenia, us.nuevo_user, us.id_rol, r.tipo_rol
         FROM usuario us
         INNER JOIN rol r USING (id_rol)
         WHERE (us.rut = $1 OR us.correo = $1) AND us.eliminado = false
@@ -26,15 +26,20 @@ export const iniciarSesion = async (idIngresado : string, claveIngresada: string
     const filaUsuario = resConsulta.rows[0];
 
     const datosUsuario = {
-        ...filaUsuario,
+        rut: filaUsuario.rut,
+        nombre: filaUsuario.nombre,
+        correo: filaUsuario.correo,
         foto: filaUsuario.foto
             ? `data:image/jpeg;base64,${Buffer.from(filaUsuario.foto).toString("base64")}`
-            : null
+            : null,
+        nuevo_user: filaUsuario.nuevo_user,
+        id_rol: filaUsuario.id_rol,
+        tipo_rol: filaUsuario.tipo_rol
     };
 
-    const hashGuardado = await (await poolDb.query("SELECT hash_contrasenia FROM usuario WHERE rut = $1 OR correo = $1",[idIngresado.toLowerCase()])).rows[0];
+    const hashGuardado = filaUsuario.hash_contrasenia;
 
-    const comparacionClave = await bcrypt.compare(claveIngresada, hashGuardado.hash_contrasenia);
+    const comparacionClave = await bcrypt.compare(claveIngresada, hashGuardado);
 
     // La clave ingresada no es la correcta clave del usuario ingresado.
     if (!comparacionClave){
@@ -74,10 +79,9 @@ export const iniciarSesion = async (idIngresado : string, claveIngresada: string
 
 export const cambiarClave = async (idUser: string, claveNueva : string) : Promise<respuestaServices> => {
     const queryBuscarUser = `
-        SELECT *
+        SELECT nuevo_user
         FROM usuario us
-        INNER JOIN rol r USING (id_rol)
-        WHERE (us.rut = $1 OR us.correo = $1) AND us.eliminado = false
+        WHERE us.rut = $1 AND us.eliminado = false
     `;
     const resConsultaBuscarUser = await poolDb.query(queryBuscarUser,[idUser.toLowerCase()]);
     
@@ -107,7 +111,7 @@ export const cambiarClave = async (idUser: string, claveNueva : string) : Promis
     const queryCambiarClave = `
         UPDATE usuario
         SET hash_contrasenia = $2, nuevo_user = false
-        WHERE rut = $1 OR correo = $1
+        WHERE rut = $1
     `;
 
     await poolDb.query(queryCambiarClave,[idUser.toLowerCase(),hashNuevaClave]);
