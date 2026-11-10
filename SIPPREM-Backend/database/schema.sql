@@ -1,6 +1,29 @@
 -- TIENEN QUE TENER INSTALADO EL POSTGIS EN POSTGRE O SINO LE VA A SALTAR UN ERROR CON EL TIPO GEOMETRIA
 CREATE EXTENSION IF NOT EXISTS postgis;
 
+DROP TABLE IF EXISTS
+    uso_eq_personal,
+    foto_incidente,
+    incidente,
+    categoria_incidente,
+    ejecucion_patrullaje,
+    realizacion_patrullaje,
+    planificacion_patrullaje,
+    equipamiento_personal,
+    tipo_equipamiento_personal,
+    equipamiento_vehicular,
+    tipo_equipamiento_vehicular,
+    articulo,
+    vehiculo,
+    tipo_vehiculo,
+    item,
+    actividad,
+    acceso_proyecto,
+    proyecto_patrullaje,
+    usuario,
+    rol
+CASCADE;
+
 create table rol(
 	id_rol integer,
 	tipo_rol varchar(20) not null unique,
@@ -64,7 +87,7 @@ create table actividad(
 
 create table item(
 	id_item varchar(20),
-	id_proyecto integer,
+	id_proyecto integer not null,
 	eliminado bool default false not null,
 	
 	constraint pk_item primary key (id_item),
@@ -514,16 +537,16 @@ INSERT INTO categoria_incidente (categoria) VALUES
 ('otro');
 
 INSERT INTO usuario (rut, nombre, correo, telefono, hash_contrasenia, nuevo_user, fecha_registro, eliminado, id_rol) VALUES 
-('00000000-0','Administrador root','admin@sipprem.com',null,'$2a$10$sG6X2ZW52kws8YOS7vZfousnSaZiClk5S/wpdk8GlkrHEAh5OkIK6',true,CURRENT_TIMESTAMP,false,1), --2pD7Api1Y8Wn
-('12345678-9', 'Edgar De La Cruz', 'lil.crux@procasting.cl', '912345678', '$2b$10$WU5N9TLYVwNLuvl/TXcp7eWJXLCN2F2VI/1bpUum95WNVf3/inow6', true,CURRENT_TIMESTAMP,false, 1), --claveAdmin
-('98765432-1', 'Fernanda Barraza', 'fer.barra@procasting.cl', '987654321', '$2b$10$2NfPAyuUYxjrEpxBTIvCsuPIuVbp6x.S4W71lFbP/BdAI1qk1588e', true,CURRENT_TIMESTAMP,false, 2),--claveSupervisor
-('11223344-5', 'Alejandro Orellana', 'jano.ohh@procasting.cl', '911223344', '$2b$10$llTLLOaAWqjjx.IONcwHeex9BkdHLiVV3MYfAQ/R3M14d./GIRwiW', true,CURRENT_TIMESTAMP,false, 3), --clavePatrullero
+('00000000-0','Administrador root','admin@sipprem.com',null,'$2a$10$sG6X2ZW52kws8YOS7vZfousnSaZiClk5S/wpdk8GlkrHEAh5OkIK6',true,CURRENT_TIMESTAMP,false,1),
+('12345678-9', 'Edgar De La Cruz', 'lil.crux@procasting.cl', '912345678', '$2b$10$WU5N9TLYVwNLuvl/TXcp7eWJXLCN2F2VI/1bpUum95WNVf3/inow6', true,CURRENT_TIMESTAMP,false, 1),
+('98765432-1', 'Fernanda Barraza', 'fer.barra@procasting.cl', '987654321', '$2b$10$2NfPAyuUYxjrEpxBTIvCsuPIuVbp6x.S4W71lFbP/BdAI1qk1588e', true,CURRENT_TIMESTAMP,false, 2),
+('11223344-5', 'Alejandro Orellana', 'jano.ohh@procasting.cl', '911223344', '$2b$10$llTLLOaAWqjjx.IONcwHeex9BkdHLiVV3MYfAQ/R3M14d./GIRwiW', true,CURRENT_TIMESTAMP,false, 3),
 
-('11111111-1', 'Juan Pérez', 'juan.perez@example.com', '911111111', '$2b$10$cdg6h9SaGY80GjlCtA90rO8/7W19RTjUFHc83.jC7dQkvCmhgfVAu', true,CURRENT_TIMESTAMP,false, 2), --1111111111
-('18222333-k', 'Carlos Gomez', 'carlos.gomez@sipprem.com', '999999999', '$2b$10$xFtisP3ex8tZ0pu5QYW18eL6jG53xjRrDpbednEXrxkoFkjTnCGdW', true,CURRENT_TIMESTAMP,false, 3), --dcf3239cde37
-('19333444-5', 'Maria Silva', 'maria.silva@sipprem.com', '922222222', '$2b$10$XFkzu3iLlYwOqKetPWa/Pe6.6HuW7iebKpebZy9XsyMN4rLsS.OCi', true,CURRENT_TIMESTAMP,false, 2), --ff8332d2050b
-('20444555-k', 'Juan Soto', 'juan.soto@sipprem.com', '933333333', '$2b$10$jNDyTHWPHnSX5HGnZKb5Luw4dnQoK2g8n0QW1nfY54SU7hNl8lSj.', true,CURRENT_TIMESTAMP,false, 3), --d0691a1dbe47
-('21555666-8', 'Ana Morales', 'ana.morales@sipprem.com', '944444444', '$2b$10$revqFHB/JZ1GF8uqBGHRquZBF5utJhODzw3oVikgcJvlGGBhvLnhy', true,CURRENT_TIMESTAMP,false, 3)--fe90573d9eeb
+('11111111-1', 'Juan Pérez', 'juan.perez@example.com', '911111111', '$2b$10$cdg6h9SaGY80GjlCtA90rO8/7W19RTjUFHc83.jC7dQkvCmhgfVAu', true,CURRENT_TIMESTAMP,false, 2),
+('18222333-k', 'Carlos Gomez', 'carlos.gomez@sipprem.com', '999999999', '$2b$10$xFtisP3ex8tZ0pu5QYW18eL6jG53xjRrDpbednEXrxkoFkjTnCGdW', true,CURRENT_TIMESTAMP,false, 3),
+('19333444-5', 'Maria Silva', 'maria.silva@sipprem.com', '922222222', '$2b$10$XFkzu3iLlYwOqKetPWa/Pe6.6HuW7iebKpebZy9XsyMN4rLsS.OCi', true,CURRENT_TIMESTAMP,false, 2),
+('20444555-k', 'Juan Soto', 'juan.soto@sipprem.com', '933333333', '$2b$10$jNDyTHWPHnSX5HGnZKb5Luw4dnQoK2g8n0QW1nfY54SU7hNl8lSj.', true,CURRENT_TIMESTAMP,false, 3),
+('21555666-8', 'Ana Morales', 'ana.morales@sipprem.com', '944444444', '$2b$10$revqFHB/JZ1GF8uqBGHRquZBF5utJhODzw3oVikgcJvlGGBhvLnhy', true,CURRENT_TIMESTAMP,false, 3)
 ;
 
 
