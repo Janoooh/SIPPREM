@@ -67,14 +67,14 @@ export const iniciarSesion = async (idIngresado : string, claveIngresada: string
     };
 };
 
-export const cambiarClave = async (idIngresado: string, claveNueva : string) : Promise<respuestaServices> => {
+export const cambiarClave = async (idUser: string, claveNueva : string) : Promise<respuestaServices> => {
     const queryBuscarUser = `
         SELECT *
         FROM usuario us
         INNER JOIN rol r USING (id_rol)
         WHERE (us.rut = $1 OR us.correo = $1) AND us.eliminado = false
     `;
-    const resConsultaBuscarUser = await poolDb.query(queryBuscarUser,[idIngresado.toLowerCase()]);
+    const resConsultaBuscarUser = await poolDb.query(queryBuscarUser,[idUser.toLowerCase()]);
     
     // El usuario no se encontro.
     if (resConsultaBuscarUser.rows.length === 0){
@@ -105,7 +105,7 @@ export const cambiarClave = async (idIngresado: string, claveNueva : string) : P
         WHERE rut = $1 OR correo = $1
     `;
 
-    await poolDb.query(queryCambiarClave,[idIngresado.toLowerCase(),hashNuevaClave]);
+    await poolDb.query(queryCambiarClave,[idUser.toLowerCase(),hashNuevaClave]);
 
     return {
         exito : true,

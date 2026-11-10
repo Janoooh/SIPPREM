@@ -3,6 +3,7 @@ import type { respuestaServices } from "../interfaces/respuestaServices.js";
 import * as authServices from "../services/auth.services.js";
 import { esClaveValida } from "../utils/validadores.utils.js";
 import { identificarErrorDB } from "../utils/errorDB.utils.js";
+import type { RequestConUsuario } from "../interfaces/RequestConUsuario.js";
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     try{
@@ -37,15 +38,16 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     };
 };
 
-export const cambiarClave = async (req : Request, res : Response) : Promise<void> => {
+export const cambiarClave = async (req : RequestConUsuario, res : Response) : Promise<void> => {
     try{
 
-        const {idIngresado, claveNuevaIng} = req.body
+        const {claveNuevaIng} = req.body
+        const idUser = req.usuario?.rutUsuario || "";
 
-        if (!idIngresado || ! claveNuevaIng){
+        if (!claveNuevaIng){
             res.status(400).json({
                 ok: false,
-                message: "Faltan datos para realizar el cambio de clave, por favor ingrese todo lo solicitado.",
+                message: "No se ingreso ninguna clave nueva, por favor ingrese una nueva clave para su cuenta.",
                 data : null
             });
             return;
@@ -60,7 +62,7 @@ export const cambiarClave = async (req : Request, res : Response) : Promise<void
             return;
         };
 
-        const resultadoCambioClave : respuestaServices = await authServices.cambiarClave(idIngresado,claveNuevaIng);
+        const resultadoCambioClave : respuestaServices = await authServices.cambiarClave(idUser,claveNuevaIng);
 
         res.status(resultadoCambioClave.codHTTP).json({
             ok: resultadoCambioClave.exito,

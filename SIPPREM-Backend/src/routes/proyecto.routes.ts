@@ -20,7 +20,7 @@ const router = Router();
 
 router.get("/", verificarRol(["admin", "supervisor"]), obtenerProyectosControlador);
 router.post("/", verificarRol(["admin"]), crearProyectoControlador);
-router.get("/:id_proyecto", verificarRol(["admin", "supervisor"]), obtenerProyectoPorIdControlador);
+router.get("/:id_proyecto", verificarRol(["admin", "supervisor"]), verificarPertenenciaProyecto, obtenerProyectoPorIdControlador);
 router.put("/:id_proyecto", verificarRol(["admin"]), actualizarProyectoControlador);
 router.delete("/:id_proyecto", verificarRol(["admin"]), eliminarProyectoControlador);
 
