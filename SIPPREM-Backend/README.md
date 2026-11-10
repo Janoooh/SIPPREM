@@ -72,13 +72,13 @@ de cada variable de entorno por lo que le indica el texto.
 
 **PONGA EL PUERTO 3000 EN BACKEND_PORT, para que la conexion del frontend sea exitosa.**
 
-**En el desarrollo se utilizo el mismo texto CODIGOGENERADORDEJWT en la variable de entorno de JWT_SECRET, puede usar el mismo.**
-
 **En la variable DB_USER se coloca el nombre del usuario que utilizara para conectarse a la base de datos, se recomienda poner el usuario postgres. La variable DB_PASSWORD es la clave de dicho usuario seleccionado.**
 
 **La variable DB_HOST se debe dejar localhost para el correcto funcionamiento del frontend y backend.**
 
 **Como el instructivo para crear la base de datos pone de nombre sipprem_db, se recomienda poner ese valor para la variable de entorno DB_NAME.**
+
+**En la variable CORS_ORIGINS debe poner los origenes del frontend, separados por una coma si es mas de 1. (Para entorno local con vite/ionic se puede usar normalmente: http://localhost:5173,http://localhost:8100)**
 
 ### Pruebas de Endpoints (Postman)
 
