@@ -46,7 +46,12 @@ export const iniciarSesion = async (idIngresado : string, claveIngresada: string
             };
     }
 
-    const generadorSecret = process.env.JWT_SECRET || "default";
+    const generadorSecret = process.env.JWT_SECRET;
+
+    if (!generadorSecret){
+        throw new Error("La variable de entorno JWT_SECRET no esta configurada.");
+    };
+
     const token = jwt.sign(
         {
             rutUsuario : datosUsuario.rut,
