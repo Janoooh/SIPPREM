@@ -7,6 +7,8 @@ import cors from "cors";
 import { verificarTokenJWT } from "./middleware/verificarTokenJWT.js";
 import { manejadorDeErrores } from "./middleware/manejadorDeErrores.js";
 import { detectarRutaNoEncontrada } from "./middleware/rutaNoEncontrada.js";
+import { createServer } from "http";
+import { inicializarSocket } from "./config/socket.js";
 
 dotenv.config();
 
@@ -51,6 +53,10 @@ app.use("/api/v1/proyectos", verificarTokenJWT,rutasProyecto);
 app.use(detectarRutaNoEncontrada);
 app.use(manejadorDeErrores);
 
-app.listen(Number(process.env.BACKEND_PORT), () => {
+const serverHttp = createServer(app);
+inicializarSocket(serverHttp,origenesPermitidos);
+
+
+serverHttp.listen(Number(process.env.BACKEND_PORT), () => {
   console.log(`Servidor ejecutándose en http://localhost:${Number(process.env.BACKEND_PORT)}`);
 });
