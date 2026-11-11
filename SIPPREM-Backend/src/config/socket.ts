@@ -13,5 +13,7 @@ export const inicializarSocket = (serverHttp: Server, origenesPermitidos: string
 
     io.on("connection", (socket: Socket) => {
         registrarEventosPatrullaje(socket)
-    })
+    });
+
+    console.log("WebSocket iniciado correctamente!");
 };

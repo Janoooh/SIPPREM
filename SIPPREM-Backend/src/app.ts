@@ -8,6 +8,7 @@ import helmet from "helmet";
 import { verificarTokenJWT } from "./middleware/verificarTokenJWT.js";
 import { manejadorDeErrores } from "./middleware/manejadorDeErrores.js";
 import { detectarRutaNoEncontrada } from "./middleware/rutaNoEncontrada.js";
+import { prevenirXSS } from "./middleware/prevenirXSS.js";
 import { createServer } from "http";
 import { inicializarSocket } from "./config/socket.js";
 
@@ -39,6 +40,8 @@ app.use(cors(opcionesCors));
 app.use(express.json(
   {limit: "10mb"}
 ));
+
+app.use(prevenirXSS);
 
 
 app.get(["/", "/api/health"], (req, res) => {
