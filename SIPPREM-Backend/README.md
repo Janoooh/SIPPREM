@@ -1228,7 +1228,7 @@ Modulo encargado de gestionar los accesos de usuarios registrados al sistema, en
 
 ## 1. Iniciar sesion en el sistema.
 
-Valida las credenciales de acceso ingresadas, y genera el token JWT para darle una sesion activa al usuario.
+Valida las credenciales de acceso ingresadas, y genera el token JWT (con expiracion de 12 horas) para darle una sesion activa al usuario. Este endpoint cuenta con un limitador de peticiones (Rate Limit) de maximo 10 intentos cada 10 minutos para prevenir ataques de fuerza bruta.
 
 Método: POST
 Ruta: /api/v1/auth
@@ -1267,11 +1267,14 @@ Respuestas esperadas:
 
 Casos de error:
 
-401: Las credenciales de acceso son incorrectas.
+400 Bad request: Faltan datos para realizar el inicio de sesion.
+401 Unauthorized: Las credenciales de acceso son incorrectas (usuario inexistente, eliminado o clave incorrecta).
+429 Too Many Requests: Superaste el numero de intentos de sesion, pruebe mas tarde.
+500 Internal server error: Error interno del servidor al procesar la peticion.
 
 ## 2. Cambiar clave de un usuario con nuevo_user = true
 
-Permite cambiar la clave de un usuario que en los registros de la base de datos tiene la columna nuevo_user en true, usandose principalmente para cambiar la clave generada aleatoriamente cuando se crea un usuario.
+Permite cambiar la clave del usuario autenticado siempre que en los registros de la base de datos tenga la columna nuevo_user en true, usandose principalmente para cambiar la clave generada aleatoriamente cuando se crea un usuario. El identificador del usuario (RUT) se obtiene automaticamente desde el token JWT enviado en la peticion.
 
 Método: PATCH
 Ruta: /api/v1/auth
@@ -1280,9 +1283,8 @@ Roles permitidos: admin, supervisor, patrullero
 Body requerido (JSON):
 
 ```
-{ 
-    "idIngresado": "string (RUT o correo)",
-    "claveNuevaIng": "string (clave nueva)"
+{
+    "claveNuevaIng": "string (clave nueva, minimo 8 caracteres)"
 }
 ```
 
@@ -1300,7 +1302,10 @@ Respuestas esperadas:
 
 Casos de error:
 
-400: No se encontro el usuario con rut/correo ingresado, o el usuario no tiene nuevo_user en true.
+400 Bad request: No se ingreso una clave nueva, la clave tiene menos de 8 caracteres, no se encontro el usuario o el usuario no tiene nuevo_user en true.
+401 Unauthorized: Token JWT no proporcionado, invalido o usuario sin sesion valida.
+403 Forbidden: No tienes permisos para acceder a este recurso.
+500 Internal server error: Error interno del servidor al procesar la peticion.
 
 ## Evidencia de pruebas en postman
 
