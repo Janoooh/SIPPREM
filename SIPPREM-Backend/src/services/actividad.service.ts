@@ -80,15 +80,16 @@ export const actualizarActividad = async (
     titulo: string,
     fecha: string,
     descripcion: string,
-    id_actividad: number
+    id_actividad: number,
+    id_proyecto: number
 ) : Promise<respuestaServices> => {
     const query = `
         UPDATE actividad
         SET titulo= $1, fecha=$2, descripcion=$3
-        WHERE id_actividad = $4 AND eliminado = false
+        WHERE id_actividad = $4 AND id_proyecto = $5 AND eliminado = false
         RETURNING id_actividad, titulo, fecha, descripcion, id_proyecto, eliminado;
     `; 
-    const resultado = await poolDb.query(query, [titulo, fecha, descripcion, id_actividad]);
+    const resultado = await poolDb.query(query, [titulo, fecha, descripcion, id_actividad, id_proyecto]);
 
     if (resultado.rows.length === 0) {
         return {
@@ -109,14 +110,14 @@ export const actualizarActividad = async (
 
 
 // Eliminar actividad (Soft Delete)
-export const eliminarActividad = async (id_actividad: number): Promise<respuestaServices> => {
+export const eliminarActividad = async (id_actividad: number, id_proyecto: number): Promise<respuestaServices> => {
     // Validamos que la actividad exista y no esté ya eliminada
     const consultaExistencia = `
         SELECT id_actividad 
         FROM actividad 
-        WHERE id_actividad = $1 AND eliminado = false;
+        WHERE id_actividad = $1 AND id_proyecto = $2 AND eliminado = false;
     `;
-    const resultadoExistencia = await poolDb.query(consultaExistencia, [id_actividad]);
+    const resultadoExistencia = await poolDb.query(consultaExistencia, [id_actividad, id_proyecto]);
 
     if (resultadoExistencia.rowCount === 0) {
         return {

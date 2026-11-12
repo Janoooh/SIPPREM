@@ -70,7 +70,7 @@ export const crearActividadControlador = async(req :Request, res: Response): Pro
 
 export const actualizarActividadControlador = async (req: Request, res: Response): Promise<void> => {
     try{
-        const { id_actividad } = req.params;
+        const { id_actividad, id_proyecto } = req.params;
         const { titulo, fecha, descripcion } = req.body;
 
         // aquí validamos que la actividad exista y que los campos no estén vacíos
@@ -96,7 +96,8 @@ export const actualizarActividadControlador = async (req: Request, res: Response
             titulo,
             fecha,
             descripcion,
-            Number(id_actividad)
+            Number(id_actividad),
+            Number(id_proyecto)
         );
 
         res.status(resultado.codHTTP).json({
@@ -116,7 +117,7 @@ export const actualizarActividadControlador = async (req: Request, res: Response
 
 export const eliminarActividadControlador = async (req: Request, res: Response): Promise<void> => {
     try{
-        const { id_actividad } = req.params;
+        const { id_actividad, id_proyecto } = req.params;
 
         if(!id_actividad || isNaN(Number(id_actividad))){
             res.status(400).json({
@@ -127,7 +128,7 @@ export const eliminarActividadControlador = async (req: Request, res: Response):
             return;
         }
 
-        const resultado = await actividadService.eliminarActividad(Number(id_actividad));
+        const resultado = await actividadService.eliminarActividad(Number(id_actividad), Number(id_proyecto));
 
         res.status(resultado.codHTTP).json({
             ok: resultado.exito,
