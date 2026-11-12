@@ -470,6 +470,79 @@ BEFORE INSERT OR UPDATE ON uso_eq_personal
 FOR EACH ROW
 EXECUTE FUNCTION validar_eq_personal_ejecucion();
 
+
+/*-----------------------------------------------------------
+
+INDICES
+
+--------------------------------------------------------------*/
+
+-- estos son indices relacionados a posgis.
+CREATE INDEX idx_proyecto_zona 
+ON proyecto_patrullaje USING GIST (zona_seleccionada);
+
+CREATE INDEX idx_plan_patrullaje_zona 
+ON planificacion_patrullaje USING GIST (zona);
+
+CREATE INDEX idx_incidente_ubicacion 
+ON incidente USING GIST (ubicacion);
+
+-- indice para los usuarios. Sirve para que se guarden de manera ordenada los usuarios que no estan eliminados
+-- A la larga es lo mejor. Mas rapido con pocos usuarios, pero se realentiza al tener muchos
+CREATE INDEX idx_usuario_activos_nombre
+ON usuario (nombre) 
+WHERE eliminado = false;
+
+-- Indice para la tabla asociativa donde esta el rut y el id del proyecto
+-- Se supone que postgre crea un indice, pero solo funciona con el rut
+-- ahora hay otro indice que sirve con el id del proyecto
+CREATE INDEX idx_acceso_proyecto_id_proyecto
+ON acceso_proyecto (id_proyecto);
+
+-- Indice para los vehiculos. Lo que hace es que se ordenen por proyectos y que no se cuenten los eliminados
+CREATE INDEX idx_vehiculo_proyecto
+ON vehiculo (id_proyecto)
+WHERE eliminado = false;
+
+-- Indice que guarda los proyectos por nombre y solo si no estan eliminados
+CREATE INDEX idx_proyecto_activos_nombre
+ON proyecto_patrullaje (nombre_proyecto)
+WHERE eliminado = false;
+
+-- Indice para que las planificaciones de patrullajes sean mas rapidas.
+CREATE INDEX idx_plan_pat_proyecto_fecha 
+ON planificacion_patrullaje (id_proyecto, hora_inicio);
+
+-- indice para la realizacion de patrullajes en este caso sirve para que se cree un indice tambien 
+-- para la id del patrullaje
+CREATE INDEX idx_realizacion_patrullaje_id_pat 
+ON realizacion_patrullaje (id_patrullaje);
+
+-- Indice para las fotos. Sirve para generar ordenarlas po id del incidente
+CREATE INDEX idx_foto_incidente_id_inc 
+ON foto_incidente (id_incidente);
+
+-- Indice para ordenar los incidentes por el id del patrullaje
+CREATE INDEX idx_incidente_id_patrullaje 
+ON incidente (id_patrullaje);
+
+-- Indice para las actividades. Las guarda ordenadas por proyecto y fecha y mientras que no este eliminada
+CREATE INDEX idx_actividad_proyecto_fecha 
+ON actividad (id_proyecto, fecha) 
+WHERE eliminado = false;
+
+-- indice para los equipamientos de cada proyecto. 
+-- Los ordena por id de cada proyecto y no guarda los eliminados
+CREATE INDEX idx_equipamiento_proyecto_activo 
+ON equipamiento_personal (id_proyecto) 
+WHERE eliminado = false;
+
+-- Hace lo mismo que el anterior, pero para los equipamientos vehiculares.
+CREATE INDEX idx_equipamiento_vehicular_proyecto_activo 
+ON equipamiento_vehicular (id_proyecto) 
+WHERE eliminado = false;
+
+
 /*-----------------------------------------------------------
 
 
