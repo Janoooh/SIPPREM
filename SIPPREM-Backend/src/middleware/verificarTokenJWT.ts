@@ -28,6 +28,17 @@ export const verificarTokenJWT = async (req: RequestConUsuario, res : Response, 
 
     try{
         const claveSecretaJWT = process.env.JWT_SECRET as string;
+
+        if (!claveSecretaJWT){
+            console.log("La variable de entorno JWT_SECRET no esta configurada.");
+            res.status(500).json({
+                ok: false,
+                message: "Error de configuracion del servidor.",
+                data: null
+            });
+            return;
+        };
+
         const datosUsuarioJWT = jwt.verify(token, claveSecretaJWT) as any;
         req.usuario = datosUsuarioJWT;
 

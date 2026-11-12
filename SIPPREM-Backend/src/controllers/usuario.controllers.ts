@@ -169,7 +169,11 @@ export const eliminarUsuario = async (req: RequestConUsuario, res: Response) : P
         const mi_rut = req.usuario?.rutUsuario as string;
         const mi_correo = req.usuario?.correoUsuario as string;
 
-        if (id_user === mi_rut || id_user === mi_correo){
+        const id_user_minus = id_user.toLowerCase();
+        const mi_rut_minus = mi_rut.toLowerCase();
+        const mi_correo_minus = mi_correo.toLowerCase()
+
+        if (id_user_minus === mi_rut_minus || id_user_minus === mi_correo_minus){
             res.status(400).json({
                 ok: false,
                 message: "No puedes eliminar tu propia cuenta de usuario.",
@@ -178,7 +182,7 @@ export const eliminarUsuario = async (req: RequestConUsuario, res: Response) : P
             return;
         };
 
-        if (id_user === "00000000-0" || id_user === "admin@sipprem.com"){
+        if (id_user_minus === "00000000-0" || id_user_minus === "admin@sipprem.com"){
             res.status(400).json({
                 ok: false,
                 message: "No puedes eliminar al administrador root.",
@@ -208,10 +212,21 @@ export const actualizarUsuario = async (req: Request, res: Response): Promise<vo
         const id_user = req.params?.id_user as string;
         const {nombre,correo,telefono,foto,id_rol} = req.body;
 
+        const id_user_minus = id_user.toLowerCase();
+
         if (!nombre || !correo || !id_rol){
             res.status(400).json({
                 ok: false,
                 message: "Los campos de nombre, correo y rol no pueden quedar vacios.",
+                data: null
+            });
+            return;
+        };
+
+        if (id_user_minus === "00000000-0" || id_user_minus === "admin@sipprem.com"){
+            res.status(400).json({
+                ok: false,
+                message: "No puedes modificar al administrador root.",
                 data: null
             });
             return;
@@ -256,6 +271,15 @@ export const actualizarUsuario = async (req: Request, res: Response): Promise<vo
 export const reestablecerClave = async (req: Request, res: Response): Promise<void> => {
     try{
         const id_user =  req.params?.id_user as string;
+
+        if (id_user.toLowerCase() === "00000000-0" || id_user.toLowerCase() === "admin@sipprem.com"){
+            res.status(400).json({
+                ok: false,
+                message: "No puedes reestablecer la clave del administrador root.",
+                data: null
+            });
+            return;
+        };
 
         const resReestablecerClave : respuestaServices = await usuarioServices.reestablecerClave(id_user);
 

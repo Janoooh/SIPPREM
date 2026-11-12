@@ -10,9 +10,16 @@ export const verificarTokenSocket = async (socket: Socket, next: (err?: Error) =
         return;
     };
 
+    const claveSecretaJWT = process.env.JWT_SECRET as string;
+
+    if (!claveSecretaJWT){
+        console.error("La variable de entorno JWT_SECRET no esta configurada.");
+        next(new Error("Error de configuracion del servidor."));
+        return;
+    };
+
     try{
 
-        const claveSecretaJWT = process.env.JWT_SECRET as string;
         const datosUsuarioJWT = jwt.verify(token, claveSecretaJWT) as any;
 
         socket.data.usuario = datosUsuarioJWT;

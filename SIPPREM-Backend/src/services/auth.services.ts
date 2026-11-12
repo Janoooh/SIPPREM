@@ -48,13 +48,19 @@ export const iniciarSesion = async (idIngresado : string, claveIngresada: string
             codHTTP: 401,
             explicacion : "Las credenciales de acceso son incorrectas.",
             datos : null
-            };
+        };
     }
 
     const generadorSecret = process.env.JWT_SECRET;
 
     if (!generadorSecret){
-        throw new Error("La variable de entorno JWT_SECRET no esta configurada.");
+        console.log("La variable de entorno JWT_SECRET no esta configurada.");
+        return {
+            exito: false,
+            codHTTP: 500,
+            explicacion: "Error de configuracion del servidor.",
+            datos : null
+        };
     };
 
     const token = jwt.sign(
