@@ -221,7 +221,7 @@ export const actualizarUsuario = async (usuarioModificado: tipoUsuario) : Promis
             telefono = $3,
             foto = $4,
             id_rol = $5
-        WHERE (rut = $6 OR correo = $6) AND eliminado = false
+        WHERE rut = $6 AND eliminado = false
         RETURNING rut
     `;
 
@@ -234,6 +234,15 @@ export const actualizarUsuario = async (usuarioModificado: tipoUsuario) : Promis
             explicacion : "El usuario a modificar no se encontro.",
             datos : null
         };    
+    };
+
+    if (Number(usuarioModificado.id_rol) === 1){
+        const queryEliminarAccesosProyectos = `
+            DELETE FROM acceso_proyecto
+            WHERE rut = $1
+        `;
+
+        await poolDb.query(queryEliminarAccesosProyectos, [id_user.toLowerCase()]);
     };
 
     return {

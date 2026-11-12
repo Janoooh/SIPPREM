@@ -1135,7 +1135,7 @@ Casos de Error:
 Este módulo gestiona la consulta, asignación y desvinculación de trabajadores (usuarios) que participan en un proyecto de patrullaje específico.
 
 ## 1. Listar todos los trabajadores de un proyecto
-Obtiene un listado de todos los trabajadores activos asignados a un proyecto específico, incluyendo sus datos personales y su rol en el sistema.
+Obtiene un listado ordenado alfabéticamente de todos los trabajadores activos asignados a un proyecto específico, incluyendo sus datos personales y su rol en el sistema.
 
 Método: `GET`  
 Ruta: `/api/v1/proyectos/:id_proyecto/trabajadores`  
@@ -1155,11 +1155,39 @@ Respuestas Esperadas:
 ```
 Casos de Error:  
 - 400 Bad Request: El ID del proyecto es inválido o no es numérico.
+- 401 Unauthorized: Token JWT no proporcionado o inválido.
+- 403 Forbidden: No tienes acceso a este proyecto o tu rol no tiene permisos.
 - 404 Not Found: El proyecto no existe o se ha eliminado.
 - 500 Internal Server Error: Error del servidor interno al obtener los trabajadores del proyecto.
 
-## 2. Asignar un trabajador a un proyecto
-Vincula un usuario registrado y activo a un proyecto de patrullaje.
+## 2. Listar trabajadores disponibles para asignar a un proyecto
+Obtiene un listado ordenado alfabéticamente de los usuarios activos del sistema que aún no han sido asignados al proyecto y cuyo rol es jerárquicamente inferior al del usuario autenticado (si consulta un `admin`, lista supervisores y patrulleros; si consulta un `supervisor`, lista únicamente patrulleros).
+
+Método: `GET`  
+Ruta: `/api/v1/proyectos/:id_proyecto/trabajadores/disponibles`  
+Autenticación: Requiere Token JWT  
+Roles permitidos: `admin`, `supervisor`  
+Parámetros de ruta (Path Params):  
+- `id_proyecto` (number): ID único del proyecto.  
+
+Respuestas Esperadas:  
+- 200 OK: Devuelve la lista con los trabajadores disponibles para asignar al proyecto (`rut`, `nombre`, `tipo_rol`).
+```JSON
+{
+  "ok": true,
+  "message": "Trabajadores disponibles del proyecto obtenidos exitosamente.",
+  "data": [ ... ]
+}
+```
+Casos de Error:  
+- 400 Bad Request: El ID del proyecto es inválido o no es numérico.
+- 401 Unauthorized: Token JWT no proporcionado o inválido.
+- 403 Forbidden: No tienes acceso a este proyecto o tu rol no tiene permisos.
+- 404 Not Found: El proyecto no existe o se ha eliminado.
+- 500 Internal Server Error: Error del servidor interno al obtener los trabajadores disponibles del proyecto.
+
+## 3. Asignar un trabajador a un proyecto
+Vincula un usuario registrado y activo (supervisor o patrullero) a un proyecto de patrullaje. No permite asignar administradores ni que un supervisor asigne a otro supervisor.
 
 Método: `POST`  
 Ruta: `/api/v1/proyectos/:id_proyecto/trabajadores`  
@@ -1185,12 +1213,14 @@ Respuestas Esperadas:
 ```
 Casos de Error:  
 - 400 Bad Request: El RUT del trabajador o el ID del proyecto no son válidos.
+- 401 Unauthorized: Token JWT no proporcionado o inválido.
+- 403 Forbidden: No tienes acceso a este proyecto, se intentó asignar a un administrador, o un supervisor intentó asignar a un usuario que no es patrullero.
 - 404 Not Found: El proyecto o el usuario especificado no existe o ha sido eliminado.
 - 409 Conflict: El trabajador ya se encuentra asignado a este proyecto.
 - 500 Internal Server Error: Error del servidor interno al asignar el trabajador al proyecto.
 
-## 3. Retirar un trabajador de un proyecto
-Elimina la asignación de un trabajador dentro de un proyecto de patrullaje específico.
+## 4. Retirar un trabajador de un proyecto
+Elimina la asignación de un trabajador dentro de un proyecto de patrullaje específico. Un supervisor solo puede retirar patrulleros del proyecto.
 
 Método: `DELETE`  
 Ruta: `/api/v1/proyectos/:id_proyecto/trabajadores/:rut`  
@@ -1211,7 +1241,9 @@ Respuestas Esperadas:
 ```
 Casos de Error:  
 - 400 Bad Request: El RUT del trabajador o el ID del proyecto no son válidos.
-- 404 Not Found: El trabajador no se encuentra asignado a este proyecto.
+- 401 Unauthorized: Token JWT no proporcionado o inválido.
+- 403 Forbidden: No tienes acceso a este proyecto o un supervisor intentó retirar a un usuario que no es patrullero.
+- 404 Not Found: El proyecto no existe o el trabajador no se encuentra asignado a este proyecto.
 - 500 Internal Server Error: Error del servidor interno al sacar al trabajador del proyecto.
 
 ### Evidencia de pruebas en Postman
@@ -1900,7 +1932,7 @@ Casos de error:
 
 ## 7. Actualizar datos de un usuario.
 
-Permite al administrador modificar los datos basicos de un usuario registrado (nombre, correo, telefono, foto e id_rol).
+Permite al administrador modificar los datos basicos de un usuario registrado (nombre, correo, telefono, foto e id_rol). Si el usuario pasa a tener el rol Administrador (id_rol = 1), el sistema elimina automaticamente todas sus asignaciones previas en proyectos (acceso_proyecto), dado que los administradores poseen acceso total.
 
 Método: PUT
 Ruta: /api/v1/usuarios/:id_user

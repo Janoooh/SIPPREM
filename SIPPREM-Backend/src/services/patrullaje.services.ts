@@ -9,19 +9,14 @@ interface tipoPatrullaje{
     patrulleros: string[]
 };
 
-/* ==========================================================================
-   INICIO SECCIÓN AGREGADA: Interfaz de datos para iniciar patrullaje (RF06)
-   ========================================================================== */
 interface tipoIniciarPatrullaje {
-    id_proyecto: number;     // ID del proyecto al que pertenece el patrullaje
-    id_patrullaje: number;   // ID del patrullaje planificado que se va a iniciar
-    rut_usuario: string;     // RUT extraído del token JWT de quien inicia el patrullaje
-    id_vehiculo: string;     // Identificador/patente del vehículo a utilizar (ej: 'VEH-001')
-    eq_personal: string[];   // Lista de IDs de equipamiento personal a llevar (ej: ['EQP-001'])
+    id_proyecto: number;     
+    id_patrullaje: number;   
+    rut_usuario: string;     
+    id_vehiculo: string;     
+    eq_personal: string[];  
 }
-/* ==========================================================================
-   FIN SECCIÓN AGREGADA: Interfaz de datos para iniciar patrullaje (RF06)
-   ========================================================================== */
+
 
 export const obtenerPatrullajes = async (id_proyecto: string): Promise<respuestaServices> => {
 
