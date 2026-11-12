@@ -60,7 +60,7 @@ export const crearProyectoControlador = async (req: Request, res: Response): Pro
         const { nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, zona_seleccionada } = req.body;
 
         // Validamos que vengan todos los campos obligatorios según la BD
-        if (!nombre_proyecto || !nombre_sector || !presupuesto || !fecha_inicio || !fecha_termino || !zona_seleccionada) {
+        if (!nombre_proyecto || !nombre_sector || presupuesto == null || presupuesto === "" || !fecha_inicio || !fecha_termino || !zona_seleccionada) {
             res.status(400).json({
                 ok: false,
                 message: "Faltan datos obligatorios para poder crear el proyecto",
