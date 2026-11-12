@@ -481,9 +481,9 @@ AQUI EMPIEZA LA PARTE DE INSERCION DE DATOS.
 
 
 INSERT INTO rol (id_rol, tipo_rol) VALUES 
-(1, 'Admin'),
-(2, 'Supervisor'),
-(3, 'Patrullero');
+(1, 'admin'),
+(2, 'supervisor'),
+(3, 'patrullero');
 
 INSERT INTO tipo_vehiculo (tipo_vehiculo) VALUES 
 ('Automovil'),
