@@ -114,6 +114,29 @@ export const actualizarProyectoControlador = async (req: Request, res: Response)
             return;
         }
 
+        if (!nombre_proyecto || typeof nombre_proyecto !== "string" || nombre_proyecto.trim() === "" ||
+            !nombre_sector || typeof nombre_sector !== "string" || nombre_sector.trim() === "" ||
+            presupuesto == null || presupuesto === "" ||
+            !fecha_inicio || !fecha_termino || !zona_seleccionada ||
+            activo == null
+        ) {
+            res.status(400).json({
+                ok: false,
+                message: "Faltan datos obligatorios para actualizar el proyecto.",
+                data: null
+            });
+            return;
+        }
+
+        if (typeof activo !== "boolean") {
+            res.status(400).json({
+                ok: false,
+                message: "El campo activo debe ser verdadero o falso.",
+                data: null
+            });
+            return;
+        }
+
         if (!esPoligonoValido(zona_seleccionada)){
             res.status(400).json({
                 ok: false,
@@ -127,7 +150,7 @@ export const actualizarProyectoControlador = async (req: Request, res: Response)
             Number(id_proyecto),
             nombre_proyecto,
             nombre_sector,
-            presupuesto ? Number(presupuesto) : undefined,
+            Number(presupuesto),
             fecha_inicio,
             fecha_termino,
             zona_seleccionada,
