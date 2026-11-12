@@ -1,0 +1,41 @@
+services:
+  database:
+    image: postgres:15-alpine
+    container_name: sipprem_db
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-sipprem}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./SIPPREM-Backend
+      dockerfile: Dockerfile
+    container_name: sipprem_backend
+    volumes:
+      - ./SIPPREM-Backend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@database:5432/${DB_NAME:-sipprem}?schema=public
+    depends_on:
+      - database
+
+  frontend:
+    build:
+      context: ./SIPPREM-Gestor
+      dockerfile: Dockerfile
+    container_name: sipprem_frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
