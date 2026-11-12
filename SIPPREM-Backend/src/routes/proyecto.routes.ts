@@ -1,0 +1,35 @@
+import {Router} from "express";
+import {verificarRol} from "../middleware/verificarRol.js";
+import {
+  obtenerProyectosControlador,
+  crearProyectoControlador,
+  obtenerProyectoPorIdControlador,
+  actualizarProyectoControlador,
+  eliminarProyectoControlador
+} from "../controllers/proyecto.controllers.js";
+import vehiculosRutas from "./vehiculo.routes.js"
+import eqPersonalRutas from "./equipamientoPersonal.routes.js"
+import eqVehicularRutas from "./equipamientoVehicular.routes.js"
+import trabajadoresRutas from "./trabajadores.routes.js";
+import actividadRutas from "./actividad.routes.js";
+import incidentesRutas from "./incidentes.routes.js";
+import patrullajeRutas from "./patrullaje.routes.js";
+import { verificarPertenenciaProyecto } from "../middleware/verificarPertenenciaProyecto.js";
+
+const router = Router();
+
+router.get("/", verificarRol(["admin", "supervisor"]), obtenerProyectosControlador);
+router.post("/", verificarRol(["admin"]), crearProyectoControlador);
+router.get("/:id_proyecto", verificarRol(["admin", "supervisor"]), verificarPertenenciaProyecto, obtenerProyectoPorIdControlador);
+router.put("/:id_proyecto", verificarRol(["admin"]), actualizarProyectoControlador);
+router.delete("/:id_proyecto", verificarRol(["admin"]), eliminarProyectoControlador);
+
+router.use("/:id_proyecto/patrullajes",verificarPertenenciaProyecto, patrullajeRutas)
+router.use("/:id_proyecto/vehiculos", verificarPertenenciaProyecto, vehiculosRutas);
+router.use("/:id_proyecto/eq_personal", verificarPertenenciaProyecto, eqPersonalRutas);
+router.use("/:id_proyecto/eq_vehicular", verificarPertenenciaProyecto, eqVehicularRutas);
+router.use("/:id_proyecto/trabajadores", verificarPertenenciaProyecto, trabajadoresRutas);
+router.use("/:id_proyecto/actividades", verificarPertenenciaProyecto, actividadRutas);
+router.use("/:id_proyecto/incidentes", verificarPertenenciaProyecto, incidentesRutas);
+
+export default router;

@@ -1,0 +1,198 @@
+import type { Request, Response } from "express";
+import * as proyectoServices from "../services/proyecto.services.js";
+import type { respuestaServices } from "../interfaces/respuestaServices.js";
+import type { RequestConUsuario } from "../interfaces/RequestConUsuario.js";
+import { esPoligonoValido } from "../utils/validadores.utils.js";
+import { identificarErrorDB } from "../utils/errorDB.utils.js";
+
+// Obtener los proyectos para un usuario
+export const obtenerProyectosControlador = async (req: RequestConUsuario, res: Response): Promise<void> => {
+    try {
+        
+        const rutUsuario = req.usuario?.rutUsuario.toLowerCase() as string;
+        const rolUsuario = req.usuario?.rol.toLowerCase() as string;
+
+        const resultado: respuestaServices = await proyectoServices.obtenerProyectos(rutUsuario, rolUsuario);
+
+        res.status(resultado.codHTTP).json({
+            ok: resultado.exito,
+            message: resultado.explicacion,
+            data: resultado.datos
+        });
+    } catch (error) {
+        console.error("Error en controlador obtenerProyectosControlador, de proyecto.controllers.ts : ", error);
+        identificarErrorDB(error,res);
+        return;
+    }
+};
+
+// Obtener un proyecto específico por ID
+export const obtenerProyectoPorIdControlador = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id_proyecto } = req.params;
+
+        if (!id_proyecto || isNaN(Number(id_proyecto))) {
+            res.status(400).json({
+                ok: false,
+                message: "El ID debe ser válido para completar la acción",
+                data: null
+            });
+            return;
+        }
+
+        const resultado: respuestaServices = await proyectoServices.obtenerProyectoPorId(Number(id_proyecto));
+
+        res.status(resultado.codHTTP).json({
+            ok: resultado.exito,
+            message: resultado.explicacion,
+            data: resultado.datos
+        });
+    } catch (error) {
+        console.error("Error en controlador obtenerProyectoPorIdControlador, de proyecto.controllers.ts : ", error);
+        identificarErrorDB(error,res);
+        return;
+    }
+};
+
+// Crear un nuevo proyecto
+export const crearProyectoControlador = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, zona_seleccionada } = req.body;
+
+        // Validamos que vengan todos los campos obligatorios según la BD
+        if (!nombre_proyecto || !nombre_sector || presupuesto == null || presupuesto === "" || !fecha_inicio || !fecha_termino || !zona_seleccionada) {
+            res.status(400).json({
+                ok: false,
+                message: "Faltan datos obligatorios para poder crear el proyecto",
+                data: null
+            });
+            return;
+        }
+
+        if (!esPoligonoValido(zona_seleccionada)){
+            res.status(400).json({
+                ok: false,
+                message: "El formato de la zona seleccionada no es valido como poligono de ubicacion.",
+                data: null
+            });
+            return;
+        }
+
+        const resultado: respuestaServices = await proyectoServices.crearProyecto(
+            String(nombre_proyecto),
+            String(nombre_sector),
+            Number(presupuesto),
+            fecha_inicio,
+            fecha_termino,
+            zona_seleccionada
+        );
+
+        res.status(resultado.codHTTP).json({
+            ok: resultado.exito,
+            message: resultado.explicacion,
+            data: resultado.datos
+        });
+    } catch (error) {
+        console.error("Error en controlador crearProyectoControlador, de proyecto.controllers.ts : ", error);
+        identificarErrorDB(error,res);
+        return;
+    }
+};
+
+// Actualizar un proyecto
+export const actualizarProyectoControlador = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id_proyecto } = req.params;
+        const { nombre_proyecto, nombre_sector, presupuesto, fecha_inicio, fecha_termino, zona_seleccionada, activo } = req.body;
+
+        if (!id_proyecto || isNaN(Number(id_proyecto))) {
+            res.status(400).json({
+                ok: false,
+                message: "El ID debe ser válido para completar la acción",
+                data: null
+            });
+            return;
+        }
+
+        if (!nombre_proyecto || typeof nombre_proyecto !== "string" || nombre_proyecto.trim() === "" ||
+            !nombre_sector || typeof nombre_sector !== "string" || nombre_sector.trim() === "" ||
+            presupuesto == null || presupuesto === "" ||
+            !fecha_inicio || !fecha_termino || !zona_seleccionada ||
+            activo == null
+        ) {
+            res.status(400).json({
+                ok: false,
+                message: "Faltan datos obligatorios para actualizar el proyecto.",
+                data: null
+            });
+            return;
+        }
+
+        if (typeof activo !== "boolean") {
+            res.status(400).json({
+                ok: false,
+                message: "El campo activo debe ser verdadero o falso.",
+                data: null
+            });
+            return;
+        }
+
+        if (!esPoligonoValido(zona_seleccionada)){
+            res.status(400).json({
+                ok: false,
+                message: "El formato de la zona seleccionada no es valido como poligono de ubicacion.",
+                data: null
+            });
+            return;
+        }
+
+        const resultado: respuestaServices = await proyectoServices.actualizarProyecto(
+            Number(id_proyecto),
+            nombre_proyecto,
+            nombre_sector,
+            Number(presupuesto),
+            fecha_inicio,
+            fecha_termino,
+            zona_seleccionada,
+            activo
+        );
+
+        res.status(resultado.codHTTP).json({
+            ok: resultado.exito,
+            message: resultado.explicacion,
+            data: resultado.datos
+        });
+    } catch (error) {
+        console.error("Error en controlador actualizarProyectoControlador, de proyecto.controllers.ts : ", error);
+        identificarErrorDB(error,res);
+        return;
+    }
+};
+
+// Eliminar un proyecto
+export const eliminarProyectoControlador = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id_proyecto } = req.params;
+
+        if (!id_proyecto || isNaN(Number(id_proyecto))) {
+            res.status(400).json({
+                ok: false,
+                message: "Faltan datos para completar la acción",
+                data: null
+            });
+            return;
+        }
+
+        const resultado: respuestaServices = await proyectoServices.eliminarProyecto(Number(id_proyecto));
+
+        res.status(resultado.codHTTP).json({
+            ok: resultado.exito,
+            message: resultado.explicacion,
+            data: resultado.datos
+        });
+    } catch (error) {
+        console.error("Error en controlador eliminarProyectoControlador, de proyecto.controllers.ts : ", error);
+        identificarErrorDB(error,res);
+        return;
+    }
+};
