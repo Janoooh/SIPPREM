@@ -1,0 +1,165 @@
+.perfil-usuario-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.perfil-loading-row {
+  padding: 60px 0;
+}
+
+.perfil-foto-col {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 8px;
+}
+
+.perfil-avatar {
+  width: 185px;
+  height: 185px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3.5px solid #48D1E6;
+  background-color: #121c27;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.perfil-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.perfil-avatar-img::part(image) {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.perfil-info-col {
+  padding-left: 20px;
+}
+
+.perfil-nombre-rol {
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.75rem;
+  display: block;
+  margin-bottom: 14px;
+  letter-spacing: 0.4px;
+  line-height: 1.25;
+}
+
+.perfil-rol-tag {
+  color: #48D1E6;
+  font-weight: 700;
+}
+
+.perfil-datos-grid {
+  margin-bottom: 28px;
+}
+
+.perfil-dato-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.perfil-dato-icono {
+  color: #48D1E6;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.perfil-dato-texto {
+  color: #D9D9D9;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 0.98rem;
+}
+
+.perfil-dato-etiqueta {
+  color: #a9c3dd;
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+.perfil-proyectos-titulo {
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.perfil-proyectos-lista {
+  background-color: #a9c3dd;
+  border: 2px solid #121c27;
+  border-radius: 8px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.perfil-proyecto-item {
+  --background: #a9c3dd;
+  --color: #121c27;
+  --border-color: rgba(18, 28, 39, 0.35);
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --min-height: 46px;
+}
+
+.perfil-proyecto-item:hover {
+  --background: #bdd2e7;
+}
+
+.perfil-proyecto-nombre {
+  color: #121c27;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 0.98rem;
+}
+
+.perfil-proyecto-vacio {
+  --background: #a9c3dd;
+  --color: #121c27;
+  --min-height: 52px;
+}
+
+.perfil-proyecto-vacio-texto {
+  color: #26384a;
+  font-family: 'Montserrat', sans-serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+/* Adaptación responsive */
+@media (max-width: 767px) {
+  .perfil-usuario-container {
+    padding: 20px 14px;
+  }
+
+  .perfil-foto-col {
+    margin-bottom: 20px;
+  }
+
+  .perfil-avatar {
+    width: 150px;
+    height: 150px;
+  }
+
+  .perfil-info-col {
+    padding-left: 0;
+  }
+
+  .perfil-nombre-rol {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+}

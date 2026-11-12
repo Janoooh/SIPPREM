@@ -117,6 +117,11 @@ const Usuarios: React.FC = () => {
     router.push(`/admin/usuarios/editar/${usuarioSeleccionado.rut}`,"forward");
   };
 
+  // Funcion handleVerDetalleUsuario: Navega a la pagina de detalle del usuario al presionar la tarjeta.
+  const handleVerDetalleUsuario = (usuarioSeleccionado: dataUsuarioConEliminar) => {
+    router.push(`/admin/usuarios/detalle/${usuarioSeleccionado.rut}`, "forward");
+  };
+
   // Funcion handleEliminarUsuario: Representa la logica a ejecutar cuando el usuario
   // presione el boton de borrar usuario, que esta en la usuarioCard.
   const handleEliminarUsuario = (usuarioSeleccionado: dataUsuarioConEliminar) => {
@@ -354,6 +359,7 @@ const Usuarios: React.FC = () => {
                       onEliminar={() => handleEliminarUsuario(usuarioItem)}
                       onRestaurar={() => handleRestaurarUsuario(usuarioItem)}
                       onRestablecerClave={() => handleRestablecerClave(usuarioItem)}
+                      onVerDetalle={() => handleVerDetalleUsuario(usuarioItem)}
                     />
                   ))
                 ) : (

@@ -17,6 +17,7 @@ interface HeaderSistemaProps{
 const HeaderSistema: React.FC<HeaderSistemaProps> = ({rol}) => {
     const router = useIonRouter();
     const esUsuariosActivo = window.location.pathname.includes('/usuarios');
+    const esMiPerfilActivo = window.location.pathname.includes('/mi-perfil');
 
     return(
         <IonToolbar className="inicio-toolbar">
@@ -46,7 +47,13 @@ const HeaderSistema: React.FC<HeaderSistemaProps> = ({rol}) => {
                 Usuarios
               </IonButton>
             )}
-            <IonButton fill="clear" className="nav-btn-clear" onClick={() => {}}>Mi perfil</IonButton>
+            <IonButton
+              fill="clear"
+              className={esMiPerfilActivo ? "nav-btn" : "nav-btn-clear"}
+              onClick={() => router.push('/mi-perfil', 'forward')}
+            >
+              Mi perfil
+            </IonButton>
             
           </IonButtons>
         </IonToolbar>

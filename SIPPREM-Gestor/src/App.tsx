@@ -13,6 +13,8 @@ import CambiarClaveInicial from './pages/CambiarClaveInicial';
 import Usuarios from './pages/Usuarios';
 import AgregarUsuario from './pages/AgregarUsuario';
 import ModificarUsuario from './pages/ModificarUsuario';
+import MiPerfil from './pages/MiPerfil';
+import DetalleUsuario from './pages/DetalleUsuario';
 import Inventario from './pages/Inventario';
 import AgregarVehiculo from './pages/AgregarVehiculo';
 import AgregarArticulo from './pages/AgregarArticulo';
@@ -63,6 +65,13 @@ const App: React.FC = () => {
           <Route path="/cambiar-clave-inicial" element={
             <RutaProtegida rolesPermitidos={["admin","supervisor"]}>
               <CambiarClaveInicial />
+            </RutaProtegida>
+          } />
+
+          {/*Ruta de perfil propio*/}
+          <Route path="/mi-perfil" element={
+            <RutaProtegida rolesPermitidos={["admin","supervisor"]}>
+              <MiPerfil />
             </RutaProtegida>
           } />
 
@@ -119,6 +128,12 @@ const App: React.FC = () => {
           <Route path="/admin/usuarios/editar/:id_user" element={
             <RutaProtegida rolesPermitidos={["admin"]}>
                 <ModificarUsuario />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/usuarios/detalle/:id_user" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <DetalleUsuario />
             </RutaProtegida>
           } />
 

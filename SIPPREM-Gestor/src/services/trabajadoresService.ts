@@ -8,6 +8,12 @@ export interface TrabajadorProyecto {
   tipo_rol: string;
 }
 
+export interface TrabajadorDisponible {
+  rut: string;
+  nombre: string;
+  tipo_rol: string;
+}
+
 export const trabajadoresService = {
   /**
     Obtiene todos los trabajadores asignados a un proyecto específico.
@@ -15,6 +21,15 @@ export const trabajadoresService = {
   **/
   obtenerTrabajadoresProyecto: async (id_proyecto: string | number): Promise<TrabajadorProyecto[]> => {
     const response = await apiClient.get(`/proyectos/${id_proyecto}/trabajadores`);
+    return response.data.data || [];
+  },
+
+  /**
+    Obtiene los trabajadores disponibles para asignar a un proyecto según el rol del usuario autenticado.
+    Endpoint: GET /api/v1/proyectos/:id_proyecto/trabajadores/disponibles
+  **/
+  obtenerTrabajadoresDisponibles: async (id_proyecto: string | number): Promise<TrabajadorDisponible[]> => {
+    const response = await apiClient.get(`/proyectos/${id_proyecto}/trabajadores/disponibles`);
     return response.data.data || [];
   },
 

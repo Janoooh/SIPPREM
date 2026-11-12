@@ -18,8 +18,8 @@ import './UsuarioCard.css';
   Interfaz UsuarioCardProps: Son los parametros que recibe una usuarioCard. Se componen
   principalmente de los datos principales del usuario, que son nombre, rol, correo y foto.
   Eliminado se usa para saber si se debe mostrar el boton de eliminar o restaurar. Ademas, se
-  pueden pasar 3 funciones callback, las cuales seran para el boton de editar, eliminar o
-  restaurar.
+  pueden pasar 4 funciones callback, las cuales seran para el boton de editar, eliminar,
+  restaurar o restablecer clave, y onVerDetalle para abrir el perfil del usuario.
 */
 export interface UsuarioCardProps {
   nombre: string;
@@ -31,6 +31,7 @@ export interface UsuarioCardProps {
   onEliminar?: () => void;
   onRestaurar?: () => void;
   onRestablecerClave?: () => void;
+  onVerDetalle?: () => void;
 }
 
 
@@ -43,10 +44,15 @@ const UsuarioCard: React.FC<UsuarioCardProps> = ({
   onEditar, 
   onEliminar,
   onRestaurar,
-  onRestablecerClave 
+  onRestablecerClave,
+  onVerDetalle
 }) => {
   return (
-    <IonCard className="usuario-card">
+    <IonCard
+      className="usuario-card"
+      style={onVerDetalle ? { cursor: 'pointer' } : undefined}
+      onClick={onVerDetalle}
+    >
       <IonCardContent className="usuario-card-content">
         <IonGrid className="ion-no-padding">
           <IonRow className="ion-align-items-center">
@@ -74,14 +80,17 @@ const UsuarioCard: React.FC<UsuarioCardProps> = ({
               </IonText>
             </IonCol>
 
-            {/*Botones para eliminar/restaurar y editar.*/}
+            {/*Botones para eliminar/restaurar, restablecer clave y editar.*/}
             <IonCol size="auto" className="usuario-acciones-col">
 
               {!eliminado 
                 ? <IonButton 
                   fill="clear" 
                   className="usuario-btn-accion usuario-btn-eliminar"
-                  onClick={onEliminar}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEliminar?.();
+                  }}
                   title="Eliminar usuario"
                   >
                     <IonIcon slot="icon-only" icon={trashOutline} />
@@ -90,7 +99,10 @@ const UsuarioCard: React.FC<UsuarioCardProps> = ({
                 : <IonButton 
                   fill="clear" 
                   className="usuario-btn-accion usuario-btn-restaurar"
-                  onClick={onRestaurar}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRestaurar?.();
+                  }}
                   title="Restaurar usuario"
                   >
                     <IonIcon slot="icon-only" icon={arrowUndoCircleOutline} />
@@ -100,7 +112,10 @@ const UsuarioCard: React.FC<UsuarioCardProps> = ({
                 <IonButton 
                   fill="clear" 
                   className="usuario-btn-accion usuario-btn-clave"
-                  onClick={onRestablecerClave}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRestablecerClave?.();
+                  }}
                   title="Restablecer contraseña"
                 >
                   <IonIcon slot="icon-only" icon={keyOutline} />
@@ -111,7 +126,10 @@ const UsuarioCard: React.FC<UsuarioCardProps> = ({
               {!eliminado && (<IonButton 
                 fill="clear" 
                 className="usuario-btn-accion usuario-btn-editar"
-                onClick={onEditar}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditar?.();
+                }}
                 title="Editar usuario"
               >
                 <IonIcon slot="icon-only" icon={createOutline} />

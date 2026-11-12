@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   IonPage,
   IonHeader,
@@ -19,9 +19,11 @@ import { useParams } from 'react-router-dom';
 import HeaderSistema from '../components/HeaderSistema';
 import MenuLateralProyecto from '../components/MenuLateralProyecto';
 import { useUsuario } from '../hooks/obtenerUsuario';
-import { trabajadoresService, TrabajadorProyecto } from '../services/trabajadoresService';
-import { usuariosService } from '../services/usuariosService';
-import { dataUsuario } from '../interfaces/dataUsuario';
+import {
+  trabajadoresService,
+  TrabajadorProyecto,
+  TrabajadorDisponible
+} from '../services/trabajadoresService';
 import './Personal.css';
 
 const Personal: React.FC = () => {
@@ -34,29 +36,31 @@ const Personal: React.FC = () => {
 
   // Estados de datos
   const [trabajadoresAsignados, setTrabajadoresAsignados] = useState<TrabajadorProyecto[]>([]);
-  const [usuariosSistema, setUsuariosSistema] = useState<dataUsuario[]>([]);
+  const [trabajadoresDisponibles, setTrabajadoresDisponibles] = useState<TrabajadorDisponible[]>([]);
   const [rutSeleccionado, setRutSeleccionado] = useState<string>('');
 
   const [cargando, setCargando] = useState<boolean>(false);
   const [guardando, setGuardando] = useState<boolean>(false);
 
-  // Carga los trabajadores asignados al proyecto y todos los usuarios activos del sistema
+  // Carga los trabajadores asignados al proyecto y los disponibles para asignar según el rol
   const cargarDatos = async () => {
     if (!id_proyecto) return;
     try {
       setCargando(true);
-      const [listaAsignados, listaUsuariosSistema] = await Promise.all([
-        trabajadoresService.obtenerTrabajadoresProyecto(String(id_proyecto)).catch(() => []),
-        usuariosService.obtenerUsuarios('activos').catch(() => [])
+      const [listaAsignados, listaDisponibles] = await Promise.all([
+        trabajadoresService.obtenerTrabajadoresProyecto(String(id_proyecto)),
+        trabajadoresService.obtenerTrabajadoresDisponibles(String(id_proyecto))
       ]);
 
       setTrabajadoresAsignados(listaAsignados || []);
-      setUsuariosSistema(listaUsuariosSistema || []);
+      setTrabajadoresDisponibles(listaDisponibles || []);
     } catch (error: any) {
       console.error('Error al cargar personal del proyecto:', error);
       mandarAlerta({
         header: 'Error',
-        message: 'No fue posible cargar la lista de trabajadores.',
+        message:
+          error.response?.data?.message ||
+          'No fue posible cargar la lista de trabajadores.',
         buttons: ['Aceptar']
       });
     } finally {
@@ -72,28 +76,47 @@ const Personal: React.FC = () => {
     cargarDatos();
   });
 
-  // Filtra los usuarios del sistema con rol Supervisor o Patrullero que AÚN NO estén asignados a este proyecto
-  const usuariosDisponibles = useMemo(() => {
-    const rutsAsignados = new Set(
-      trabajadoresAsignados.map((t) => t.rut.toLowerCase().trim())
-    );
-
-    return (usuariosSistema || []).filter((u) => {
-      const tipo = u.tipo_rol?.toLowerCase();
-      const esRolValido = tipo === 'supervisor' || tipo === 'patrullero';
-      const noAsignado = !rutsAsignados.has(u.rut.toLowerCase().trim());
-      return esRolValido && noAsignado;
-    });
-  }, [usuariosSistema, trabajadoresAsignados]);
+  // Valida que un supervisor solo pueda asignar o retirar patrulleros (los admins tienen acceso total)
+  const validarPermisoSupervisor = (
+    tipoRolObjetivo: string | undefined,
+    accion: 'asignar' | 'retirar'
+  ): boolean => {
+    if (
+      rol?.toLowerCase() === 'supervisor' &&
+      tipoRolObjetivo?.toLowerCase() !== 'patrullero'
+    ) {
+      mandarAlerta({
+        header: 'Acción no permitida',
+        message:
+          accion === 'asignar'
+            ? 'Como supervisor, solo puedes asignar patrulleros al proyecto.'
+            : 'Como supervisor, solo puedes retirar patrulleros del proyecto.',
+        buttons: ['Entendido']
+      });
+      return false;
+    }
+    return true;
+  };
 
   // Manejador para agregar un trabajador al proyecto
   const handleAgregarTrabajador = async () => {
     if (!rutSeleccionado) {
       mandarAlerta({
         header: 'Selección requerida',
-        message: 'Por favor seleccione un supervisor o patrullero de la lista.',
+        message: 'Por favor seleccione un trabajador de la lista.',
         buttons: ['Aceptar']
       });
+      return;
+    }
+
+    const trabajadorAAsignar = trabajadoresDisponibles.find(
+      (t) => t.rut === rutSeleccionado
+    );
+
+    if (
+      trabajadorAAsignar &&
+      !validarPermisoSupervisor(trabajadorAAsignar.tipo_rol, 'asignar')
+    ) {
       return;
     }
 
@@ -109,7 +132,7 @@ const Personal: React.FC = () => {
       });
 
       setRutSeleccionado('');
-      // Recargar lista actualizada
+      // Recargar listas actualizadas
       await cargarDatos();
     } catch (error: any) {
       console.error('Error al asignar trabajador:', error);
@@ -127,6 +150,8 @@ const Personal: React.FC = () => {
 
   // Manejador para remover un trabajador del proyecto
   const handleRemoverTrabajador = (trabajador: TrabajadorProyecto) => {
+    if (!validarPermisoSupervisor(trabajador.tipo_rol, 'retirar')) return;
+
     mandarAlerta({
       header: 'Confirmar retiro',
       subHeader: `${trabajador.nombre} (${trabajador.rut})`,
@@ -256,7 +281,7 @@ const Personal: React.FC = () => {
                             onChange={(e) => setRutSeleccionado(e.target.value)}
                           >
                             <option value="">Seleccione un trabajador...</option>
-                            {usuariosDisponibles.map((u) => (
+                            {trabajadoresDisponibles.map((u) => (
                               <option key={`usr-${u.rut}`} value={u.rut}>
                                 {u.nombre} - {u.tipo_rol} ({u.rut})
                               </option>
@@ -264,9 +289,11 @@ const Personal: React.FC = () => {
                           </select>
                         </div>
 
-                        {usuariosDisponibles.length === 0 && (
+                        {trabajadoresDisponibles.length === 0 && (
                           <p className="sin-disponibles-texto">
-                            Todos los supervisores y patrulleros del sistema ya están asignados a este proyecto.
+                            {rol?.toLowerCase() === 'supervisor'
+                              ? 'No hay patrulleros disponibles para asignar a este proyecto.'
+                              : 'No hay supervisores ni patrulleros disponibles para asignar a este proyecto.'}
                           </p>
                         )}
 

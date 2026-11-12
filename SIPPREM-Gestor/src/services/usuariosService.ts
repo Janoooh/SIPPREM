@@ -1,6 +1,22 @@
 import { dataUsuario } from '../interfaces/dataUsuario';
 import { apiClient } from './apiClient';
 
+export interface UsuarioPerfil {
+    rut: string;
+    nombre: string;
+    correo: string;
+    telefono: string | null;
+    foto: string | null;
+    id_rol: number;
+    tipo_rol: string;
+    fecha_registro: string;
+}
+
+export interface ProyectoUsuario {
+    id_proyecto: number;
+    nombre_proyecto: string;
+}
+
 export const usuariosService = {
     /* Funcion obtenerUsuarios: Encargada de traer los usuarios del backend con
     el uso del apiClient. Recibe un estado, el cual indica si traemos los activos,
@@ -25,6 +41,22 @@ export const usuariosService = {
         
         const resObtenerUsuario = await apiClient.get(`/usuarios/${id_user}`);
         return resObtenerUsuario;
+    },
+
+    /*Funcion obtenerMiPerfil: Obtiene los datos del perfil del usuario autenticado actual.
+    Endpoint: GET /api/v1/usuarios/me */
+    obtenerMiPerfil: async (): Promise<UsuarioPerfil> => {
+
+        const resMiPerfil = await apiClient.get("/usuarios/me");
+        return resMiPerfil.data.data;
+    },
+
+    /*Funcion obtenerProyectosDeUsuario: Obtiene los proyectos asignados a un usuario por su RUT.
+    Endpoint: GET /api/v1/usuarios/:id_user/proyectos */
+    obtenerProyectosDeUsuario: async (id_user: string): Promise<ProyectoUsuario[]> => {
+
+        const resProyectos = await apiClient.get(`/usuarios/${id_user}/proyectos`);
+        return resProyectos.data.data || [];
     },
 
     modificarUsuario: async (usuarioModificado: dataUsuario) => {
