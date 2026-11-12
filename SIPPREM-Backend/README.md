@@ -269,11 +269,13 @@ Respuestas Esperadas:
 ```
 Casos de Error:  
 - 400 Bad Request: El ID del proyecto no es válido o no es numérico.
+- 401 Unauthorized: Token JWT no proporcionado o inválido.
+- 403 Forbidden: No tienes acceso a este proyecto o tu rol no tiene permisos.
 - 404 Not Found: El proyecto no existe o no hay incidentes registrados para este proyecto.
 - 500 Internal Server Error: Error interno del servidor o de base de datos.
 
 ## 2. Obtener un incidente específico por ID
-Busca y devuelve los detalles completos de un incidente en particular (incluyendo su fotografía opcional) validando que pertenezca al proyecto indicado.  
+Busca y devuelve los detalles completos de un incidente en particular junto con todas sus fotografías asociadas en formato Base64, validando que pertenezca al proyecto indicado.  
 
 Método: `GET`  
 Ruta: `/api/v1/proyectos/:id_proyecto/incidentes/:id_incidente`  
@@ -281,7 +283,7 @@ Autenticación: Requiere Token JWT.
 Roles permitidos: `admin`, `supervisor`, `patrullero`  
 Parámetros de ruta (Path Params):  
 - `id_proyecto` (number): ID único del proyecto.
-- `id_incidente` (string/number): ID único del incidente.  
+- `id_incidente` (number): ID numérico único del incidente.  
 
 Respuestas Esperadas:  
 - 200 OK: Devuelve los datos detallados del incidente.
@@ -290,21 +292,26 @@ Respuestas Esperadas:
 {
   "ok": true,
   "message": "Incidente encontrado correctamente.",
-  "data": { ... }
+  "data": {
+    "incidente": { ... },
+    "fotos": [ ... ]
+  }
 }
 ```
 Casos de Error:  
 - 400 Bad Request: Los identificadores proporcionados no son válidos.
-- 404 Not Found: El incidente no fue encontrado o no pertenece al proyecto.
+- 401 Unauthorized: Token JWT no proporcionado o inválido.
+- 403 Forbidden: No tienes acceso a este proyecto o tu rol no tiene permisos.
+- 404 Not Found: El proyecto o el incidente no fue encontrado.
 - 500 Internal Server Error: Error interno del servidor.
 
 ## 3. Registrar un nuevo incidente
-Permite reportar y registrar un incidente asociado a un patrullaje dentro del proyecto, admitiendo además una ubicación geográfica (WKT) y una fotografía opcional.  
+Permite reportar y registrar un incidente asociado a un patrullaje dentro del proyecto en el que participa el patrullero autenticado, admitiendo una ubicación geográfica en formato WKT (`POINT(longitud latitud)`) y un arreglo opcional de fotografías en Base64.  
 
 Método: `POST`  
 Ruta: `/api/v1/proyectos/:id_proyecto/incidentes`  
 Autenticación: Requiere Token JWT.  
-Roles permitidos: `admin`, `supervisor`, `patrullero`  
+Roles permitidos: `patrullero`  
 Parámetros de ruta (Path Params):  
 - `id_proyecto` (number): ID único del proyecto.
 Body requerido (JSON):  
@@ -316,7 +323,9 @@ Body requerido (JSON):
   "nivel_gravedad": 3,
   "observaciones": "Descripción detallada del incidente ocurrido...",
   "ubicacion": "POINT(-70.6565 -33.4435)",
-  "fotografia": "base64_o_url_de_la_foto (opcional)"
+  "fotografias": [
+    "data:image/jpeg;base64,... (opcional)"
+  ]
 }
 ```
 Respuestas Esperadas:  
@@ -330,8 +339,10 @@ Respuestas Esperadas:
 }
 ```
 Casos de Error:  
-- 400 Bad Request: Faltan datos obligatorios, el formato es incorrecto o el nivel de gravedad está fuera del rango permitido (1 a 5).
-- 404 Not Found: El proyecto especificado no existe, o el patrullaje indicado no existe/no pertenece al proyecto.
+- 400 Bad Request: Faltan datos obligatorios, el formato de ubicación (`POINT`) o fotografías es incorrecto, o el nivel de gravedad no es un entero entre 1 y 5.
+- 401 Unauthorized: Token JWT no proporcionado o inválido.
+- 403 Forbidden: Tu rol no es patrullero, no tienes acceso a este proyecto, o intentas registrar un incidente en un patrullaje al que no estás asignado.
+- 404 Not Found: El proyecto especificado no existe, o el patrullaje indicado no existe o no pertenece al proyecto.
 - 500 Internal Server Error: Error interno del servidor al procesar el registro.
 
 ### Evidencia de pruebas en Postman

@@ -39,3 +39,12 @@ export const esPoligonoValido = (zona: string): boolean => {
     // Se valida si el primer punto es igual al ultimo.
     return puntos[0] === puntos[puntos.length - 1];
 };
+
+export const esPuntoValido = (punto: string): boolean => {
+
+    if (typeof punto !== "string") return false;
+
+    // Se verifica que el texto venga con formato de punto, valido para postgis.
+    const regexPunto = /^POINT\s*\(\s*-?\d+(\.\d+)?\s+-?\d+(\.\d+)?\s*\)$/i;
+    return regexPunto.test(punto.trim());
+};

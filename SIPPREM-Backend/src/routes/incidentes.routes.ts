@@ -9,7 +9,7 @@ import {
 const router = Router({ mergeParams: true });
 
 router.get("/", verificarRol(["admin", "supervisor"]), obtenerIncidentesControlador);
-router.post("/", verificarRol(["admin", "supervisor", "patrullero"]), crearIncidenteControlador);
+router.post("/", verificarRol(["patrullero"]), crearIncidenteControlador);
 router.get("/:id_incidente", verificarRol(["admin", "supervisor", "patrullero"]), obtenerIncidentePorIdControlador);
 
 export default router;

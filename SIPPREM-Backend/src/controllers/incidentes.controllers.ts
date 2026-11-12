@@ -2,6 +2,8 @@ import type { Request, Response } from "express";
 import type { respuestaServices } from "../interfaces/respuestaServices.js";
 import * as incidentesServices from "../services/incidentes.services.js";
 import { identificarErrorDB } from "../utils/errorDB.utils.js";
+import type { RequestConUsuario } from "../interfaces/RequestConUsuario.js";
+import { esPuntoValido } from "../utils/validadores.utils.js";
 
 export const obtenerIncidentesControlador = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -36,7 +38,7 @@ export const obtenerIncidentePorIdControlador = async (req: Request, res: Respon
     try {
         const {id_proyecto, id_incidente} = req.params;
 
-        if (!id_proyecto || isNaN(Number(id_proyecto)) || !id_incidente || String(id_incidente).trim() === "") {
+        if (!id_proyecto || isNaN(Number(id_proyecto)) || !id_incidente || isNaN(Number(id_incidente))) {
             res.status(400).json({
                 ok: false,
                 message: "Los identificadores deben ser válidos para completar la acción",
@@ -61,18 +63,19 @@ export const obtenerIncidentePorIdControlador = async (req: Request, res: Respon
     }
 };
 
-export const crearIncidenteControlador = async (req: Request, res: Response): Promise<void> => {
+export const crearIncidenteControlador = async (req: RequestConUsuario, res: Response): Promise<void> => {
     try {
         const {id_proyecto} = req.params;
-        const {id_patrullaje, id_categoria_incidente, nivel_gravedad, observaciones, ubicacion, fotografia} = req.body;
+        const {id_patrullaje, id_categoria_incidente, nivel_gravedad, observaciones, ubicacion, fotografias} = req.body;
+        const rutUser = req.usuario?.rutUsuario || "";
 
         if (
             !id_proyecto || isNaN(Number(id_proyecto)) ||
             !id_patrullaje || isNaN(Number(id_patrullaje)) ||
             !id_categoria_incidente || isNaN(Number(id_categoria_incidente)) ||
             !nivel_gravedad || isNaN(Number(nivel_gravedad)) ||
-            !observaciones ||
-            !ubicacion
+            !observaciones || typeof observaciones !== "string" || observaciones.trim() === "" ||
+            !ubicacion || !esPuntoValido(ubicacion)
         ) {
             res.status(400).json({
                 ok: false,
@@ -84,13 +87,41 @@ export const crearIncidenteControlador = async (req: Request, res: Response): Pr
 
         const gravedadNum = Number(nivel_gravedad);
 
-        if (gravedadNum < 1 || gravedadNum > 5) {
+        if (!Number.isInteger(gravedadNum) || gravedadNum < 1 || gravedadNum > 5) {
             res.status(400).json({
                 ok: false,
-                message: "El nivel de gravedad debe ser un número entre 1 y 5.",
+                message: "El nivel de gravedad debe ser un número entero entre 1 y 5.",
                 data: null
             });
             return;
+        }
+
+        let listaFotos: string[] = [];
+
+        if (fotografias !== undefined && fotografias !== null) {
+
+            if (!Array.isArray(fotografias)) {
+                res.status(400).json({
+                    ok: false,
+                    message: "El campo fotografias debe ser un arreglo de textos Base64.",
+                    data: null
+                });
+                return;
+            }
+
+            const todasValidas = fotografias.every(
+                (foto) => typeof foto === "string" && foto.trim() !== ""
+            );
+            if (!todasValidas) {
+                res.status(400).json({
+                    ok: false,
+                    message: "Todas las fotografías deben ser textos Base64 validos.",
+                    data: null
+                });
+                return;
+            }
+
+            listaFotos = fotografias;
         }
 
         const nuevoIncidente = {
@@ -98,12 +129,12 @@ export const crearIncidenteControlador = async (req: Request, res: Response): Pr
             id_patrullaje: Number(id_patrullaje),
             id_categoria_incidente: Number(id_categoria_incidente),
             nivel_gravedad: gravedadNum,
-            observaciones: String(observaciones),
-            ubicacion: String(ubicacion),
-            fotografia: fotografia ? String(fotografia) : null
+            observaciones: observaciones.trim(),
+            ubicacion: ubicacion.trim(),
+            fotografias: listaFotos
         };
 
-        const resCrearIncidente: respuestaServices = await incidentesServices.crearIncidente(nuevoIncidente);
+        const resCrearIncidente: respuestaServices = await incidentesServices.crearIncidente(nuevoIncidente, rutUser);
 
         res.status(resCrearIncidente.codHTTP).json({
             ok: resCrearIncidente.exito,
