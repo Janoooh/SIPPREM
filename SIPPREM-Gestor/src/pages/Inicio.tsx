@@ -1,9 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   IonPage, 
-  IonHeader, 
-  IonToolbar, 
-  IonButtons, 
+  IonHeader,
   IonImg, 
   IonButton, 
   IonContent, 
@@ -17,51 +15,70 @@ import {
   IonCardContent,
   IonChip,
   IonLabel,
-  useIonRouter
+  IonAvatar,
+  IonSpinner,
+  useIonRouter,
+  useIonAlert,
+  useIonViewWillEnter
 } from '@ionic/react';
 import ProyectoPatrullajeCard from '../components/ProyectoPatrullajeCard';
 import HeaderSistema from '../components/HeaderSistema';
 import { proyectoPatrullaje } from '../interfaces/proyectoPatrullaje';
 import './Inicio.css';
+import { useUsuario } from '../hooks/obtenerUsuario';
+import { proyectosService } from '../services/proyectosService';
 
-interface InicioProps {
-  nombreUsuario: string;
-  rol: string;
-}
-
-const Inicio: React.FC<InicioProps> = ({ nombreUsuario, rol }) => {
+const Inicio: React.FC = () => {
   
-  // Creacion de proyectos de ejemplo para mostrarlos en el inicio.
-  const proyectos: proyectoPatrullaje[] = [
-    {
-      id: 1,
-      nombre: 'Proyecto Eje Brasil',
-      fechaInicio: new Date(),
-      fechaTermino: new Date(),
-      presupuestoAsignado: 1000
-    },
-    {
-      id: 2,
-      nombre: 'Patrullajes en Cerro Alegre',
-      fechaInicio: new Date(),
-      fechaTermino: new Date(),
-      presupuestoAsignado: 2000
-    },
-    {
-      id: 3,
-      nombre: 'Proyecto de patrullaje en Bellavista',
-      fechaInicio: new Date(),
-      fechaTermino: new Date(),
-      presupuestoAsignado: 3000
-    },
-    {
-      id: 4,
-      nombre: 'Proyecto Las Arboleadas',
-      fechaInicio: new Date(),
-      fechaTermino: new Date(),
-      presupuestoAsignado: 3000
+  // Obtenemos los datos del usuario en sesion mediante el hook useUsuario
+  const { usuario } = useUsuario();
+  const nombreUsuario = usuario.nombre;
+  const rol = usuario.tipo_rol;
+  const foto = usuario.foto;
+
+  // Hook de Ionic para mostrar alertas
+  const [mandarAlerta] = useIonAlert();
+
+  // Estado para guardar la lista de proyectos obtenidos desde el backend
+  const [proyectos, setProyectos] = useState<proyectoPatrullaje[]>([]);
+
+  // Estado para controlar el spinner de carga durante la peticion asincrona
+  const [cargando, setCargando] = useState<boolean>(false);
+
+  // Funcion cargarProyectos: Encargada de usar proyectosService para traer desde el
+  // endpoint /proyectos del backend la lista de proyectos correspondientes.
+  const cargarProyectos = async () => {
+    try {
+      setCargando(true); // Indicamos que comenzo la carga de datos
+      const respuesta = await proyectosService.obtenerProyectos();
+      setProyectos(respuesta || []); // Guardamos los proyectos obtenidos en el estado
+    } catch (error: any) {
+      // Si el backend responde 404 (no hay proyectos para mostrar), dejamos la lista vacia sin alerta de error
+      if (error.response?.status === 404) {
+        setProyectos([]);
+        return;
+      }
+      console.error("Error al obtener proyectos:", error);
+      mandarAlerta({
+        header: "Error",
+        message: "No fue posible cargar la lista de proyectos.",
+        buttons: ["Aceptar"]
+      });
+    } finally {
+      setCargando(false); // Finalizamos la carga de datos
     }
-  ];
+  };
+
+  // Uso de hook useEffect para cargar la lista de proyectos al iniciar el componente.
+  useEffect(() => {
+    cargarProyectos();
+  }, []);
+
+  // Uso de hook useIonViewWillEnter para recargar la lista de proyectos cada vez que se entra a la 
+  // ventana, manteniendo siempre la informacion actualizada.
+  useIonViewWillEnter(() => {
+    cargarProyectos();
+  });
 
   const router = useIonRouter();
 
@@ -69,7 +86,7 @@ const Inicio: React.FC<InicioProps> = ({ nombreUsuario, rol }) => {
     <IonPage>
 
       <IonHeader className="ion-no-border">
-        <HeaderSistema nombreUsuario={nombreUsuario} rol={rol}/>
+        <HeaderSistema rol={rol}/>
       </IonHeader>
 
       <IonContent fullscreen style={{ '--background': '#3b5066' } as React.CSSProperties}>
@@ -82,26 +99,50 @@ const Inicio: React.FC<InicioProps> = ({ nombreUsuario, rol }) => {
               {/* Mensajes de bienvenida.*/}
               <IonRow className="ion-align-items-center ion-margin-bottom">
                 <IonCol size="auto">
-                  <IonImg src="/assets/fotoPerfil.png" alt="Profile" className="profile-picture" />
+                  <IonAvatar className="profile-avatar">
+                    <IonImg src={foto || "/assets/fotoPerfil.png"} alt="Profile" className="profile-picture" />
+                  </IonAvatar>
                 </IonCol>
                 <IonCol>
                   <IonText className="welcome-text">
                     <h1>BIENVENIDO {nombreUsuario !== 'NotData' && nombreUsuario ? nombreUsuario.toUpperCase() : 'USUARIO'}</h1>
                   </IonText>
                   <IonChip className="role-chip">
-                    <IonLabel>{rol !== 'NotData' && rol ? rol : 'SIN ROL'}</IonLabel>
+                    <IonLabel>{rol !== 'NotData' && rol ? rol.toUpperCase() : 'SIN ROL'}</IonLabel>
                   </IonChip>
                 </IonCol>
               </IonRow>
 
-              {/*Lista de proyectos existentes.*/}
-              <IonRow>
-                <IonCol size="12">
-                  {proyectos.map((proyecto) => (
-                    <ProyectoPatrullajeCard key={proyecto.id} proyecto={proyecto} rolUsuario={rol}/>
-                  ))}
-                </IonCol>
-              </IonRow>
+              {/* Spinner que se muestra mientras se obtienen los proyectos desde el backend */}
+              {cargando && (
+                <IonRow className="ion-justify-content-center ion-margin-top">
+                  <IonSpinner name="crescent" color="light" />
+                </IonRow>
+              )}
+
+              {/* Lista de proyectos obtenidos*/}
+              {!cargando && (
+                <IonRow>
+                  <IonCol size="12">
+                    {proyectos.length > 0 ? (
+                      proyectos.map((proyecto) => (
+                        <ProyectoPatrullajeCard
+                          key={proyecto.id_proyecto}
+                          proyecto={proyecto}
+                          rolUsuario={rol}
+                          onProyectoEliminado={(idEliminado) => {
+                            setProyectos((prev) => prev.filter((p) => p.id_proyecto !== idEliminado));
+                          }}
+                        />
+                      ))
+                    ) : (
+                      <IonText style={{ color: 'white' }}>
+                        <p>No hay proyectos registrados para mostrar.</p>
+                      </IonText>
+                    )}
+                  </IonCol>
+                </IonRow>
+              )}
 
             </IonCol>
 
@@ -115,22 +156,18 @@ const Inicio: React.FC<InicioProps> = ({ nombreUsuario, rol }) => {
                 </IonCardHeader>
                 <IonCardContent className="dashboard-content">
                   <IonText className="dashboard-text">
-                    {rol === 'ADMIN' && (<p>Proyectos activos: 1</p>)}
-                    {rol === 'SUPERVISOR' && (<p>Proyectos asignados: 1</p>)}
+                    {rol === 'admin' && (<p>Proyectos activos: {proyectos.length}</p>)}
+                    {rol === 'supervisor' && (<p>Proyectos asignados: {proyectos.length}</p>)}
                   </IonText>
                   <IonText className="dashboard-text">
-                    {rol === 'ADMIN' && (<p>Proyectos cerrados: 0</p>)}
+                    {rol === 'admin' && (<p>Proyectos cerrados: 0</p>)}
                     
-                  </IonText>
-                  <IonText className="dashboard-text">
-                    
-                    {rol === 'ADMIN' && (<p>Usuarios registrados: 2</p>)}
                   </IonText>
                 </IonCardContent>
               </IonCard>
               
               {/*Boton para agregar mas proyectos.*/}
-              {rol === 'ADMIN' && (
+              {rol === 'admin' && (
               <IonButton 
                 expand="block" 
                 fill="outline" 

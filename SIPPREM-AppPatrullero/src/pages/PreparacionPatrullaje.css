@@ -1,0 +1,118 @@
+.preparacion-content {
+  --background: #4a5e73;
+}
+
+.preparacion-container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  max-width: 450px;
+  margin: 0 auto;
+  min-height: 100%;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.preparacion-logo {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+}
+
+.titulo-seccion h2 {
+  color: #ffffff;
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.label-form {
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.input-box-patente {
+  background-color: #1e293b;
+  border: 2px solid #38bdf8;
+  border-radius: 8px;
+  padding: 4px 10px;
+}
+
+.select-patente {
+  color: #ffffff;
+  width: 100%;
+}
+
+.seccion-articulos-header {
+  margin-bottom: 8px;
+}
+
+.lista-articulos-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.fila-articulo-prep {
+  background-color: #ffffff;
+  color: #000000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border: 2px solid #1e293b;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.articulo-nombre {
+  flex: 1;
+}
+
+.articulo-cantidad {
+  font-size: 1.2rem;
+  font-weight: 900;
+}
+
+.boton-agregar-container {
+  margin-bottom: 20px;
+}
+
+.btn-agregar-articulo {
+  --border-color: #38bdf8;
+  --color: #ffffff;
+  --border-radius: 12px;
+  font-weight: bold;
+  text-transform: none;
+  font-size: 1.1rem;
+  height: 48px;
+}
+
+.boton-iniciar-container {
+  margin-top: auto;
+  margin-bottom: 20px;
+}
+
+.btn-iniciar-patrullaje {
+  --background: #38bdf8;
+  --color: #ffffff;
+  --border-radius: 25px;
+  font-weight: bold;
+  text-transform: none;
+  font-size: 1.2rem;
+  height: 52px;
+}

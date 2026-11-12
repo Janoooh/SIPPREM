@@ -5,37 +5,55 @@ import {
     IonButton,
     IonImg,
     IonText,
-    IonTitle
+    IonTitle,
+    useIonRouter
 } from '@ionic/react';
 import './HeaderSistema.css';
 
 interface HeaderSistemaProps{
-    nombreUsuario: string,
     rol: string
 };
 
-const HeaderSistema: React.FC<HeaderSistemaProps> = ({nombreUsuario ,rol}) => {
+const HeaderSistema: React.FC<HeaderSistemaProps> = ({rol}) => {
+    const router = useIonRouter();
+    const esUsuariosActivo = window.location.pathname.includes('/usuarios');
+    const esMiPerfilActivo = window.location.pathname.includes('/mi-perfil');
 
     return(
         <IonToolbar className="inicio-toolbar">
-          <IonButtons slot="start">
+          <IonButtons slot="start" style={{ cursor: 'pointer' }} onClick={() => router.push(rol === 'admin' ? '/admin/inicio' : '/supervisor/inicio', 'forward')}>
             <IonImg src="/assets/logoSIPPREM.png" alt="SIPPREM Logo" className="header-logo" />
           </IonButtons>
-          <IonTitle className="name-text">
+          <IonTitle 
+            className="name-text" 
+            style={{ cursor: 'pointer' }} 
+            onClick={() => router.push(rol === 'admin' ? '/admin/inicio' : '/supervisor/inicio', 'forward')}
+          >
             SIPPREM
           </IonTitle>
           
           {/*Botones del navegador del header.*/}
           <IonButtons slot="end" className="header-nav-buttons">
             
-            {rol === 'ADMIN' && 
-              (
-              <IonButton fill="clear" className="nav-btn-clear" onClick={() => {}}>Usuarios</IonButton>
-            )}
-            {rol === 'ADMIN' && (
+            {rol === 'admin' && (
               <IonButton fill="clear" className="nav-btn-clear" onClick={() => {}}>Historial de Proyectos</IonButton>
             )}
-            <IonButton fill="clear" className="nav-btn-clear" onClick={() => {}}>Mi perfil</IonButton>
+            {rol === 'admin' && (
+              <IonButton 
+                fill="clear" 
+                className={esUsuariosActivo ? "nav-btn" : "nav-btn-clear"} 
+                onClick={() => router.push('/admin/usuarios', 'forward')}
+              >
+                Usuarios
+              </IonButton>
+            )}
+            <IonButton
+              fill="clear"
+              className={esMiPerfilActivo ? "nav-btn" : "nav-btn-clear"}
+              onClick={() => router.push('/mi-perfil', 'forward')}
+            >
+              Mi perfil
+            </IonButton>
             
           </IonButtons>
         </IonToolbar>

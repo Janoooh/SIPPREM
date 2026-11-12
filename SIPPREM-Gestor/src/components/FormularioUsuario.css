@@ -1,0 +1,228 @@
+.formulario-usuario-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.form-titulo {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.6rem;
+  display: block;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+}
+
+.form-campos-col {
+  padding-right: 25px;
+}
+
+.form-label {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-top: 12px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.asterisco-obligatorio {
+  color: #48D1E6;
+  font-weight: 800;
+  margin-left: 3px;
+}
+
+.form-input {
+  --background: #D9D9D9;
+  --color: #121c27;
+  --placeholder-color: #666666;
+  --placeholder-opacity: 0.8;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  --border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  height: 40px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.form-input-disabled {
+  --background: #8e9ca8;
+  --color: #3b5066;
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.rol-row {
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+
+.rol-label-col {
+  display: flex;
+  align-items: center;
+}
+
+.form-select-col {
+  flex: 1;
+}
+
+.form-select {
+  --background: #D9D9D9;
+  --color: #121c27;
+  --placeholder-color: #444444;
+  --placeholder-opacity: 0.9;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  --border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  height: 40px;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.form-nota-obligatorios {
+  color: #a9c3dd;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-style: italic;
+  display: block;
+  margin-top: 15px;
+}
+
+.form-foto-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 10px;
+}
+
+.foto-picker-wrapper {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3.5px solid #48D1E6;
+  background-color: #121c27;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.foto-picker-wrapper:hover {
+  transform: scale(1.03);
+  border-color: white;
+  box-shadow: 0 6px 20px rgba(72, 209, 230, 0.4);
+}
+
+.foto-picker-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.foto-picker-img::part(image) {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.foto-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(18, 28, 39, 0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.foto-picker-wrapper:hover .foto-overlay {
+  background: rgba(18, 28, 39, 0.65);
+}
+
+.foto-overlay-icon {
+  font-size: 2.6rem;
+  color: #48D1E6;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+
+.foto-overlay-texto {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-submit-usuario {
+  --background: #121c27;
+  --border-color: #48D1E6;
+  --border-width: 1.5px;
+  --border-style: solid;
+  --border-radius: 20px;
+  --color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-transform: none;
+  min-width: 180px;
+  height: 44px;
+  margin-top: 35px;
+  transition: transform 0.2s ease, --border-color 0.2s ease;
+}
+
+.btn-submit-usuario:hover {
+  transform: translateY(-2px);
+  --border-color: white;
+}
+
+.btn-submit-usuario[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Adaptación responsive para pantallas móviles */
+@media (max-width: 768px) {
+  .formulario-usuario-container {
+    padding: 10px;
+  }
+
+  .form-campos-col {
+    padding-right: 0;
+  }
+
+  .form-foto-col {
+    margin-top: 30px;
+    padding-top: 0;
+  }
+
+  .foto-picker-wrapper {
+    width: 150px;
+    height: 150px;
+  }
+
+  .btn-submit-usuario {
+    width: 100%;
+    margin-top: 25px;
+  }
+
+  .form-titulo {
+    font-size: 1.35rem;
+  }
+}

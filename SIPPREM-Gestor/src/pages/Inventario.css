@@ -1,0 +1,137 @@
+/* Estilos generales de las secciones */
+.titulo-seccion {
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.header-seccion-inventario {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* Botón de Agregar Vehículo y Acciones */
+.btn-agregar-vehiculo {
+  --background: #38bdf8;
+  --color: #ffffff;
+  font-weight: bold;
+  text-transform: none;
+  border-radius: 8px;
+}
+
+/* Tabla de Vehículos */
+.tabla-vehiculos-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 30px;
+  max-width: 700px;
+  max-height: 200px;      /* Altura máxima antes de activar el scroll */
+  overflow-y: auto;       /* Habilita el scroll vertical */
+  padding-right: 5px; 
+}
+
+.fila-vehiculo {
+  background-color: #ffffff;
+  color: #000000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border: 2px solid #1e293b;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.icono-eliminar {
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: #000;
+}
+
+/* Contenedor principal de las dos tablas de artículos */
+.articulos-doble-tabla-wrapper {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.columna-tabla-articulo {
+  flex: 1;
+  min-width: 280px;
+}
+
+.subtitulo-tabla {
+  color: #ffffff;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* Tablas de Artículos con scroll independiente */
+.tabla-articulos-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 180px;      /* Altura máxima antes de activar el scroll */
+  overflow-y: auto;       /* Habilita el scroll vertical */
+  border: 2px solid #1e293b;
+  background-color: #ffffff;
+}
+
+.fila-articulo {
+  background-color: #ffffff;
+  color: #000000;
+  padding: 12px 15px;
+  border-bottom: 1px solid #cbd5e1;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fila-articulo:last-child {
+  border-bottom: none;
+}
+
+.fila-vehiculo {
+  background-color: #ffffff;
+  color: #000000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border: 2px solid #1e293b;
+}
+
+/* Columna para apilar el nombre y la patente */
+.vehiculo-info-columna {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* Espacio pequeño entre el nombre y la patente */
+}
+
+.vehiculo-tipo {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #000000;
+}
+
+.vehiculo-patente {
+  font-size: 0.85rem;
+  color: #555555;
+  font-weight: 500;
+}
+
+.icono-eliminar {
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: #000;
+}
+.alert-message {
+  white-space: pre-line;
+}

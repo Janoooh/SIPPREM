@@ -1,11 +1,24 @@
 import { Navigate, Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { useState } from 'react';
+import { RutaProtegida } from './routes/rutaProtegida';
 import Login from './pages/Login';
 import Inicio from './pages/Inicio';
 import AgregarProyecto from './pages/AgregarProyecto';
+import ModificarProyecto from './pages/ModificarProyecto';
 import InicioProyecto from './pages/InicioProyecto';
+import Cronograma from './pages/Cronograma';
+import AgregarPatrullaje from './pages/AgregarPatrullaje';
+import CambiarClaveInicial from './pages/CambiarClaveInicial';
+import Usuarios from './pages/Usuarios';
+import AgregarUsuario from './pages/AgregarUsuario';
+import ModificarUsuario from './pages/ModificarUsuario';
+import MiPerfil from './pages/MiPerfil';
+import DetalleUsuario from './pages/DetalleUsuario';
+import Inventario from './pages/Inventario';
+import AgregarVehiculo from './pages/AgregarVehiculo';
+import AgregarArticulo from './pages/AgregarArticulo';
+import Personal from './pages/Personal';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -23,20 +36,11 @@ import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-
-/* import '@ionic/react/css/palettes/dark.always.css'; */
-/* import '@ionic/react/css/palettes/dark.class.css'; */
 import '@ionic/react/css/palettes/dark.system.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import { navigate } from 'ionicons/icons';
+
 
 interface datosUsuario{
   nombre: string,
@@ -47,50 +51,177 @@ setupIonicReact();
 
 const App: React.FC = () => {
 
-  const [usuario, setUsuario] = useState<datosUsuario>({'nombre':'NotData', 'rol':'NotData'});
-
   return (
-  <IonApp>
-    <IonReactRouter>
-      <IonRouterOutlet>
-        
-        {/*Ruta publica del login.*/}
-        <Route path="/login" element={<Login setUsuario={setUsuario} />} />
+    <IonApp>
+      <IonReactRouter>
+        <IonRouterOutlet>
+          
+          {/*Ruta publica del login.*/}
+          <Route path="/login" element={<Login />} />
 
-        {/*Rutas protegidas.*/}
+          {/*Rutas protegidas.*/}
 
-        {/*Rutas del administrador*/}
-        <Route path="/admin/inicio" element={usuario.nombre !== "NotData" 
-              ? <Inicio nombreUsuario={usuario.nombre} rol={usuario.rol}/>
-              : <Navigate to="/login" replace />
-              } />
-        <Route path="/admin/agregar-proyecto" element={usuario.nombre !== "NotData" 
-              ? <AgregarProyecto nombreUsuario={usuario.nombre} rol={usuario.rol}/>
-              : <Navigate to="/login" replace />
-              } />
-        <Route path="/admin/proyecto/:id" element={usuario.nombre !== "NotData" 
-              ? <InicioProyecto nombreUsuario={usuario.nombre} rol={usuario.rol} />
-              : <Navigate to="/login" replace />
-              } />
+          {/*Ruta de cambio de clave*/}
+          <Route path="/cambiar-clave-inicial" element={
+            <RutaProtegida rolesPermitidos={["admin","supervisor"]}>
+              <CambiarClaveInicial />
+            </RutaProtegida>
+          } />
 
-        {/*Rutas del supervisor*/}
-        <Route path="/supervisor/inicio" element={usuario.nombre !== "NotData"
-              ? <Inicio nombreUsuario={usuario.nombre} rol={usuario.rol}/>
-              : <Navigate to="/login" replace />
-              } />
-        <Route path="/supervisor/proyecto/:id" element={usuario.nombre !== "NotData" 
-              ? <InicioProyecto nombreUsuario={usuario.nombre} rol={usuario.rol} />
-              : <Navigate to="/login" replace />
-              } />
+          {/*Ruta de perfil propio*/}
+          <Route path="/mi-perfil" element={
+            <RutaProtegida rolesPermitidos={["admin","supervisor"]}>
+              <MiPerfil />
+            </RutaProtegida>
+          } />
 
-        {/*Ruta de seguridad, reedirige al login cuando tratan de acceder a la raiz.*/}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+          {/*Rutas de administrador*/}
 
-        {/*Ruta de seguridad, reedirige al login cuando ingresan una ruta inexistente.*/}
-        <Route path='*' element={<Navigate to="/login" replace />}></Route>
-      </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
+          <Route path="/admin/inicio" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+              <Inicio />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/agregar-proyecto" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <AgregarProyecto />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/editar/:id_proyecto" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <ModificarProyecto />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <InicioProyecto />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto/cronograma" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <Cronograma />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto/cronograma/registrar-patrullaje" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <AgregarPatrullaje />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/usuarios" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <Usuarios />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/usuarios/agregar" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <AgregarUsuario />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/usuarios/editar/:id_user" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <ModificarUsuario />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/usuarios/detalle/:id_user" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <DetalleUsuario />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto/inventario" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <Inventario />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto/inventario/vehiculos/agregar" element={
+           <RutaProtegida rolesPermitidos={["admin"]}>
+                <AgregarVehiculo />
+          </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto/inventario/articulos/registrar" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+              <AgregarArticulo />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto/personal" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+              <Personal />
+            </RutaProtegida>
+          } />
+
+
+          {/*Rutas de supervisor*/}
+
+          <Route path="/supervisor/inicio" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <Inicio />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <InicioProyecto />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/cronograma" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <Cronograma />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/cronograma/registrar-patrullaje" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <AgregarPatrullaje />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/inventario" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <Inventario />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/inventario/vehiculos/agregar" element={
+           <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <AgregarVehiculo />
+          </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/inventario/articulos/registrar" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+              <AgregarArticulo />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/personal" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+              <Personal />
+            </RutaProtegida>
+          } />
+
+          
+
+          {/*Ruta de seguridad, reedirige al login cuando tratan de acceder a la raiz.*/}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+
+          {/*Ruta de seguridad, reedirige al login cuando ingresan una ruta inexistente.*/}
+          <Route path='*' element={<Navigate to="/login" replace />}></Route>
+        </IonRouterOutlet>
+      </IonReactRouter>
+    </IonApp>
 )};
 
 export default App;

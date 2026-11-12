@@ -1,0 +1,60 @@
+/* Contenedor de los campos del formulario de proyecto */
+.formulario-proyecto-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Etiquetas de los campos */
+.label-text {
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 5px;
+  margin-top: 15px;
+  display: block;
+}
+
+/* Inputs del formulario */
+.custom-input {
+  --background: #D9D9D9;
+  --color: black;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  --border-radius: 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  height: 35px;
+  margin-bottom: 10px;
+}
+
+/* Estilo visual para los campos bloqueados cuando se está en modo modificar */
+.custom-input-disabled {
+  --background: #9ca3af;
+  --color: #374151;
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Filas para los campos de fecha (inicio y término) */
+.date-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.date-row .date-label {
+  margin: 0;
+  width: 140px;
+}
+
+.date-input {
+  flex: 1;
+  margin-bottom: 0;
+}

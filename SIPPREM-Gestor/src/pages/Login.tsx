@@ -17,40 +17,55 @@ import {
 } from '@ionic/react';
 import React, { useState } from 'react';
 import './Login.css';
+import { authService } from '../services/authService';
 
-interface loginProps{
-    setUsuario: (datos: any) => void;
-};
+const Login: React.FC = () => {
 
-const Login: React.FC<loginProps> = ({setUsuario}) => {
-
-  const [identificador, setIdentifier] = useState<string>('');
+  const [identificador, setIdentificador] = useState<string>('');
   const [clave, setPassword] = useState<string>('');
   const router = useIonRouter();
 
   const [mandarAlerta] = useIonAlert();
 
-  // Función para manejar el inicio de sesión
-  const handleLogin = () => {
-    console.log('Intento de login:', { identificador, clave });
-    if (identificador.trim() === 'admin'){
-        setUsuario({
-            nombre: 'Usuario de administrador',
-            rol: 'ADMIN'
-        });
-        router.push("/admin/inicio","forward");
-    }else if(identificador.trim() === 'supervisor'){
-        setUsuario({
-            nombre: 'Usuario de supervisor',
-            rol: 'SUPERVISOR'
-        });
-        router.push("/supervisor/inicio","forward");
-    }else{
+  // Funcion handleLogin: Encargada de manejar el inicio de sesion al presionar el boton de iniciar
+  const handleLogin = async () => {
+
+    try {
+      
+      const { datosUsuario } = await authService.iniciarSesion({
+        identificador,
+        clave
+      });
+
+      // Si el usuario es un patrullero no puede acceder al gestor SIPPREM.
+      if (datosUsuario.tipo_rol === "patrullero") {
         mandarAlerta({
-            header: 'Acceso Denegado',
-            subHeader: 'Credenciales de acceso incorrectas',
-            message: 'El RUT o la contraseña ingresada no son válidos. Por favor, intente nuevamente.',
-            buttons: ['Aceptar']
+          header: "Acceso denegado.",
+          subHeader: "No tienes acceso al sistema.",
+          message: "Este sistema es exclusivo para administradores y supervisores, no para patrulleros.",
+          buttons: ["Aceptar"]
+        });
+        router.push("/login", "forward");
+        return;
+      }
+
+      if (datosUsuario.nuevo_user === true) {
+        // Redirige al cambio obligatorio de clave si es usuario nuevo
+        router.push("/cambiar-clave-inicial", "forward");
+      } else {
+        // Redirige al panel correspondiente (admin o supervisor)
+        if (datosUsuario.tipo_rol === "admin" || datosUsuario.tipo_rol === "supervisor") {
+          router.push(`/${datosUsuario.tipo_rol}/inicio`, "forward");
+        }
+      }
+
+    } catch (error: any) {
+      
+      mandarAlerta({
+        header: "Acceso denegado.",
+        subHeader: "Error de autenticacion.",
+        message: error.response?.data?.message || "No fue posible conectar con el servidor.",
+        buttons: ["Aceptar"]
       });
     }
   };
@@ -77,7 +92,7 @@ const Login: React.FC<loginProps> = ({setUsuario}) => {
                     className="login-input"
                     type="text"
                     value={identificador}
-                    onIonInput={(e: any) => setIdentifier(e.detail.value!)}
+                    onIonInput={(e: any) => setIdentificador(e.detail.value!)}
                   />
 
                   <IonLabel className="input-label">Ingrese su clave:</IonLabel>
