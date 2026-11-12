@@ -53,7 +53,16 @@ Ahora, procedemos a crear la base de datos con el comando:
 psql -U postgres -c "CREATE DATABASE sipprem_db;"
 ```
 
-Tras tener la base de datos creada procederemos a ejecutar el script de schema.sql, usando el comando:
+Teniendo la base de datos creada, ejecutaremos los dos comandos siguientes para asegurarnos de que al cargar los datos del schema.sql se guarden bien los textos con tildes, u otros caracteres especiales.
+
+```
+chcp 65001
+```
+```
+set PGCLIENTENCODING=UTF8
+```
+
+Ahora si, tras establecer esas dos configuraciones para la ventana cmd, procederemos a ejecutar el script de schema.sql, usando el comando:
 ```
 psql -U postgres -d sipprem_db -f database/schema.sql
 ```
