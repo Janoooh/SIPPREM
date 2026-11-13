@@ -48,15 +48,14 @@ export const authService = {
   },
 
   /*Funcion cambiarClave: Encargada de modificar la clave de un usuario que tiene una
-  clave aleatoria asignada.*/
-  cambiarClave: async ({identificador, clave}: CredencialesLogin): Promise<void> => {
-    
-    const datosPeticion = { 
-      idIngresado: identificador.trim(),
-      claveNuevaIng: clave.trim() 
+  clave aleatoria asignada. El backend identifica al usuario mediante el token JWT.*/
+  cambiarClave: async (claveNueva: string): Promise<void> => {
+
+    const datosPeticion = {
+      claveNuevaIng: claveNueva.trim()
     };
 
-    const resCambiarClaveInicial = await apiClient.patch("/auth",datosPeticion);
+    await apiClient.patch("/auth", datosPeticion);
 
     return;
   }

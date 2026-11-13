@@ -9,6 +9,9 @@ import ModificarProyecto from './pages/ModificarProyecto';
 import InicioProyecto from './pages/InicioProyecto';
 import Cronograma from './pages/Cronograma';
 import AgregarPatrullaje from './pages/AgregarPatrullaje';
+import ModificarPatrullaje from './pages/ModificarPatrullaje';
+import AgregarActividad from './pages/AgregarActividad';
+import ModificarActividad from './pages/ModificarActividad';
 import CambiarClaveInicial from './pages/CambiarClaveInicial';
 import Usuarios from './pages/Usuarios';
 import AgregarUsuario from './pages/AgregarUsuario';
@@ -107,9 +110,26 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
+          <Route path="/admin/proyecto/:id_proyecto/cronograma/patrullajes/editar/:id_patrullaje" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <ModificarPatrullaje />
+            </RutaProtegida>
+          } />
           <Route path="/admin/proyecto/:id_proyecto/cronograma/registrar-patrullaje" element={
             <RutaProtegida rolesPermitidos={["admin"]}>
                 <AgregarPatrullaje />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto/cronograma/actividades/agregar" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <AgregarActividad />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto/cronograma/actividades/editar/:id_actividad" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <ModificarActividad />
             </RutaProtegida>
           } />
 
@@ -182,9 +202,26 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
+          <Route path="/supervisor/proyecto/:id_proyecto/cronograma/patrullajes/editar/:id_patrullaje" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <ModificarPatrullaje />
+            </RutaProtegida>
+          } />
           <Route path="/supervisor/proyecto/:id_proyecto/cronograma/registrar-patrullaje" element={
             <RutaProtegida rolesPermitidos={["supervisor"]}>
                 <AgregarPatrullaje />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/cronograma/actividades/agregar" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <AgregarActividad />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/cronograma/actividades/editar/:id_actividad" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <ModificarActividad />
             </RutaProtegida>
           } />
 

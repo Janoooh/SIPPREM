@@ -17,7 +17,6 @@ import {
   useIonAlert
 } from '@ionic/react';
 import './CambiarClaveInicial.css';
-import { useUsuario } from '../hooks/obtenerUsuario';
 import { authService } from '../services/authService';
 
 const CambiarClaveInicial: React.FC = () => {
@@ -27,9 +26,6 @@ const CambiarClaveInicial: React.FC = () => {
 
   const router = useIonRouter();
   const [mandarAlerta] = useIonAlert();
-
-  // Cargamos los datos guardados del usuario.
-  const {usuario} = useUsuario();
 
   // Funcion handleCambiarClave: Encargada de modificar la clave del usuario al presionar el boton de cambiar clave.
   // Para lo anterior usa el authService.
@@ -48,7 +44,7 @@ const CambiarClaveInicial: React.FC = () => {
     try{
 
       // Cambiamos la clave del usuario.
-      await authService.cambiarClave({identificador: usuario.rut, clave: nuevaClave});
+      await authService.cambiarClave(nuevaClave);
 
       mandarAlerta({
         header: 'Clave Modificada',

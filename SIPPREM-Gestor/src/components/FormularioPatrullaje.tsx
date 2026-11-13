@@ -18,6 +18,8 @@ export interface FormularioPatrullajeProps {
   /** Hora de término en formato HH:MM */
   horaTermino: string;
   setHoraTermino: (hora: string) => void;
+  /** Deshabilita edición cuando el patrullaje no está Planificado */
+  deshabilitado?: boolean;
 }
 
 // Opciones de horas de 00 a 23 en formato 24 horas
@@ -37,7 +39,8 @@ const FormularioPatrullaje: React.FC<FormularioPatrullajeProps> = ({
   horaInicio,
   setHoraInicio,
   horaTermino,
-  setHoraTermino
+  setHoraTermino,
+  deshabilitado = false
 }) => {
   // Descomponer horaInicio y horaTermino en hora y minuto
   const [horaInicioH, horaInicioM] = useMemo(() => {
@@ -49,6 +52,17 @@ const FormularioPatrullaje: React.FC<FormularioPatrullajeProps> = ({
     const partes = (horaTermino || '16:00').split(':');
     return [partes[0] || '16', partes[1] || '00'];
   }, [horaTermino]);
+
+  // Asegura que minutos no múltiplos de 5 cargados en edición también aparezcan en el selector
+  const minutosInicioOpciones = useMemo(() => {
+    if (MINUTOS_OPCIONES.includes(horaInicioM)) return MINUTOS_OPCIONES;
+    return [...MINUTOS_OPCIONES, horaInicioM].sort();
+  }, [horaInicioM]);
+
+  const minutosTerminoOpciones = useMemo(() => {
+    if (MINUTOS_OPCIONES.includes(horaTerminoM)) return MINUTOS_OPCIONES;
+    return [...MINUTOS_OPCIONES, horaTerminoM].sort();
+  }, [horaTerminoM]);
 
   // Actualizar hora de inicio
   const handleCambiarInicio = (nuevaH: string, nuevoM: string) => {
@@ -62,6 +76,7 @@ const FormularioPatrullaje: React.FC<FormularioPatrullajeProps> = ({
 
   // Aplicar un turno sugerido con un solo clic
   const aplicarTurno = (ini: string, fin: string) => {
+    if (deshabilitado) return;
     setHoraInicio(ini);
     setHoraTermino(fin);
   };
@@ -95,7 +110,7 @@ const FormularioPatrullaje: React.FC<FormularioPatrullajeProps> = ({
   // Si se selecciona el mismo encargado como acompañante, se limpia el acompañante
   const handleChangeEncargado = (nuevoRut: string) => {
     setEncargadoRut(nuevoRut);
-    if (nuevoRut && nuevoRut === acompananteRut) {
+    if (nuevoRut && nuevoRut.toLowerCase() === acompananteRut.toLowerCase()) {
       setAcompananteRut('');
     }
   };
@@ -109,6 +124,7 @@ const FormularioPatrullaje: React.FC<FormularioPatrullajeProps> = ({
           className="select-patrullero"
           value={encargadoRut}
           onChange={(e) => handleChangeEncargado(e.target.value)}
+          disabled={deshabilitado}
         >
           <option value="">Patrulleros (Seleccione encargado)</option>
           {patrullerosDisponibles.map((p) => (
@@ -126,10 +142,11 @@ const FormularioPatrullaje: React.FC<FormularioPatrullajeProps> = ({
           className="select-patrullero"
           value={acompananteRut}
           onChange={(e) => setAcompananteRut(e.target.value)}
+          disabled={deshabilitado}
         >
           <option value="">Patrulleros (Sin acompañante)</option>
           {patrullerosDisponibles
-            .filter((p) => p.rut !== encargadoRut)
+            .filter((p) => p.rut.toLowerCase() !== encargadoRut.toLowerCase())
             .map((p) => (
               <option key={`acom-${p.rut}`} value={p.rut}>
                 {p.nombre} ({p.rut})
@@ -155,6 +172,7 @@ const FormularioPatrullaje: React.FC<FormularioPatrullajeProps> = ({
                 value={horaInicioH}
                 onChange={(e) => handleCambiarInicio(e.target.value, horaInicioM)}
                 title="Hora de inicio"
+                disabled={deshabilitado}
               >
                 {HORAS_OPCIONES.map((h) => (
                   <option key={`ini-h-${h}`} value={h}>
@@ -168,8 +186,9 @@ const FormularioPatrullaje: React.FC<FormularioPatrullajeProps> = ({
                 value={horaInicioM}
                 onChange={(e) => handleCambiarInicio(horaInicioH, e.target.value)}
                 title="Minutos de inicio"
+                disabled={deshabilitado}
               >
-                {MINUTOS_OPCIONES.map((m) => (
+                {minutosInicioOpciones.map((m) => (
                   <option key={`ini-m-${m}`} value={m}>
                     {m} min
                   </option>
@@ -189,6 +208,7 @@ const FormularioPatrullaje: React.FC<FormularioPatrullajeProps> = ({
                 value={horaTerminoH}
                 onChange={(e) => handleCambiarTermino(e.target.value, horaTerminoM)}
                 title="Hora de término"
+                disabled={deshabilitado}
               >
                 {HORAS_OPCIONES.map((h) => (
                   <option key={`fin-h-${h}`} value={h}>
@@ -202,8 +222,9 @@ const FormularioPatrullaje: React.FC<FormularioPatrullajeProps> = ({
                 value={horaTerminoM}
                 onChange={(e) => handleCambiarTermino(horaTerminoH, e.target.value)}
                 title="Minutos de término"
+                disabled={deshabilitado}
               >
-                {MINUTOS_OPCIONES.map((m) => (
+                {minutosTerminoOpciones.map((m) => (
                   <option key={`fin-m-${m}`} value={m}>
                     {m} min
                   </option>
@@ -219,6 +240,7 @@ const FormularioPatrullaje: React.FC<FormularioPatrullajeProps> = ({
           <div className="chips-turnos">
             <button
               type="button"
+              disabled={deshabilitado}
               className={`chip-turno ${
                 horaInicio === '08:00' && horaTermino === '16:00' ? 'chip-activo' : ''
               }`}
@@ -228,6 +250,7 @@ const FormularioPatrullaje: React.FC<FormularioPatrullajeProps> = ({
             </button>
             <button
               type="button"
+              disabled={deshabilitado}
               className={`chip-turno ${
                 horaInicio === '16:00' && horaTermino === '00:00' ? 'chip-activo' : ''
               }`}
@@ -237,6 +260,7 @@ const FormularioPatrullaje: React.FC<FormularioPatrullajeProps> = ({
             </button>
             <button
               type="button"
+              disabled={deshabilitado}
               className={`chip-turno ${
                 horaInicio === '00:00' && horaTermino === '08:00' ? 'chip-activo' : ''
               }`}
