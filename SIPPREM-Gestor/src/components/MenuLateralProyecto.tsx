@@ -106,6 +106,7 @@ const MenuLateralProyecto: React.FC<MenuLateralProyectoProps> = ({
           className={`menu-btn ${seccionActiva === 'mapa' ? 'menu-btn-activo' : ''}`}
           expand="block"
           fill={seccionActiva === 'mapa' ? 'solid' : 'clear'}
+          onClick={() => irARuta('/mapa')}
         >
           Mapa GPS
         </IonButton>

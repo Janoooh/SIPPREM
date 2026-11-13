@@ -1,6 +1,7 @@
 import { apiClient } from './apiClient';
 import { Preferences } from '@capacitor/preferences';
 import type { dataUsuario } from '../interfaces/dataUsuario';
+import { EVENTO_SESION_PATRULLERO } from '../context/seguimientoContext';
 
 export interface CredencialesLogin {
   identificador: string;
@@ -40,6 +41,7 @@ export const authService = {
 
     await Preferences.set({ key: "token", value: token });
     await Preferences.set({ key: "usuario", value: JSON.stringify(datosUsuarioLower) });
+    window.dispatchEvent(new Event(EVENTO_SESION_PATRULLERO));
 
     return {
       token,

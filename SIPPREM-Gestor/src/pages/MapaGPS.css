@@ -1,0 +1,349 @@
+.mapa-gps-grid {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.mapa-gps-contenido-col {
+  padding-left: 15px;
+}
+
+.mapa-gps-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.mapa-gps-titulo {
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.65rem;
+  display: block;
+}
+
+.mapa-gps-subtitulo {
+  color: #48D1E6;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin: 4px 0 0 0;
+  text-transform: uppercase;
+}
+
+.mapa-gps-controles {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.mapa-estado-pill,
+.mapa-contador-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #121c27;
+  border: 1px solid #334155;
+  color: #e2e8f0;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.mapa-estado-pill.conectado {
+  border-color: #22c55e;
+}
+
+.mapa-estado-pill.error {
+  border-color: #ef4444;
+  color: #fecaca;
+}
+
+.estado-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: #48D1E6;
+}
+
+.mapa-estado-pill.conectado .estado-dot {
+  background-color: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+}
+
+.mapa-estado-pill.error .estado-dot {
+  background-color: #ef4444;
+}
+
+.btn-refrescar-mapa {
+  --border-color: #48D1E6;
+  --color: #ffffff;
+  --border-radius: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  text-transform: none;
+  margin: 0;
+}
+
+.mapa-gps-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.leyenda-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #f1f5f9;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.leyenda-muestra {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.leyenda-muestra.zona {
+  background-color: rgba(34, 197, 94, 0.45);
+  border: 2px solid #22c55e;
+}
+
+.leyenda-muestra.patrullero {
+  background-color: #facc15;
+  border: 2px solid #121c27;
+}
+
+.leyenda-muestra.seleccionado {
+  background-color: #facc15;
+  border: 3px solid #ef4444;
+}
+
+/* Distribución mapa central + tarjeta derecha al seleccionar un patrullero */
+.mapa-gps-workspace {
+  display: flex;
+  gap: 18px;
+  align-items: stretch;
+}
+
+.mapa-gps-canvas-card {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 540px;
+  background-color: #121c27;
+  border: 2px solid #48D1E6;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.32);
+}
+
+.mapa-gps-leaflet {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.mapa-gps-loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #e2e8f0;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.mapa-sin-senales-badge {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  z-index: 450;
+  pointer-events: none;
+  background-color: rgba(18, 28, 39, 0.9);
+  border: 1px solid #48D1E6;
+  color: #f1f5f9;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* Tarjeta lateral con el detalle del patrullero seleccionado */
+.detalle-patrullero-card {
+  width: 300px;
+  flex-shrink: 0;
+  background-color: #121c27;
+  border: 2px solid #48D1E6;
+  border-radius: 18px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.detalle-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.detalle-badge-en-curso {
+  background-color: rgba(34, 197, 94, 0.18);
+  color: #4ade80;
+  border: 1px solid #22c55e;
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.btn-cerrar-detalle {
+  --color: #94a3b8;
+  --padding-start: 4px;
+  --padding-end: 4px;
+  margin: 0;
+}
+
+.btn-cerrar-detalle:hover {
+  --color: #ffffff;
+}
+
+.detalle-identidad {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.detalle-avatar-circulo {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #1e293b;
+  border: 1.5px solid #48D1E6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  color: #48D1E6;
+  flex-shrink: 0;
+}
+
+.detalle-nombre-patrullero {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  line-height: 1.25;
+}
+
+.detalle-rut-patrullero {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.detalle-divisor {
+  height: 1px;
+  background-color: #243447;
+  margin: 6px 0 16px 0;
+}
+
+.detalle-datos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.detalle-dato-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background-color: #1a2836;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border-left: 3px solid #48D1E6;
+}
+
+.detalle-dato-icono {
+  font-size: 1.2rem;
+  color: #48D1E6;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.detalle-dato-etiqueta {
+  display: block;
+  font-size: 0.76rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.detalle-dato-valor {
+  margin: 3px 0 0 0;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.detalle-footer-gps {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid #243447;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.detalle-coords-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #cbd5e1;
+}
+
+.detalle-ultima-senal {
+  color: #48D1E6;
+  font-weight: 600;
+}
+
+@media (max-width: 991px) {
+  .mapa-gps-contenido-col {
+    padding-left: 0;
+    margin-top: 16px;
+  }
+
+  .mapa-gps-workspace {
+    flex-direction: column;
+  }
+
+  .mapa-gps-canvas-card {
+    height: 400px;
+  }
+
+  .detalle-patrullero-card {
+    width: 100%;
+  }
+}

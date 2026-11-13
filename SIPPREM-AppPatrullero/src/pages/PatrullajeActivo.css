@@ -1,0 +1,214 @@
+.patrullaje-activo-content {
+  --background: #2c3e50;
+}
+
+.patrullaje-activo-container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 18px 24px 18px;
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.activo-header {
+  margin-bottom: 14px;
+}
+
+.activo-titulo {
+  color: #ffffff;
+  font-size: 1.45rem;
+  font-weight: 700;
+  margin: 0;
+  text-align: left;
+}
+
+.activo-proyecto {
+  color: #38bdf8;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 4px 0 0 0;
+}
+
+.activo-mapa-box {
+  width: 100%;
+  height: 300px;
+  border: 2px solid #38bdf8;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #1e293b;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  margin-bottom: 12px;
+}
+
+.activo-estado-gps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  background-color: #1e293b;
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  border: 1px solid #334155;
+}
+
+.gps-indicador-punto {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background-color: #38bdf8;
+}
+
+.activo-estado-gps.activo .gps-indicador-punto {
+  background-color: #22c55e;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.7);
+}
+
+.activo-estado-gps.alerta {
+  border-color: #d9a35b;
+  color: #fde68a;
+}
+
+.activo-estado-gps.alerta .gps-indicador-punto {
+  background-color: #e0a44b;
+}
+
+.activo-mapa-leaflet {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.activo-mapa-estado {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  text-align: center;
+  padding: 16px;
+}
+
+.activo-horarios {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 22px;
+  padding: 12px 14px;
+  background-color: #34495e;
+  border-radius: 10px;
+  border-left: 4px solid #27ae60;
+}
+
+.activo-horarios p {
+  color: #ffffff;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.activo-acciones-wrapper {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.activo-botones-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.btn-activo-incidente {
+  --background: #b87e38;
+  --background-activated: #9c692c;
+  --color: #ffffff;
+  --border-color: #d9a35b;
+  --border-style: solid;
+  --border-width: 1px;
+  --border-radius: 12px;
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+  font-weight: 700;
+  text-transform: none;
+  font-size: 0.95rem;
+  min-height: 52px;
+  margin: 0;
+  white-space: normal;
+}
+
+.panico-boton-wrapper {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.panico-boton-wrapper.manteniendo .btn-activo-panico {
+  --background: #a33f3f;
+  --border-color: #f87171;
+}
+
+.btn-activo-panico {
+  --background: #b54c4c;
+  --background-activated: #993d3d;
+  --color: #ffffff;
+  --border-color: #d47878;
+  --border-style: solid;
+  --border-width: 1px;
+  --border-radius: 12px;
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+  font-weight: 700;
+  text-transform: none;
+  font-size: 0.95rem;
+  min-height: 52px;
+  height: 100%;
+  margin: 0;
+  white-space: normal;
+}
+
+.panico-progreso-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.panico-progreso-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background-color: rgba(254, 202, 202, 0.24);
+  transition: width 50ms linear;
+}
+
+.panico-progreso-barra {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 4px;
+  background-color: #fecaca;
+  transition: width 50ms linear;
+}
+
+.btn-activo-terminar {
+  --background: #1e293b;
+  --background-activated: #0f172a;
+  --color: #ffffff;
+  --border-color: #38bdf8;
+  --border-style: solid;
+  --border-width: 2px;
+  --border-radius: 25px;
+  font-weight: 700;
+  text-transform: none;
+  font-size: 1.05rem;
+  height: 50px;
+  margin: 0;
+}

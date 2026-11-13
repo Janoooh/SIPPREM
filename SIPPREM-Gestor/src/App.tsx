@@ -22,6 +22,8 @@ import Inventario from './pages/Inventario';
 import AgregarVehiculo from './pages/AgregarVehiculo';
 import AgregarArticulo from './pages/AgregarArticulo';
 import Personal from './pages/Personal';
+import MapaGPS from './pages/MapaGPS';
+import { SocketProvider } from './context/SocketProvider';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -57,6 +59,7 @@ const App: React.FC = () => {
   return (
     <IonApp>
       <IonReactRouter>
+        <SocketProvider>
         <IonRouterOutlet>
           
           {/*Ruta publica del login.*/}
@@ -181,6 +184,12 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
+          <Route path="/admin/proyecto/:id_proyecto/mapa" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+              <MapaGPS />
+            </RutaProtegida>
+          } />
+
 
           {/*Rutas de supervisor*/}
 
@@ -249,6 +258,12 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
+          <Route path="/supervisor/proyecto/:id_proyecto/mapa" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+              <MapaGPS />
+            </RutaProtegida>
+          } />
+
           
 
           {/*Ruta de seguridad, reedirige al login cuando tratan de acceder a la raiz.*/}
@@ -257,6 +272,7 @@ const App: React.FC = () => {
           {/*Ruta de seguridad, reedirige al login cuando ingresan una ruta inexistente.*/}
           <Route path='*' element={<Navigate to="/login" replace />}></Route>
         </IonRouterOutlet>
+        </SocketProvider>
       </IonReactRouter>
     </IonApp>
 )};

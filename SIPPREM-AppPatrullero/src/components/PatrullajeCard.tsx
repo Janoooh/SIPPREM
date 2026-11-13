@@ -9,6 +9,7 @@ import L from 'leaflet';
 import { MapContainer, TileLayer, Polygon, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { PatrullajeUsuario } from '../interfaces/patrullajeUsuario';
+import { MAP_TILE_URL } from '../config/env';
 import './PatrullajeCard.css';
 
 const QUINCE_MINUTOS_MS = 15 * 60 * 1000;
@@ -46,7 +47,10 @@ export const convertirGeoJSONAPuntos = (geoJson: any): PuntoMapa[] => {
   return [];
 };
 
-const AjustadorMapa: React.FC<{ puntos: PuntoMapa[] }> = ({ puntos }) => {
+export const AjustadorMapa: React.FC<{
+  puntos: PuntoMapa[];
+  padding?: [number, number];
+}> = ({ puntos, padding = [8, 8] }) => {
   const map = useMap();
 
   useEffect(() => {
@@ -55,7 +59,7 @@ const AjustadorMapa: React.FC<{ puntos: PuntoMapa[] }> = ({ puntos }) => {
       if (puntos.length >= 3) {
         const bounds = L.latLngBounds(puntos);
         if (bounds.isValid()) {
-          map.fitBounds(bounds, { padding: [8, 8], animate: false });
+          map.fitBounds(bounds, { padding, animate: false });
         }
       }
     };
@@ -76,7 +80,7 @@ const AjustadorMapa: React.FC<{ puntos: PuntoMapa[] }> = ({ puntos }) => {
       clearTimeout(t2);
       resizeObserver.disconnect();
     };
-  }, [map, puntos]);
+  }, [map, puntos, padding[0], padding[1]]);
 
   return null;
 };
@@ -91,7 +95,7 @@ const formatearFecha = (fechaIso: string): string => {
   return `${dia}/${mes}/${anio}`;
 };
 
-const formatearHora = (fechaIso: string): string => {
+export const formatearHora = (fechaIso: string): string => {
   if (!fechaIso) return '--:--';
   const fecha = new Date(fechaIso);
   return !Number.isNaN(fecha.getTime())
@@ -177,7 +181,7 @@ const PatrullajeCard: React.FC<PatrullajeCardProps> = ({ patrullaje }) => {
             >
               <AjustadorMapa puntos={puntosZona} />
               <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                url={MAP_TILE_URL}
                 attribution="&copy; OpenStreetMap contributors"
               />
               <Polygon
@@ -231,10 +235,10 @@ const PatrullajeCard: React.FC<PatrullajeCardProps> = ({ patrullaje }) => {
             disabled={!botonHabilitado}
             onClick={() => {
               if (!botonHabilitado) return;
-              router.push(
-                `/patrullero/proyecto/${patrullaje.id_proyecto}/preparacion?id_patrullaje=${patrullaje.id_patrullaje}`,
-                'forward'
-              );
+              const rutaDestino = esEnCurso
+                ? `/patrullero/proyecto/${patrullaje.id_proyecto}/patrullaje-activo?id_patrullaje=${patrullaje.id_patrullaje}`
+                : `/patrullero/proyecto/${patrullaje.id_proyecto}/preparacion?id_patrullaje=${patrullaje.id_patrullaje}`;
+              router.push(rutaDestino, 'forward');
             }}
           >
             {textoBoton}

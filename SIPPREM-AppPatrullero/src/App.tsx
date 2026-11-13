@@ -5,7 +5,9 @@ import { RutaProtegida } from './routes/rutaProtegida';
 import Login from './pages/Login';                       
 import CambiarClaveInicial from './pages/CambiarClaveInicial'; 
 import PatrullajeInicio from './pages/PatrullajeInicio'; 
-import PreparacionPatrullaje from './pages/PreparacionPatrullaje';  
+import PreparacionPatrullaje from './pages/PreparacionPatrullaje';
+import PatrullajeActivo from './pages/PatrullajeActivo';
+import { SeguimientoProvider } from './context/SeguimientoProvider';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -30,6 +32,7 @@ const App: React.FC = () => {
   return (
     <IonApp>
       <IonReactRouter>
+        <SeguimientoProvider>
         <IonRouterOutlet>
           
           {/* Ruta pública del login */}
@@ -59,12 +62,20 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
+          {/* Gestión del patrullaje en curso */}
+          <Route path="/patrullero/proyecto/:id_proyecto/patrullaje-activo" element={
+            <RutaProtegida rolesPermitidos={["patrullero"]}>
+              <PatrullajeActivo />
+            </RutaProtegida>
+          } />
+
 
           {/* Rutas de seguridad */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path='*' element={<Navigate to="/login" replace />} />
 
         </IonRouterOutlet>
+      </SeguimientoProvider>
       </IonReactRouter>
     </IonApp>
   );

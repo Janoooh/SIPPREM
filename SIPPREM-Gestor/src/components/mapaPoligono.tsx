@@ -11,6 +11,7 @@ import {
   useMapEvents
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { MAP_TILE_URL } from '../config/env';
 import './mapaPoligono.css';
 
 // Tipo que representa una coordenada geográfica [latitud, longitud]
@@ -195,7 +196,7 @@ const MapaPoligono: React.FC<MapaPoligonoProps> = ({
             <CapturadorClicksMapa onAgregarPunto={handleAgregarPunto} soloLectura={soloLectura} />
 
             <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              url={MAP_TILE_URL}
               attribution="&copy; OpenStreetMap contributors"
             />
 

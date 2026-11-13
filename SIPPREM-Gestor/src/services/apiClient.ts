@@ -1,8 +1,9 @@
 import axios from "axios";
 import { Preferences } from "@capacitor/preferences";
+import { BACKEND_URL } from "../config/env";
 
 export const apiClient = axios.create({
-    baseURL: "http://localhost:3000/api/v1",
+    baseURL: `${BACKEND_URL}/api/v1`,
     headers: {"Content-Type":"application/json",},
     timeout: 10000 //10 seg
 });

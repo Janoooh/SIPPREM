@@ -1,27 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  IonPage, 
-  IonContent, 
-  IonImg, 
-  IonLabel, 
-  IonButton, 
-  IonSelect, 
-  IonSelectOption, 
-  useIonRouter, 
-  useIonAlert, 
-  useIonToast 
+import {
+  IonPage,
+  IonContent,
+  IonImg,
+  useIonRouter,
+  useIonAlert,
+  useIonToast
 } from '@ionic/react';
 import './PreparacionPatrullaje.css';
 import BarraNavInferior from '../components/barraNavInferior';
-import { useUsuario } from '../hooks/obtenerUsuario';
+import FormularioIniciarPatrullaje from '../components/FormularioIniciarPatrullaje';
 import { useParams, useLocation } from 'react-router-dom';
 import { vehiculosService, dataVehiculo } from '../services/vehiculoService';
-import { eqPersonalService, dataEqPersonal } from '../services/EquipamientoPersonalService'; // <--- Importamos tu servicio de equipamiento personal
+import { eqPersonalService, dataEqPersonal } from '../services/EquipamientoPersonalService';
 import { patrullajeService } from '../services/patrullajeService';
+import { notificarCambioEstadoPatrullaje } from '../context/seguimientoContext';
 
 const PreparacionPatrullaje: React.FC = () => {
   const router = useIonRouter();
-  const { usuario } = useUsuario();
   const [mandarAlerta] = useIonAlert();
   const [mandarToast] = useIonToast();
 
@@ -97,11 +93,11 @@ const PreparacionPatrullaje: React.FC = () => {
 
     try {
       await patrullajeService.iniciarPatrullaje(
-        id_proyecto, 
-        Number(id_patrullaje), 
+        id_proyecto,
+        Number(id_patrullaje),
         {
           id_vehiculo: patenteSeleccionada,
-          eq_personal: articulosSeleccionados 
+          eq_personal: articulosSeleccionados
         }
       );
 
@@ -112,17 +108,21 @@ const PreparacionPatrullaje: React.FC = () => {
         color: "success"
       });
 
-      router.push(`/patrullero/proyecto/${id_proyecto}/inicio`, "back");
+      notificarCambioEstadoPatrullaje();
+
+      router.push(
+        `/patrullero/proyecto/${id_proyecto}/patrullaje-activo?id_patrullaje=${id_patrullaje}`,
+        "forward",
+        "replace"
+      );
 
     } catch (error: any) {
-      // 1. Esto imprimirá el error exacto que envía tu backend en la consola (F12)
       console.error("DETALLE COMPLETO DEL ERROR:", error.response || error);
 
-      // 2. Intentamos extraer el mensaje de todas las formas posibles
-      const mensajeBackend = 
-        error.response?.data?.message || 
-        error.response?.data?.explicacion || 
-        error.message || 
+      const mensajeBackend =
+        error.response?.data?.message ||
+        error.response?.data?.explicacion ||
+        error.message ||
         "No fue posible iniciar el patrullaje.";
 
       mandarAlerta({
@@ -137,7 +137,7 @@ const PreparacionPatrullaje: React.FC = () => {
     <IonPage>
       <IonContent fullscreen className="preparacion-content">
         <div className="preparacion-container">
-          
+
           <div className="logo-container">
             <IonImg src="/assets/logoSIPPREM.png" alt="SIPPREM Logo" className="preparacion-logo" />
           </div>
@@ -146,77 +146,17 @@ const PreparacionPatrullaje: React.FC = () => {
             <h2>Inicio de patrullaje</h2>
           </div>
 
-          {/* Selección de vehículo */}
-          <div className="form-group">
-            <IonLabel className="label-form">Patente del vehículo a utilizar:</IonLabel>
-            <div className="input-box-patente">
-              <IonSelect
-                value={patenteSeleccionada}
-                placeholder={cargandoVehiculos ? "Cargando vehículos..." : "Seleccione un vehículo"}
-                onIonChange={e => setPatenteSeleccionada(e.detail.value)}
-                className="select-patente"
-              >
-                {listaVehiculos.map((vehiculo) => (
-                  <IonSelectOption key={vehiculo.id_item} value={vehiculo.id_item}>
-                    {vehiculo.id_item} - {vehiculo.nombre_vehiculo}
-                  </IonSelectOption>
-                ))}
-              </IonSelect>
-            </div>
-          </div>
-
-          {/* Título Artículos a utilizar */}
-          <div className="seccion-articulos-header">
-            <IonLabel className="label-form">Articulos a utilizar (Equipamiento)</IonLabel>
-          </div>
-
-          {/* Selección múltiple de equipamiento personal obtenido de la BD */}
-          <div className="form-group">
-            <div className="input-box-patente">
-              <IonSelect
-                multiple={true}
-                value={articulosSeleccionados}
-                placeholder={cargandoArticulos ? "Cargando equipamiento..." : "Seleccione equipamiento personal"}
-                onIonChange={e => setArticulosSeleccionados(e.detail.value)}
-                className="select-patente"
-              >
-                {listaArticulos.map((art) => (
-                  <IonSelectOption key={art.id_item} value={art.id_item}>
-                    {art.tipo_eq_personal} (Talla: {art.talla}) - [{art.id_item}]
-                  </IonSelectOption>
-                ))}
-              </IonSelect>
-            </div>
-          </div>
-
-          {/* Lista visual de los artículos seleccionados */}
-          <div className="lista-articulos-container">
-            {articulosSeleccionados.length > 0 ? (
-              articulosSeleccionados.map((idItem) => {
-                const itemEncontrado = listaArticulos.find(a => a.id_item === idItem);
-                return itemEncontrado ? (
-                  <div className="fila-articulo-prep" key={idItem}>
-                    <span className="articulo-nombre">{itemEncontrado.tipo_eq_personal}</span>
-                    <span className="articulo-cantidad">Talla: {itemEncontrado.talla}</span>
-                  </div>
-                ) : null;
-              })
-            ) : (
-              <p style={{ color: '#aaa', textAlign: 'center', fontSize: '0.9rem' }}>No hay equipamiento seleccionado</p>
-            )}
-          </div>
-
-          <div className="boton-agregar-container">
-            <IonButton fill="outline" className="btn-agregar-articulo" expand="block">
-              Agregar articulo
-            </IonButton>
-          </div>
-
-          <div className="boton-iniciar-container">
-            <IonButton expand="block" className="btn-iniciar-patrullaje" onClick={handleIniciarPatrullaje}>
-              Iniciar patrullaje
-            </IonButton>
-          </div>
+          <FormularioIniciarPatrullaje
+            listaVehiculos={listaVehiculos}
+            patenteSeleccionada={patenteSeleccionada}
+            setPatenteSeleccionada={setPatenteSeleccionada}
+            cargandoVehiculos={cargandoVehiculos}
+            listaArticulos={listaArticulos}
+            articulosSeleccionados={articulosSeleccionados}
+            setArticulosSeleccionados={setArticulosSeleccionados}
+            cargandoArticulos={cargandoArticulos}
+            onIniciarPatrullaje={handleIniciarPatrullaje}
+          />
 
         </div>
       </IonContent>

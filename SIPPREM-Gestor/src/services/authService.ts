@@ -40,6 +40,7 @@ export const authService = {
 
     await Preferences.set({ key: "token", value: token });
     await Preferences.set({ key: "usuario", value: JSON.stringify(datosUsuarioLower) });
+    window.dispatchEvent(new Event("sipprem-sesion-actualizada"));
 
     return {
       token,
