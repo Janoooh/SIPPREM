@@ -7,15 +7,12 @@ import {
   IonButton, 
   IonSelect, 
   IonSelectOption, 
-  IonTabBar, 
-  IonTabButton, 
-  IonIcon,
   useIonRouter, 
   useIonAlert, 
   useIonToast 
 } from '@ionic/react';
-import { homeOutline, calendarOutline, personOutline } from 'ionicons/icons';
 import './PreparacionPatrullaje.css';
+import BarraNavInferior from '../components/barraNavInferior';
 import { useUsuario } from '../hooks/obtenerUsuario';
 import { useParams, useLocation } from 'react-router-dom';
 import { vehiculosService, dataVehiculo } from '../services/vehiculoService';
@@ -224,17 +221,7 @@ const PreparacionPatrullaje: React.FC = () => {
         </div>
       </IonContent>
 
-      <IonTabBar slot="bottom" className="custom-tab-bar">
-        <IonTabButton tab="home" onClick={() => router.push(`/patrullero/inicio`, "forward")}>
-          <IonIcon icon={homeOutline} />
-        </IonTabButton>
-        <IonTabButton tab="calendar" href={`/patrullero/proyecto/${id_proyecto}/calendario`}>
-          <IonIcon icon={calendarOutline} />
-        </IonTabButton>
-        <IonTabButton tab="profile" href={`/patrullero/proyecto/${id_proyecto}/perfil`}>
-          <IonIcon icon={personOutline} />
-        </IonTabButton>
-      </IonTabBar>
+      <BarraNavInferior id_proyecto={id_proyecto} />
     </IonPage>
   );
 };
