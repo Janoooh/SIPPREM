@@ -1,16 +1,21 @@
+# Docker Compose: Archivo de configuración para levantar los servicios de la aplicación SIPPREM (Base de datos, Backend y Frontend)
 services:
+  #  1er SERVICIO: BASE DE DATOS (PostgreSQL + PostGIS)
   database:
-    image: postgres:15-alpine
+    image: postgis/postgis:15-3.4-alpine
     container_name: sipprem_db
     environment:
+    # Si el usuario no tiene un archivo .env, Docker ocupa los valores de prueba (después del :-)
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
-      POSTGRES_DB: ${DB_NAME:-sipprem}
+      POSTGRES_DB: ${DB_NAME:-sipprem_db}
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_final:/var/lib/postgresql/data
+      - ./SIPPREM-Backend/database/schema.sql:/docker-entrypoint-initdb.d/init.sql
 
+  # 2do SERVICIO: BACKEND (Node.js + Express)
   backend:
     build:
       context: ./SIPPREM-Backend
@@ -22,11 +27,20 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - BACKEND_PORT=3000
-      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@database:5432/${DB_NAME:-sipprem}?schema=public
+    # Variables de entorno con valores por defecto para una evaluación segura
+      - BACKEND_PORT=${BACKEND_PORT:-3000}
+      - JWT_SECRET=${JWT_SECRET:-clave_secreta_para_evaluacion_123}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - DB_HOST=database
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME:-sipprem_db}
+      - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@database:5432/${DB_NAME:-sipprem_db}?schema=public
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:8080,http://localhost:5173}
     depends_on:
       - database
 
+  # 3er SERVICIO: FRONTEND (React)
   frontend:
     build:
       context: ./SIPPREM-Gestor
@@ -38,4 +52,4 @@ services:
       - backend
 
 volumes:
-  postgres_data:
+  postgres_data_final:
