@@ -31,10 +31,11 @@
     - [Justificación Técnica](#Justificación-Técnica)
 8. [Prototipo de UI/UX de la aplicación](#Prototipo-de-UIUX-de-la-aplicación)
 9. [Librerías principales utilizadas](#Librerías-principales-utilizadas)
-10. [Como clonar el repositorio (EP1)](#Como-clonar-el-repositorio-EP1)
-11. [Como acceder al sistema (EP1)](#Como-acceder-al-sistema-EP1)
-12. [Distribucion de responsabilidades en el equipo (EP1)](#Distribucion-de-responsabilidades-en-el-equipo-EP1)
-13. [Uso de herramientas de IA (EP1)](#Uso-de-herramientas-IA-EP1)
+10. [API Externa utilizada](#API-Externa-utilizada)
+11. [Como clonar el repositorio (EP1)](#Como-clonar-el-repositorio-EP1)
+12. [Como acceder al sistema (EP1)](#Como-acceder-al-sistema-EP1)
+13. [Distribucion de responsabilidades en el equipo (EP1)](#Distribucion-de-responsabilidades-en-el-equipo-EP1)
+14. [Uso de herramientas de IA (EP1)](#Uso-de-herramientas-IA-EP1)
 
 ---
 ## **Justificación del problema**
@@ -736,6 +737,19 @@ La arquitectura de navegación se definió considerando criterios de usabilidad,
 | `ionicons` | Colección oficial de iconos utilizada por los componentes de Ionic.|
 |  `leaflet`     | Biblioteca motor para la renderización, manipulación e interacción con mapas interactivos de código abierto.|
 |  `react-leaflet` | Wrapper de React que expone los elementos de Leaflet como componentes declarativos.|
+|  `axios` | Cliente HTTP utilizado para realizar las peticiones a la API REST del backend y gestionar el envío automático del token JWT.|
+|  `@capacitor/preferences` | Almacenamiento local utilizado para guardar la sesión del usuario y el token de autenticación en el dispositivo o navegador.|
+|  `@capacitor/geolocation` | Plugin de Capacitor (en SIPPREM-AppPatrullero) que obtiene las coordenadas GPS en vivo del dispositivo móvil durante el patrullaje.|
+
+Existen otros modulos de capacitor, pero en esta tabla se colocaron las principales utilizadas.
+
+## API Externa utilizada
+
+En este sistema se decidió utilizar el servicio de mapas de OpenStreetMap para poder trabajar con las ubicaciones. Se necesitaba gestionar las zonas de los proyectos y de los patrullajes, y para hacerlo se muestra el mapa de OpenStreetMap con la librería de Leaflet. Además, es útil tanto en el gestor del sistema (para delimitar las zonas y mostrar en vivo la ubicación de los patrulleros en patrullaje) como en la aplicación móvil del patrullero (para ver el área asignada y guiarse durante su ronda). Se justifica esta API debido a que el problema al que responde necesita una mejor gestión de las localizaciones que se tratan en el proceso de patrullajes, por lo que consideramos que era la forma más adecuada de solventar aquello, dando una solución que sigue consistencia y estándares en UI/UX.
+
+Para conectar este servicio sin dejar direcciones fijas escritas en el código, la dirección desde donde se cargan las imágenes del mapa (`https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`) se configura mediante la variable de entorno `VITE_MAP_TILE_URL` en el archivo `.env` de cada aplicación frontend. Al iniciar la aplicación, el sistema verifica que esta variable esté presente y bien configurada antes de ejecutarse.
+
+Además, los mapas cuentan con manejo de errores: si falla la conexión a internet o el servicio de OpenStreetMap presenta algún problema al cargar el mapa, la aplicación detecta el fallo y muestra un aviso en pantalla indicando que no se pudo cargar el mapa base, pero sin bloquear la vista. De esta manera, el usuario puede seguir viendo las zonas dibujadas y la ubicación de los patrulleros en todo momento, y cuando la conexión vuelve a funcionar, el aviso desaparece automáticamente.
 
 ## Como clonar el repositorio (EP1)
 
@@ -750,6 +764,12 @@ npm install
 Si no tiene instalado Ionic, entonces debe ejecutar:
 ```
 npm install -g @ionic/cli
+```
+
+Antes de ejecutar la aplicación, debemos crear un archivo llamado `.env` dentro de la carpeta del proyecto (`SIPPREM-Gestor` o `SIPPREM-AppPatrullero`), guiándonos por el archivo `.env.prueba` incluido en la carpeta. En este archivo `.env` se deben definir las siguientes variables con la dirección del backend y la del servicio de mapas:
+```env
+VITE_BACKEND_URL=http://localhost:3000
+VITE_MAP_TILE_URL=https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
 ```
 
 Tras todo esto, podremos ejecutar el proyecto con un servidor de desarrollo usando:
