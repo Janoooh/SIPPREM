@@ -738,6 +738,7 @@ La arquitectura de navegación se definió considerando criterios de usabilidad,
 |  `leaflet`     | Biblioteca motor para la renderización, manipulación e interacción con mapas interactivos de código abierto.|
 |  `react-leaflet` | Wrapper de React que expone los elementos de Leaflet como componentes declarativos.|
 |  `axios` | Cliente HTTP utilizado para realizar las peticiones a la API REST del backend y gestionar el envío automático del token JWT.|
+|  `socket.io-client` | Cliente de comunicación en tiempo real utilizado para transmitir la ubicación GPS de los patrulleros y las alertas del botón de pánico.|
 |  `@capacitor/preferences` | Almacenamiento local utilizado para guardar la sesión del usuario y el token de autenticación en el dispositivo o navegador.|
 |  `@capacitor/geolocation` | Plugin de Capacitor (en SIPPREM-AppPatrullero) que obtiene las coordenadas GPS en vivo del dispositivo móvil durante el patrullaje.|
 
