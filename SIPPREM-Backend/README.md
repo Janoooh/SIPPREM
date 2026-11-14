@@ -1794,7 +1794,7 @@ Casos de error:
 
 ## 3. Obtener mis patrullajes asignados.
 
-Permite a un patrullero autenticado consultar todos los patrullajes a los que ha sido asignado a lo largo de los diferentes proyectos, detallando el estado, el horario planificado y la zona delimitada.
+Permite a un patrullero autenticado consultar todos los patrullajes a los que ha sido asignado a lo largo de los diferentes proyectos, detallando el estado, el horario planificado, la zona delimitada y el vehículo utilizado en su ejecución (`id_vehiculo`).
 
 Método: GET
 Ruta: /api/v1/usuarios/me/patrullajes
@@ -1827,7 +1827,8 @@ Respuestas esperadas:
                     ]
                 ]
             },
-            "estado": "Finalizado"
+            "estado": "Finalizado",
+            "id_vehiculo": "VEH-001"
         }
     ]
 }
