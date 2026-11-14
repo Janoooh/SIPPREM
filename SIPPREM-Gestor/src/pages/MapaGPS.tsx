@@ -24,7 +24,7 @@ import {
 } from 'ionicons/icons';
 import { useLocation, useParams } from 'react-router-dom';
 import L from 'leaflet';
-import { MapContainer, TileLayer, Polygon, CircleMarker, Tooltip, useMap } from 'react-leaflet';
+import { MapContainer, Polygon, CircleMarker, Tooltip, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import HeaderSistema from '../components/HeaderSistema';
 import MenuLateralProyecto from '../components/MenuLateralProyecto';
@@ -34,7 +34,8 @@ import { proyectoPatrullaje } from '../interfaces/proyectoPatrullaje';
 import { proyectosService } from '../services/proyectosService';
 import { patrullajesService, PatrullajeProyecto } from '../services/patrullajesService';
 import { useSocketGlobal } from '../context/socketContext';
-import { MAP_TILE_URL } from '../config/env';
+import { CapaTilesMapa } from '../components/CapaTilesMapa';
+import { AvisoErrorMapa } from '../components/AvisoErrorMapa';
 import './MapaGPS.css';
 
 const CENTRO_FALLBACK_CHILE: PuntoMapa = [-33.4489, -70.6693];
@@ -129,6 +130,7 @@ const MapaGPS: React.FC = () => {
   const [patrullajes, setPatrullajes] = useState<PatrullajeProyecto[]>([]);
   const [cargando, setCargando] = useState<boolean>(true);
   const [rutSeleccionado, setRutSeleccionado] = useState<string | null>(null);
+  const [errorMapaBase, setErrorMapaBase] = useState<boolean>(false);
   const alertaEnfocadaRef = useRef<string | null>(null);
 
   // Carga el proyecto (para su zona base) y los patrullajes (para dibujar sectores "En curso")
@@ -362,10 +364,7 @@ const MapaGPS: React.FC = () => {
                           claveProyecto={`${id_proyecto}-${zonasEnCurso.length > 0 ? 'en-curso' : 'base'}`}
                         />
 
-                        <TileLayer
-                          url={MAP_TILE_URL}
-                          attribution="&copy; OpenStreetMap contributors"
-                        />
+                        <CapaTilesMapa onErrorChange={setErrorMapaBase} />
 
                         {/* Polígono general del proyecto como referencia sutil */}
                         {puntosZonaProyecto.length >= 3 && (
@@ -452,6 +451,8 @@ const MapaGPS: React.FC = () => {
                           );
                         })}
                       </MapContainer>
+
+                      {errorMapaBase && <AvisoErrorMapa />}
 
                       {listaPatrullerosActivos.length === 0 && (
                         <div className="mapa-sin-senales-badge">

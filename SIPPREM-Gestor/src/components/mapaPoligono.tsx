@@ -3,7 +3,6 @@ import { IonButton, IonIcon, IonText } from '@ionic/react';
 import { arrowUndoOutline } from 'ionicons/icons';
 import {
   MapContainer,
-  TileLayer,
   Polygon,
   Polyline,
   CircleMarker,
@@ -11,7 +10,8 @@ import {
   useMapEvents
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { MAP_TILE_URL } from '../config/env';
+import { CapaTilesMapa } from './CapaTilesMapa';
+import { AvisoErrorMapa } from './AvisoErrorMapa';
 import './mapaPoligono.css';
 
 // Tipo que representa una coordenada geográfica [latitud, longitud]
@@ -144,6 +144,7 @@ const MapaPoligono: React.FC<MapaPoligonoProps> = ({
 }) => {
   // Estado interno de la lista de puntos (se sincroniza si el padre pasa la prop `puntos`)
   const [listaPuntos, setListaPuntos] = useState<PuntoMapa[]>(puntos || []);
+  const [errorMapaBase, setErrorMapaBase] = useState(false);
 
   useEffect(() => {
     if (puntos !== undefined) {
@@ -195,10 +196,7 @@ const MapaPoligono: React.FC<MapaPoligonoProps> = ({
             <MapResizer puntosCentrar={puntosParaCentrar} />
             <CapturadorClicksMapa onAgregarPunto={handleAgregarPunto} soloLectura={soloLectura} />
 
-            <TileLayer
-              url={MAP_TILE_URL}
-              attribution="&copy; OpenStreetMap contributors"
-            />
+            <CapaTilesMapa onErrorChange={setErrorMapaBase} />
 
             {/* Polígono de referencia (ej. zona delimitada del proyecto) para guiar al usuario */}
             {puntosReferencia && puntosReferencia.length >= 3 && (
@@ -254,6 +252,7 @@ const MapaPoligono: React.FC<MapaPoligonoProps> = ({
               />
             )}
           </MapContainer>
+          {errorMapaBase && <AvisoErrorMapa />}
         </div>
 
         {/* Botón al lado del mapa con flecha tipo volver para deshacer el último punto */}

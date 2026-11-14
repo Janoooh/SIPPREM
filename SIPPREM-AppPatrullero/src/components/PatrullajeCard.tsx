@@ -6,10 +6,11 @@ import {
   useIonRouter
 } from '@ionic/react';
 import L from 'leaflet';
-import { MapContainer, TileLayer, Polygon, useMap } from 'react-leaflet';
+import { MapContainer, Polygon, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { PatrullajeUsuario } from '../interfaces/patrullajeUsuario';
-import { MAP_TILE_URL } from '../config/env';
+import { CapaTilesMapa } from './CapaTilesMapa';
+import { AvisoErrorMapa } from './AvisoErrorMapa';
 import './PatrullajeCard.css';
 
 const QUINCE_MINUTOS_MS = 15 * 60 * 1000;
@@ -110,6 +111,7 @@ interface PatrullajeCardProps {
 const PatrullajeCard: React.FC<PatrullajeCardProps> = ({ patrullaje }) => {
   const router = useIonRouter();
   const [ahoraMs, setAhoraMs] = useState<number>(() => Date.now());
+  const [errorMapaBase, setErrorMapaBase] = useState<boolean>(false);
 
   const puntosZona = useMemo(
     () => convertirGeoJSONAPuntos(patrullaje.zona),
@@ -166,6 +168,7 @@ const PatrullajeCard: React.FC<PatrullajeCardProps> = ({ patrullaje }) => {
       <IonCardContent className="card-content-flex">
         <div className="mapa-container">
           {puntosZona.length >= 3 ? (
+            <>
             <MapContainer
               center={puntosZona[0]}
               zoom={15}
@@ -180,10 +183,7 @@ const PatrullajeCard: React.FC<PatrullajeCardProps> = ({ patrullaje }) => {
               keyboard={false}
             >
               <AjustadorMapa puntos={puntosZona} />
-              <TileLayer
-                url={MAP_TILE_URL}
-                attribution="&copy; OpenStreetMap contributors"
-              />
+              <CapaTilesMapa onErrorChange={setErrorMapaBase} />
               <Polygon
                 positions={puntosZona}
                 interactive={false}
@@ -195,6 +195,8 @@ const PatrullajeCard: React.FC<PatrullajeCardProps> = ({ patrullaje }) => {
                 }}
               />
             </MapContainer>
+            {errorMapaBase && <AvisoErrorMapa compacto />}
+            </>
           ) : (
             <div className="mapa-sin-zona">Sin zona</div>
           )}

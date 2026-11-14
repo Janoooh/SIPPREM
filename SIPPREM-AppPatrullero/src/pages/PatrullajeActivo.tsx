@@ -12,7 +12,7 @@ import {
 import { Capacitor } from '@capacitor/core';
 import { Haptics, NotificationType } from '@capacitor/haptics';
 import { useParams, useLocation } from 'react-router-dom';
-import { MapContainer, TileLayer, Polygon, CircleMarker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, Polygon, CircleMarker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import BarraNavInferior from '../components/barraNavInferior';
 import {
@@ -29,7 +29,8 @@ import {
   notificarCambioEstadoPatrullaje,
   useSeguimientoGlobal
 } from '../context/seguimientoContext';
-import { MAP_TILE_URL } from '../config/env';
+import { CapaTilesMapa } from '../components/CapaTilesMapa';
+import { AvisoErrorMapa } from '../components/AvisoErrorMapa';
 import './PatrullajeActivo.css';
 
 const DURACION_HOLD_PANICO_MS = 5000;
@@ -75,6 +76,7 @@ const PatrullajeActivo: React.FC = () => {
   const [patrullaje, setPatrullaje] = useState<PatrullajeUsuario | null>(patrullajeGlobal);
   const [cargando, setCargando] = useState<boolean>(!patrullajeGlobal);
   const [finalizando, setFinalizando] = useState<boolean>(false);
+  const [errorMapaBase, setErrorMapaBase] = useState<boolean>(false);
 
   const mandarAlertaRef = useRef(mandarAlerta);
   const mandarToastRef = useRef(mandarToast);
@@ -315,7 +317,8 @@ const PatrullajeActivo: React.FC = () => {
                 <IonSpinner name="crescent" color="light" />
               </div>
             ) : centroInicialMapa ? (
-              <MapContainer
+              <>
+                <MapContainer
                 center={centroInicialMapa}
                 zoom={15}
                 className="activo-mapa-leaflet"
@@ -326,10 +329,7 @@ const PatrullajeActivo: React.FC = () => {
                   <CentradorInicialUbicacion punto={centroInicialMapa} tieneZona={false} />
                 )}
 
-                <TileLayer
-                  url={MAP_TILE_URL}
-                  attribution="&copy; OpenStreetMap contributors"
-                />
+                <CapaTilesMapa onErrorChange={setErrorMapaBase} />
 
                 {puntosZona.length >= 3 && (
                   <Polygon
@@ -373,6 +373,8 @@ const PatrullajeActivo: React.FC = () => {
                   </>
                 )}
               </MapContainer>
+              {errorMapaBase && <AvisoErrorMapa />}
+              </>
             ) : (
               <div className="activo-mapa-estado">
                 <span>Zona de patrullaje no disponible</span>
