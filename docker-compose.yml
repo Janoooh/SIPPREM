@@ -1,18 +1,24 @@
-# Docker Compose: Archivo de configuración para levantar los servicios de la aplicación SIPPREM (Base de datos, Backend y Frontend)
+# Docker Compose: Archivo de configuración para levantar los 4 servicios de la aplicación SIPPREM.
 services:
-  #  1er SERVICIO: BASE DE DATOS (PostgreSQL + PostGIS)
+  #  1er SERVICIO: BASE DE DATOS (PostgreSQL + PostGIS: Manejo de geolocalización y mapas)
   database:
     image: postgis/postgis:15-3.4-alpine
     container_name: sipprem_db
-    environment:
-    # Si el usuario no tiene un archivo .env, Docker ocupa los valores de prueba (después del :-)
+    environment: 
+    # Cuando contenedor se ejecuta
+    # Variables de entorno con valores por defecto (después del :-). Cuando contenedor se ejecuta.
+    # Permite ejecutar el proyecto sin disponer de un archivo .env y sin necesidad de compartir credenciales privadas.
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       POSTGRES_DB: ${DB_NAME:-sipprem_db}
     ports:
+    # Puerto de acceso: Base de datos disponible localmente en el puerto 5432.
       - "5432:5432"
     volumes:
+    # Volumenes: Archivos independientes fuera del contenedor.
+      # Guarda los datos en un volumen persistente (postgres_data_final) para que no se pierdan al reiniciar el contenedor.
       - postgres_data_final:/var/lib/postgresql/data
+      # Inicializa la base de datos con un script SQL al iniciar el contenedor por primera vez.
       - ./SIPPREM-Backend/database/schema.sql:/docker-entrypoint-initdb.d/init.sql
 
   # 2do SERVICIO: BACKEND (Node.js + Express)
@@ -22,12 +28,15 @@ services:
       dockerfile: Dockerfile
     container_name: sipprem_backend
     volumes:
+    # Volumenes: Sincroniza archivos locales con los del contenedor.
       - ./SIPPREM-Backend:/app
       - /app/node_modules
     ports:
+    # Puerto de acceso: Backend disponible localmente en el puerto 3000. http://localhost:3000
       - "3000:3000"
-    environment:
-    # Variables de entorno con valores por defecto para una evaluación segura
+    environment: 
+    # Variables de entorno con valores por defecto (después del :-). Cuando contenedor se ejecuta.
+    # Permite ejecutar el proyecto sin disponer de un archivo .env y sin necesidad de compartir credenciales privadas.
       - BACKEND_PORT=${BACKEND_PORT:-3000}
       - JWT_SECRET=${JWT_SECRET:-clave_secreta_para_evaluacion_123}
       - DB_USER=${DB_USER:-postgres}
@@ -36,20 +45,40 @@ services:
       - DB_PORT=${DB_PORT:-5432}
       - DB_NAME=${DB_NAME:-sipprem_db}
       - DATABASE_URL=postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@database:5432/${DB_NAME:-sipprem_db}?schema=public
-      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:8080,http://localhost:5173}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:8080,http://localhost:5173,http://localhost:8100}
     depends_on:
+    # Contenedor no se iniciará hasta que la base de datos esté lista. 
       - database
+  
+  # PARTE FRONTEND
 
-  # 3er SERVICIO: FRONTEND (React)
+  # 3er SERVICIO: PANEL GESTOR (Página Central Web / React + Vite)
   frontend:
     build:
       context: ./SIPPREM-Gestor
       dockerfile: Dockerfile
     container_name: sipprem_frontend
-    ports:
+    ports:  
+    # Puerto de acceso: Frontend disponible localmente en el puerto 8080. http://localhost:8080
       - "8080:80"
     depends_on:
+    # Contenedor no se iniciará hasta que el backend esté listo.
       - backend
 
+# 4to SERVICIO: APP PATRULLERO (Simulador Web Móvil / Ionic + Vite)
+  app_patrullero:
+    build:
+      context: ./SIPPREM-AppPatrullero
+      dockerfile: Dockerfile
+      args:
+      # Argumentos de construcción: Cuando se construye la imagen, antes de ejecutar el contenedor.
+        - VITE_BACKEND_URL=${VITE_BACKEND_URL:-http://localhost:3000}
+    container_name: sipprem_app_patrullero
+    ports:
+    # Puerto de acceso: App Patrullero disponible localmente en el puerto 8100. http://localhost:8100
+      - "8100:80" 
+    depends_on:
+      - backend
 volumes:
+# Declaración de volumen persistente para la base de datos PostgreSQL/PostGIS.
   postgres_data_final:
