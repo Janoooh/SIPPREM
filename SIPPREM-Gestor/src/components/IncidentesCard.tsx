@@ -3,6 +3,7 @@ import { IonIcon } from '@ionic/react';
 import {
   alertCircleOutline,
   calendarOutline,
+  eyeOutline,
   locateOutline,
   personOutline,
   shieldCheckmarkOutline
@@ -84,9 +85,10 @@ const AjustadorPuntoMapa: React.FC<{ punto: [number, number] }> = ({ punto }) =>
 
 export interface IncidentesCardProps {
   incidente: IncidenteProyecto;
+  onVerDetalle?: (incidente: IncidenteProyecto) => void;
 }
 
-const IncidentesCard: React.FC<IncidentesCardProps> = ({ incidente }) => {
+const IncidentesCard: React.FC<IncidentesCardProps> = ({ incidente, onVerDetalle }) => {
   const [errorMapaBase, setErrorMapaBase] = useState<boolean>(false);
 
   const coordenadas = useMemo(
@@ -190,6 +192,18 @@ const IncidentesCard: React.FC<IncidentesCardProps> = ({ incidente }) => {
           )}
         </div>
       </div>
+      {onVerDetalle && (
+        <div className="incidente-card-footer">
+          <button
+            type="button"
+            className="btn-ver-detalle-incidente"
+            onClick={() => onVerDetalle(incidente)}
+          >
+            <IonIcon icon={eyeOutline} />
+            <span>Ver detalle y fotografías</span>
+          </button>
+        </div>
+      )}
     </article>
   );
 };

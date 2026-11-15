@@ -14,10 +14,15 @@ export interface IncidenteProyecto {
   nivel_gravedad: number;
   id_patrullaje: number;
   categoria: string;
-  // Campos opcionales para cuando el backend incluya al patrullero en obtenerIncidentes
+  // Campos opcionales cuando el backend incluya al patrullero
   rut?: string;
   rut_patrullero?: string;
   nombre_patrullero?: string;
+}
+
+export interface DetalleIncidenteRespuesta {
+  incidente: IncidenteProyecto;
+  fotos: string[];
 }
 
 export const incidentesService = {
@@ -36,5 +41,19 @@ export const incidentesService = {
       }
       throw error;
     }
+  },
+
+  /**
+   * Obtiene el detalle completo de un incidente específico junto con sus fotografías en Base64.
+   * Endpoint: GET /api/v1/proyectos/:id_proyecto/incidentes/:id_incidente
+   */
+  obtenerIncidentePorId: async (
+    id_proyecto: string | number,
+    id_incidente: string | number
+  ): Promise<DetalleIncidenteRespuesta> => {
+    const response = await apiClient.get(
+      `/proyectos/${id_proyecto}/incidentes/${id_incidente}`
+    );
+    return response.data?.data;
   }
 };

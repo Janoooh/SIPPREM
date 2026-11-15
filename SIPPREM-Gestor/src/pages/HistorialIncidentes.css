@@ -34,6 +34,61 @@
   margin: 4px 0 0 0;
 }
 
+.historial-topbar-derecha {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.grupo-filtro-fecha {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.etiqueta-filtro-fecha {
+  color: #cbd5e1;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.input-filtro-fecha {
+  background-color: #1e293b;
+  color: #f8fafc;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.86rem;
+  font-weight: 600;
+  outline: none;
+  color-scheme: dark;
+}
+
+.input-filtro-fecha:focus {
+  border-color: #93c5fd;
+}
+
+.btn-limpiar-fecha {
+  background-color: #334155;
+  color: #e2e8f0;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.btn-limpiar-fecha:hover {
+  background-color: #475569;
+}
+
 .historial-contador-texto {
   color: #e2e8f0;
   font-family: 'Montserrat', sans-serif;

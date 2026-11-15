@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   IonCol,
   IonContent,
@@ -9,6 +9,7 @@ import {
   IonRow,
   IonSpinner,
   useIonAlert,
+  useIonRouter,
   useIonViewWillEnter
 } from '@ionic/react';
 import { useParams } from 'react-router-dom';
@@ -20,14 +21,30 @@ import { useUsuario } from '../hooks/obtenerUsuario';
 import { IncidenteProyecto, incidentesService } from '../services/incidentesService';
 import './HistorialIncidentes.css';
 
+// Obtiene la fecha en formato YYYY-MM-DD (hora local) para compararla con el input type="date"
+const obtenerFechaLocalYYYYMMDD = (fechaIso: string): string => {
+  if (!fechaIso) return '';
+  const fecha = new Date(fechaIso);
+  if (Number.isNaN(fecha.getTime())) {
+    return String(fechaIso).slice(0, 10);
+  }
+  const anio = fecha.getFullYear();
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  return `${anio}-${mes}-${dia}`;
+};
+
 const HistorialIncidentes: React.FC = () => {
   const { usuario } = useUsuario();
   const rol = usuario.tipo_rol;
+  const rolRuta = (rol || 'supervisor').toLowerCase();
   const { id_proyecto } = useParams<{ id_proyecto: string }>();
+  const router = useIonRouter();
   const [mandarAlerta] = useIonAlert();
 
   const [incidentes, setIncidentes] = useState<IncidenteProyecto[]>([]);
   const [cargando, setCargando] = useState<boolean>(true);
+  const [fechaFiltro, setFechaFiltro] = useState<string>('');
 
   const cargarIncidentes = useCallback(async () => {
     if (!id_proyecto) return;
@@ -55,6 +72,13 @@ const HistorialIncidentes: React.FC = () => {
     void cargarIncidentes();
   });
 
+  const incidentesFiltrados = useMemo(() => {
+    if (!fechaFiltro) return incidentes;
+    return incidentes.filter(
+      (incidente) => obtenerFechaLocalYYYYMMDD(incidente.fecha_hora) === fechaFiltro
+    );
+  }, [incidentes, fechaFiltro]);
+
   return (
     <IonPage>
       <IonHeader className="ion-no-border">
@@ -73,7 +97,7 @@ const HistorialIncidentes: React.FC = () => {
             </IonCol>
 
             <IonCol size="12" sizeMd="9" className="historial-incidentes-col">
-              {/* Cabecera superior */}
+              {/* Cabecera superior con filtro por fecha y contador en texto simple */}
               <div className="historial-topbar">
                 <div>
                   <IonLabel className="historial-titulo">Historial de incidentes</IonLabel>
@@ -82,12 +106,36 @@ const HistorialIncidentes: React.FC = () => {
                   </p>
                 </div>
 
-                <span className="historial-contador-texto">
-                  Total: {incidentes.length}{' '}
-                  {incidentes.length === 1
-                    ? 'incidente registrado'
-                    : 'incidentes registrados'}
-                </span>
+                <div className="historial-topbar-derecha">
+                  <div className="grupo-filtro-fecha">
+                    <label htmlFor="input-filtro-fecha" className="etiqueta-filtro-fecha">
+                      Filtrar por fecha:
+                    </label>
+                    <input
+                      id="input-filtro-fecha"
+                      type="date"
+                      className="input-filtro-fecha"
+                      value={fechaFiltro}
+                      onChange={(e) => setFechaFiltro(e.target.value)}
+                    />
+                    {fechaFiltro && (
+                      <button
+                        type="button"
+                        className="btn-limpiar-fecha"
+                        onClick={() => setFechaFiltro('')}
+                      >
+                        Ver todos
+                      </button>
+                    )}
+                  </div>
+
+                  <span className="historial-contador-texto">
+                    Total: {incidentesFiltrados.length}{' '}
+                    {incidentesFiltrados.length === 1
+                      ? 'incidente registrado'
+                      : 'incidentes registrados'}
+                  </span>
+                </div>
               </div>
 
               {/* Contenido principal: lista de tarjetas IncidentesCard */}
@@ -96,16 +144,26 @@ const HistorialIncidentes: React.FC = () => {
                   <IonSpinner name="crescent" color="light" />
                   <span>Cargando incidentes del proyecto...</span>
                 </div>
-              ) : incidentes.length === 0 ? (
+              ) : incidentesFiltrados.length === 0 ? (
                 <div className="historial-vacio-box">
-                  <span>Aún no se han reportado incidentes en este proyecto.</span>
+                  <span>
+                    {fechaFiltro
+                      ? 'No hay incidentes registrados en la fecha seleccionada.'
+                      : 'Aún no se han reportado incidentes en este proyecto.'}
+                  </span>
                 </div>
               ) : (
                 <div className="lista-incidentes-cards">
-                  {incidentes.map((incidente) => (
+                  {incidentesFiltrados.map((incidente) => (
                     <IncidentesCard
                       key={incidente.id_incidente}
                       incidente={incidente}
+                      onVerDetalle={(item) =>
+                        router.push(
+                          `/${rolRuta}/proyecto/${id_proyecto}/historial/${item.id_incidente}`,
+                          'forward'
+                        )
+                      }
                     />
                   ))}
                 </div>

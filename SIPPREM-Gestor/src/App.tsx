@@ -24,6 +24,7 @@ import AgregarArticulo from './pages/AgregarArticulo';
 import Personal from './pages/Personal';
 import MapaGPS from './pages/MapaGPS';
 import HistorialIncidentes from './pages/HistorialIncidentes';
+import DetalleIncidente from './pages/DetalleIncidente';
 import { SocketProvider } from './context/SocketProvider';
 
 /* Core CSS required for Ionic components to work properly */
@@ -198,6 +199,12 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
+          <Route path="/admin/proyecto/:id_proyecto/historial/:id_incidente" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+              <DetalleIncidente />
+            </RutaProtegida>
+          } />
+
           {/*Rutas de supervisor*/}
 
           <Route path="/supervisor/inicio" element={
@@ -276,6 +283,12 @@ const App: React.FC = () => {
           <Route path="/supervisor/proyecto/:id_proyecto/historial" element={
             <RutaProtegida rolesPermitidos={["supervisor"]}>
               <HistorialIncidentes />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/historial/:id_incidente" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+              <DetalleIncidente />
             </RutaProtegida>
           } />
 
