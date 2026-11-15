@@ -132,7 +132,8 @@ export const obtenerPatrullajesDeUsuario = async (id_user: string): Promise<resp
                     WHEN ep.hora_real_termino IS NOT NULL THEN 'Finalizado'
                     WHEN ep.hora_real_inicio IS NOT NULL THEN 'En curso'
                     ELSE 'Planificado'
-                END AS estado
+                END AS estado,
+                ep.id_vehiculo
         FROM realizacion_patrullaje rp
         INNER JOIN planificacion_patrullaje pp USING (id_patrullaje)
         LEFT JOIN ejecucion_patrullaje ep USING (id_patrullaje)

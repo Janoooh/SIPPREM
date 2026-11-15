@@ -241,7 +241,9 @@ export const iniciarPatrullaje = async (datosInicio: tipoIniciarPatrullaje): Pro
     const queryVerificarEstado = `
         SELECT 
             p.id_patrullaje,
-            e.id_patrullaje AS id_ejecucion
+            e.id_patrullaje AS id_ejecucion,
+            (CURRENT_TIMESTAMP < p.hora_inicio - INTERVAL '15 minutes') AS demasiado_temprano,
+            (CURRENT_TIMESTAMP > p.hora_termino) AS horario_expirado
         FROM planificacion_patrullaje p
         LEFT JOIN ejecucion_patrullaje e ON p.id_patrullaje = e.id_patrullaje
         WHERE p.id_patrullaje = $1 AND p.id_proyecto = $2;
@@ -279,6 +281,23 @@ export const iniciarPatrullaje = async (datosInicio: tipoIniciarPatrullaje): Pro
             exito: false,
             codHTTP: 403,
             explicacion: "No tienes permiso para iniciar este patrullaje porque no estás asignado a él.",
+            datos: null
+        };
+    }
+
+    if (resVerificar.rows[0].demasiado_temprano) {
+        return {
+            exito: false,
+            codHTTP: 409,
+            explicacion: "Solo puedes iniciar el patrullaje cuando falten 15 minutos o menos para la hora de inicio planificada.",
+            datos: null
+        };
+    }
+    if (resVerificar.rows[0].horario_expirado) {
+        return {
+            exito: false,
+            codHTTP: 409,
+            explicacion: "No se puede iniciar el patrullaje porque su horario planificado ya finalizó.",
             datos: null
         };
     }

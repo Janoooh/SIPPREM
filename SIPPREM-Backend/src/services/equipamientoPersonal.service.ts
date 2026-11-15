@@ -3,19 +3,6 @@ import type { respuestaServices } from "../interfaces/respuestaServices.js";
 
 // Funcion que hace la consulta a la base de datos para mostrar los equipamientos personales de un proyecto
 export const mostrarEquipamientosPersonales= async (id_proyecto : number): Promise <respuestaServices> =>{
-    // Valida que el proyecto exista
-    const queryProyecto = `select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado = false;`;
-    const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
-    
-    if (proyecto.rows.length === 0){
-        return{
-            exito: false, 
-            codHTTP: 404,
-            explicacion : "Ese proyecto no existe.",
-            datos : null
-        };
-    }
-
     //SE hace la consulta a la base de datos para que muestre todos los equipamientos personales en el proyecto
     const query = `
                     select id_item, talla, tipo_eq_personal
@@ -47,19 +34,6 @@ export const mostrarEquipamientosPersonales= async (id_proyecto : number): Promi
 
 // Funcion para consultar un equipamiento personal
 export const mostrarUNequipamientoPersonal = async (id_item: string, id_proyecto: number): Promise<respuestaServices> => {
-        // Valida que el proyecto exista
-    const queryProyecto = `select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado = false;`;
-    const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
-    
-    if (proyecto.rows.length === 0){
-        return{
-            exito: false, 
-            codHTTP: 404,
-            explicacion : "Ese proyecto no existe.",
-            datos : null
-        };
-    }
-
     //Query para que muestre el registro con el id dado dentro del proyecto indicado
     const query = `
         select id_item,tipo_eq_personal, talla
@@ -91,19 +65,6 @@ export const mostrarUNequipamientoPersonal = async (id_item: string, id_proyecto
 
 // Agrega un equipamiento personal a la base de datos
 export const agregarEquipamientoPersonal = async (id_item: string, id_proyecto: number, id_tipo: number, talla : string): Promise <respuestaServices> =>{
-    //Verifica que el proyecto exista
-    const queryProyecto =`select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado= false;`;
-    const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
-    
-    if (proyecto.rows.length === 0){
-        return{
-            exito: false, 
-            codHTTP: 404,
-            explicacion : "Ese proyecto no existe.",
-            datos : null
-        };
-    }
-
     //Verifica que el equipamiento personal exista
     const queryTipoEqPersonal = `select id_tipo_eq_personal from tipo_equipamiento_personal where id_tipo_eq_personal = $1;`
     const vehiculo = await poolDb.query(queryTipoEqPersonal, [id_tipo]);
@@ -112,7 +73,7 @@ export const agregarEquipamientoPersonal = async (id_item: string, id_proyecto: 
         return{
             exito: false, 
             codHTTP: 404,
-            explicacion : "Ese tipo de equipamiento vehicular no existe.",
+            explicacion : "Ese tipo de equipamiento personal no existe.",
             datos : null
         };
     }
@@ -148,19 +109,6 @@ export const agregarEquipamientoPersonal = async (id_item: string, id_proyecto: 
 
 // Funcion para actualizar un equipamiento personal usando COALESCE
 export const actualizarEquipamientoPersonal = async (id_item: string, id_tipo: number | null, talla: string | null, id_proyecto:number): Promise<respuestaServices> => {
-    //Se valida que exista el proyecto en la base de datos
-    const queryProyecto = `select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado = false;`;
-    const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
-    
-    if (proyecto.rows.length === 0) {
-        return {
-            exito: false,
-            codHTTP: 404,
-            explicacion: "El proyecto no existe.",
-            datos: null
-        };
-    }
-
     //Se valida el tipo de equipamiento personal
     if (id_tipo !== null) {
         const queryTipo = `select id_tipo_eq_personal from tipo_equipamiento_personal where id_tipo_eq_personal = $1;`;

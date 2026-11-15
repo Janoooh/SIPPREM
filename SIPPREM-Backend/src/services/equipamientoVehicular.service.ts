@@ -3,19 +3,6 @@ import type { respuestaServices } from "../interfaces/respuestaServices.js";
 
 // Consulta a la base de datos por los equipamientos vehiculares dado un proyecto
 export const mostrarEquipamientosVehiculares= async (id_proyecto: number): Promise <respuestaServices> =>{
-    //Verifica que el proyecto dado exista en la base de datos
-    const queryProyecto = `select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado = false;`;
-    const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
-    
-    if (proyecto.rows.length === 0){
-        return{
-            exito: false, 
-            codHTTP: 404,
-            explicacion : "Ese proyecto no existe.",
-            datos : null
-        };
-    }
-
     //Query para mostrar los equipamientos vehiculares relacionados a un proyecto
     const query = `
                     select id_item, tipo_eq_vehicular, id_vehiculo
@@ -47,19 +34,6 @@ export const mostrarEquipamientosVehiculares= async (id_proyecto: number): Promi
 
 // Consulta a la base de datos para mostrar un único equipamiento vehicular dado su ID
 export const mostrarUNequipamientoVehicular = async (id_item: string, id_proyecto : number): Promise<respuestaServices> => {
-     //Verifica que el proyecto dado exista en la base de datos
-    const queryProyecto = `select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado = false;`;
-    const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
-    
-    if (proyecto.rows.length === 0){
-        return{
-            exito: false, 
-            codHTTP: 404,
-            explicacion : "Ese proyecto no existe.",
-            datos : null
-        };
-    }
-
     //Query para mostrar el registro de un equipamiento vehicular en el proyecto
     const query = `
         select id_item, tipo_eq_vehicular
@@ -91,19 +65,6 @@ export const mostrarUNequipamientoVehicular = async (id_item: string, id_proyect
 
 // agregar un equipamiento vehicular a la base de datos
 export const agregarEquipamientoVehicular = async (id_item: string, id_proyecto: number, id_tipo : number, id_vehiculo :string): Promise <respuestaServices> =>{
-    //Se verifica que el proyecto exista
-    const queryProyecto =`select * from proyecto_patrullaje where id_proyecto = $1 and eliminado= false;`;
-    const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
-    
-    if (proyecto.rows.length === 0){
-        return{
-            exito: false, 
-            codHTTP: 404,
-            explicacion : "Ese proyecto no existe.",
-            datos : null
-        };
-    }
-
     //Se verifica que el tipo de equipamiento exista
     const queryTipoEqVehicular = `select * from tipo_equipamiento_vehicular where id_tipo_eq_vehicular = $1;`
     const vehiculo = await poolDb.query(queryTipoEqVehicular, [id_tipo]);
@@ -150,19 +111,6 @@ export const agregarEquipamientoVehicular = async (id_item: string, id_proyecto:
 
 // Actualiza un equipamiento vehicular usando COALESCE
 export const actualizarEquipamientoVehicular = async (id_item: string, id_tipo: number | null, id_proyecto: number): Promise<respuestaServices> => {
-    //Se valida que exista el proyecto en la base de datos
-    const queryProyecto = `select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado = false;`;
-    const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
-    
-    if (proyecto.rows.length === 0) {
-        return {
-            exito: false,
-            codHTTP: 404,
-            explicacion: "El proyecto no existe.",
-            datos: null
-        };
-    }
-
     //Se valida el tipo de equipamiento vehicular
     if (id_tipo !== null) {
         const queryTipo = `select * from tipo_equipamiento_vehicular where id_tipo_eq_vehicular = $1;`;

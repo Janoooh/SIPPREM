@@ -1,4 +1,51 @@
-# Requisitos Previos
+## Indice
+
+1. [Decisiones de diseño](#decisiones-de-diseño)
+    - [Aclaraciones sobre la optimización aplicada a la base de datos](#aclaraciones-sobre-la-optimización-aplicada-a-la-base-de-datos)
+2. [Instalación](#instalación)
+    - [Requisitos Previos](#requisitos-previos)
+    - [Clonar el repositorio](#clonar-el-repositorio)
+    - [Backend (Servidor y API REST)](#backend-servidor-y-api-rest)
+    - [Cómo crear la base de datos](#cómo-crear-la-base-de-datos)
+    - [Configuracion del .env](#configuracion-del-env)
+3. [Pruebas de Endpoints (Postman)](#pruebas-de-endpoints-postman)
+    - [Módulo de proyectos](#módulo-de-proyectos)
+    - [Módulo de incidentes](#módulo-de-incidentes)
+    - [Módulo de vehículos](#módulo-de-vehículos)
+    - [Módulo de Equipamiento Personal](#módulo-de-equipamiento-personal)
+    - [Módulo de equipamiento vehicular](#módulo-de-equipamiento-vehicular)
+    - [Submodulo - Tipos](#submodulo---tipos)
+        - [Submodulo tipos de vehiculos](#submodulo-tipos-de-vehiculos)
+        - [Submodulo tipos de equipamientos personales](#submodulo-tipos-de-equipamientos-personales)
+        - [Submodulo tipos de equipamientos vehiculares](#submodulo-tipos-de-equipamientos-vehiculares)
+    - [Módulo de actividades](#módulo-de-actividades)
+    - [Módulo de trabajadores](#módulo-de-trabajadores)
+    - [Módulo de Auth](#módulo-de-auth)
+    - [Módulo de patrullajes](#módulo-de-patrullajes)
+    - [Módulo de Usuarios](#módulo-de-usuarios)
+
+# Decisiones de diseño
+
+## Aclaraciones sobre la optimización aplicada a la base de datos
+
+La principal y única optimización que se le aplicó a la base de datos es el uso de índices para distintas tablas.  
+La ventaja principal de los índices es agilizar las consultas, pero impactando en temas de tiempo cualquier acción que modifique las filas de la base de datos (agregar, eliminar y modificar).   
+Teniendo esto en cuenta, como grupo decidimos que sacrificar milisegundos al momento de ingresar registros es aceptable, si eso hacía que la visualización de los datos fuese más rápida. Esta decisión se tomó teniendo en cuenta la escalabilidad de la aplicación, ya que a medida que el sistema acumule registros estos índices serán decisivos para que la plataforma no colapse.  
+
+El qué hace cada índice y en cuáles tablas se aplican están en el script de la base de datos, pero nos gustaría explicar de manera más clara los distintos tipos que usamos y el porqué de su implementación:  
+
+**Índices espaciales:** Estos se crearon porque estamos utilizando PosGis para manejar las ubicaciones dentro de la aplicación. Estas ubicaciones pueden tomar distintas formas, en nuestro caso utilizamos puntos y formas geométricas.  
+Lo principal a saber es que dentro de la plataforma es necesario hacer validaciones donde se relacionan estos elementos ente sí (por ejemplo, verificar si una coordenada específica se encuentra dentro de un polígono que representa un patrullaje). Estos cálculos son muy caros en temas de procesamiento, ya que se debe comparar con todos los datos dentro de la tabla.  
+El agregar estos índices hace que se ralentice la inserción de estos elementos geoespaciales, pero reduce de manera significativa el tiempo en la que se realizan las validaciones en la base de datos, esto es especialmente notable cuando hay mucha información dentro de la tabla.  
+
+**Eliminación lógica:** La base de datos utiliza una eliminación lógica de datos para ciertas tablas, esto significa que los datos eliminados no se borran de la base de datos, sino más bien se marcan como inoperativos. Esta práctica es muy útil en especial para evitarse los quebraderos de cabezas relacionados con el eliminar datos que están a su vez conectados con otras tablas, pero como consecuencia, a la larga se acumularán muchos registros históricos que ralentizan las búsquedas.  
+Para evitar que las consultas se vuelvan lentas creamos estos índices parciales cuyo objetivo es guardar solo los datos que no están eliminados.
+
+**Las claves foráneas:** Las bases de datos relacionales no hacen índices para las claves foráneas, esto es un problema, ya que gran parte de las consultas a la base de datos dentro del sistema tienen algún filtro relacionado a otra tabla (por ejemplo, buscar elementos asociados a un proyecto, patrullaje o incidente). Esto hace que se tenga que recorrer toda la tabla registro a registro para encontrar los datos. Aunque con pocos datos el impacto es imperceptible, es una optimización crítica y necesaria a medida que el volumen de información del sistema aumente.  
+
+# Instalación
+
+## Requisitos Previos
 Cuenta con las siguientes herramientas instaladas en tu sistema antes de comenzar:
 - Git (para clonar y gestionar el repositorio)
 - Node.js (v18 o superior) y npm
@@ -6,8 +53,7 @@ Cuenta con las siguientes herramientas instaladas en tu sistema antes de comenza
 - Ionic CLI (para el desarrollo y ejecución del frontend: `npm install -g @ionic/cli`)
 
 
-## Guía de instalación y ejecución  
-Clonar el repositorio  
+## Clonar el repositorio  
 Abre la CMD y ejecuta los siguientes comandos:
 
 ```
@@ -34,7 +80,7 @@ Pruebas para el funcionamiento de la API REST con Postman
 La API está desarrollada con Node.js, Express y TypeScript, conectándose a una base de datos PostgreSQL.
 URL Base: `http://localhost:3000/api/v1`
 
-### Como crear la base de datos
+### Cómo crear la base de datos
 
 En este documento markdown se procede a explicar paso a paso como crear la base de datos con el archivo schema.sql presente en la carpeta database.
 
@@ -89,7 +135,7 @@ de cada variable de entorno por lo que le indica el texto.
 
 **En la variable CORS_ORIGINS debe poner los origenes del frontend, separados por una coma si es mas de 1. (Para entorno local con vite/ionic se puede usar normalmente: http://localhost:5173,http://localhost:8100)**
 
-### Pruebas de Endpoints (Postman)
+# Pruebas de Endpoints (Postman)
 
 Se recomienda utilizar **Postman** para realizar las pruebas de forma rápida y visual. La colección incluye todos los casos de éxito y los principales casos de error y validaciones de negocio.  
 Sigue estos pasos para configurar el entorno:  
@@ -914,7 +960,7 @@ Casos de Error:
 ### Evidencia de pruebas en Postman
 ![Evidencia Eq. Vehicular](./pruebas/capturas/evidencia-eqvehicular.png)
 
-# Submódulo - Tipos
+# Submodulo - Tipos
 
 ## Subrutas de Tipos de Equipamiento Vehicular
 
@@ -922,7 +968,6 @@ El router principal cuenta con la siguiente redirección hacia las operaciones d
 
 * **Ruta base:** `/api/v1/proyectos/:id_proyecto/eq_vehicular/tipos`
 * **Módulo de rutas:** [Tipos de equipamientos vehiculares](#submodulo-tipos-de-equipamientos-vehiculares)
-
 
 ## Submodulo tipos de vehiculos
 
@@ -1274,7 +1319,7 @@ title: EstosSonMisEndpoints
 
 ---
 
-# Modulo de Auth
+# Módulo de Auth
 
 Modulo encargado de gestionar los accesos de usuarios registrados al sistema, entregando metodos para poder iniciar sesion, y para cambiar la contraseña (Siempre y cuando el usuario tenga disponible esa accion).
 
@@ -1369,7 +1414,7 @@ title: EstosSonMisEndpointsPatrullajes
 
 ---
 
-# Modulo de patrullajes
+# Módulo de patrullajes
 
 Modulo encargado de gestionar los patrullajes de cada proyecto del sistema. Cuenta con metodos tanto para gestionar las planificaciones de patrullaje, como para ejecutar los patrullajes que se encuentran planificados.
 
@@ -1706,7 +1751,7 @@ title: EstosSonMisEndpointsUsuarios
 
 ---
 
-# Modulo de Usuarios
+# Módulo de Usuarios
 
 Modulo encargado de la administracion y gestion de usuarios en el sistema SIPPREM. Permite registrar nuevos colaboradores, consultar la lista y detalles de usuarios, gestionar su perfil personal, ver sus patrullajes y proyectos asignados, actualizar su informacion, restablecer sus credenciales de acceso y realizar el borrado o restauracion logica de sus cuentas.
 
@@ -1794,7 +1839,7 @@ Casos de error:
 
 ## 3. Obtener mis patrullajes asignados.
 
-Permite a un patrullero autenticado consultar todos los patrullajes a los que ha sido asignado a lo largo de los diferentes proyectos, detallando el estado, el horario planificado y la zona delimitada.
+Permite a un patrullero autenticado consultar todos los patrullajes a los que ha sido asignado a lo largo de los diferentes proyectos, detallando el estado, el horario planificado, la zona delimitada y el vehículo utilizado en su ejecución (`id_vehiculo`).
 
 Método: GET
 Ruta: /api/v1/usuarios/me/patrullajes
@@ -1827,7 +1872,8 @@ Respuestas esperadas:
                     ]
                 ]
             },
-            "estado": "Finalizado"
+            "estado": "Finalizado",
+            "id_vehiculo": "VEH-001"
         }
     ]
 }
