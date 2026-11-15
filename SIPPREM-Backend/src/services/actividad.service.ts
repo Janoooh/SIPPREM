@@ -3,61 +3,27 @@ import type { respuestaServices } from "../interfaces/respuestaServices.js";
 
 // Obtener todas las actividades de un proyecto específico
 export const obtenerActividadesPorProyecto = async (id_proyecto: number): Promise<respuestaServices> => {
-    // verificar si el proyecto existe y si no esta eliminado
-    const queryProyecto = `
-    SELECT id_proyecto
-    FROM proyecto_patrullaje
-    WHERE id_proyecto = $1 AND eliminado = false;
+    // Obtenemos las actividades no eliminadas asociadas a ese proyecto 
+    const queryActividades = `
+            SELECT id_actividad, titulo, fecha, descripcion, id_proyecto 
+            FROM actividad
+            WHERE id_proyecto = $1 AND eliminado = false
+            ORDER BY fecha ASC;
     `;
-const resProyecto = await poolDb.query(queryProyecto, [id_proyecto]);
+    const resActividades = await poolDb.query(queryActividades, [id_proyecto]);
 
-//si el proyecto no existe o esta eliminado
-if(resProyecto.rows.length === 0){
-    return{
-        exito: false,
-        codHTTP: 404,
-        explicacion: "El proyecto no existe o ha sido eliminado.",
-        datos: null
-    };
-}
-// Obtenemos las actividades no eliminadas asociadas a ese proyecto 
-const queryActividades = `
-        SELECT id_actividad, titulo, fecha, descripcion, id_proyecto 
-        FROM actividad
-        WHERE id_proyecto = $1 AND eliminado = false
-        ORDER BY fecha ASC;
-`;
-const resActividades = await poolDb.query(queryActividades, [id_proyecto]);
-
-// en caso de exito
-return {
-        exito: true,
-        codHTTP: 200,
-        explicacion: "Actividades obtenidas correctamente.",
-        datos: resActividades.rows
-    };
+    // en caso de exito
+    return {
+            exito: true,
+            codHTTP: 200,
+            explicacion: "Actividades obtenidas correctamente.",
+            datos: resActividades.rows
+        };
 };
 
 
 // Crear una nueva activadad 
 export const crearActividad = async (titulo: string, fecha: string, descripcion: string, id_proyecto: number): Promise<respuestaServices> => {
-    // verificar si el proyecto existe y si no esta eliminado
-    const queryProyecto = `
-        SELECT id_proyecto 
-        FROM proyecto_patrullaje 
-        WHERE id_proyecto = $1 AND eliminado = false;
-    `;
-    const resProyecto = await poolDb.query(queryProyecto, [id_proyecto]);
-
-    if (resProyecto.rows.length === 0) {
-        return {
-            exito: false,
-            codHTTP: 404,
-            explicacion: "No se puede crear la actividad: el proyecto no existe o ha sido eliminado.",
-            datos: null
-        };
-    }
-
     // se agrega la nueva actividad 
     const queryInsert = `
         INSERT INTO actividad (titulo, fecha, descripcion, id_proyecto)

@@ -3,21 +3,6 @@ import type { respuestaServices } from "../interfaces/respuestaServices.js";
 
 // Funcion que muestra los vehiculos relacionado a un proyecto
 export const mostrarVehiculos= async (id_proyecto: number): Promise<respuestaServices> => {
-    // Se hace la consulta para ver si existe el proyecto dado
-    const queryProyecto = `select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado = false;`;
-    const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
-    
-    // verifica si la consulta anterior retorno algun dato, en este si tiene almenos una fila
-    if (proyecto.rows.length === 0){
-        return{
-            exito: false, 
-            codHTTP: 404,
-            explicacion : "Ese proyecto no existe.",
-            datos : null
-        };
-    }
-
-
     // Consulta para ver los vehiculos relacionados a un proyecto el formato que devuelve es el siguiente:
     //    patente, marca y tipo
     //ej: 123-ACV, Honda civic, automovil
@@ -53,20 +38,6 @@ export const mostrarVehiculos= async (id_proyecto: number): Promise<respuestaSer
 
 //funcion para ver un vehiculo dado un proyecto
 export const mostrarUNvehiculo = async (id_item: string, id_proyecto: number): Promise<respuestaServices> => {
-    // Se hace la consulta para ver si existe el proyecto dado
-    const queryProyecto = `select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado = false;`;
-    const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
-    
-    // verifica si la consulta anterior retorno algun dato, en este si tiene almenos una fila
-    if (proyecto.rows.length === 0){
-        return{
-            exito: false, 
-            codHTTP: 404,
-            explicacion : "Ese proyecto no existe.",
-            datos : null
-        };
-    }
-    
     //Consulta para mostrar un solo vehiculo
     // formato {"id_item": "ABC-123" , "nombre_vehiculo": "ejemplo V16", "tipo_vehiculo": "Automovil"}
     const query = `
@@ -99,19 +70,6 @@ export const mostrarUNvehiculo = async (id_item: string, id_proyecto: number): P
 
 // Funcion para agregar un vehiculo dado los datos necesarios
 export const agregarVehiculo = async(id_item: string, id_proyecto: number, nombre_vehiculo: string, id_tipo_vehiculo: number) :Promise<respuestaServices> => {
-    //query para ver si el proyecto existe
-    const queryProyecto =`select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado= false;`;
-    const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
-    
-    if (proyecto.rows.length === 0){
-        return{
-            exito: false, 
-            codHTTP: 404,
-            explicacion : "Ese proyecto no existe.",
-            datos : null
-        };
-    }
-
     //query para ver si el tipo de vehiculo ingresado existe
     const queryTipoVehiculo = `select id_tipo_vehiculo from tipo_vehiculo where id_tipo_vehiculo = $1;`
     const tipoVehiculo = await poolDb.query(queryTipoVehiculo, [id_tipo_vehiculo]);
@@ -158,19 +116,6 @@ export const agregarVehiculo = async(id_item: string, id_proyecto: number, nombr
 
 // Funcion para modificar un vehiculo
 export const actualizarVehiculo = async (id_vehiculo: string, nombre_vehiculo: string | null, id_tipo_vehiculo: number | null, id_proyecto: number): Promise<respuestaServices> => {
-    //verifica el proyecto
-    const queryProyecto =`select id_proyecto from proyecto_patrullaje where id_proyecto = $1 and eliminado= false;`;
-    const proyecto = await poolDb.query(queryProyecto, [id_proyecto]);
-    
-    if (proyecto.rows.length === 0){
-        return{
-            exito: false, 
-            codHTTP: 404,
-            explicacion : "Ese proyecto no existe.",
-            datos : null
-        };
-    }
-    
     // en caso que se quiera modificar el tipo de vehiculo entra en el if
     if (id_tipo_vehiculo !== null){
         //query para ver si el tipo de vehiculo ingresado existe
