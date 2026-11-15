@@ -13,8 +13,10 @@ COPY . .
 # VITE_BACKEND_URL es una variable de entorno que se utiliza en la aplicación Vite para definir la URL del backend.
 # Se recibe el argumento desde el docker-compose
 ARG VITE_BACKEND_URL
+ARG VITE_MAP_TILE_URL
 # Se combierte en variable de entorno para que Vite lo lea
 ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+ENV VITE_MAP_TILE_URL=$VITE_MAP_TILE_URL
 
 # Compilar la aplicación Vite (React) para producción
 RUN npm run build

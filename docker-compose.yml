@@ -57,6 +57,10 @@ services:
     build:
       context: ./SIPPREM-Gestor
       dockerfile: Dockerfile
+      args:
+      # Argumentos de construcción: Cuando se construye la imagen, antes de ejecutar el contenedor.
+        - VITE_BACKEND_URL=${VITE_BACKEND_URL:-http://localhost:3000}
+        - VITE_MAP_TILE_URL=${VITE_MAP_TILE_URL:-https://tile.openstreetmap.org/{z}/{x}/{y}.png}
     container_name: sipprem_frontend
     ports:  
     # Puerto de acceso: Frontend disponible localmente en el puerto 8080. http://localhost:8080
@@ -73,6 +77,7 @@ services:
       args:
       # Argumentos de construcción: Cuando se construye la imagen, antes de ejecutar el contenedor.
         - VITE_BACKEND_URL=${VITE_BACKEND_URL:-http://localhost:3000}
+        - VITE_MAP_TILE_URL=${VITE_MAP_TILE_URL:-https://tile.openstreetmap.org/{z}/{x}/{y}.png}
     container_name: sipprem_app_patrullero
     ports:
     # Puerto de acceso: App Patrullero disponible localmente en el puerto 8100. http://localhost:8100
