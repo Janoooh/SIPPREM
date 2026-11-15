@@ -7,6 +7,7 @@ import CambiarClaveInicial from './pages/CambiarClaveInicial';
 import PatrullajeInicio from './pages/PatrullajeInicio'; 
 import PreparacionPatrullaje from './pages/PreparacionPatrullaje';
 import PatrullajeActivo from './pages/PatrullajeActivo';
+import ReportarIncidente from './pages/ReportarIncidente';
 import { SeguimientoProvider } from './context/SeguimientoProvider';
 
 /* Core CSS required for Ionic components to work properly */
@@ -69,6 +70,13 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
+
+          {/* Reporte de incidente durante un patrullaje en curso */}
+          <Route path="/patrullero/proyecto/:id_proyecto/patrullaje-activo/reportar" element={
+            <RutaProtegida rolesPermitidos={["patrullero"]}>
+              <ReportarIncidente />
+            </RutaProtegida>
+          } />
 
           {/* Rutas de seguridad */}
           <Route path="/" element={<Navigate to="/login" replace />} />

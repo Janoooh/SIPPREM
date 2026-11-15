@@ -136,7 +136,7 @@ const PatrullajeActivo: React.FC = () => {
       try {
         await Haptics.notification({ type: NotificationType.Warning });
       } catch {
-        
+        // Vibración opcional en dispositivos compatibles
       }
     }
 
@@ -204,12 +204,23 @@ const PatrullajeActivo: React.FC = () => {
   const centroInicialMapa = puntosZona.length >= 3 ? puntosZona[0] : puntoUsuario;
 
   const handleReportarIncidente = () => {
-    mandarToast({
-      message: 'Módulo de reporte de incidentes disponible próximamente.',
-      duration: 2500,
-      position: 'bottom',
-      color: 'warning'
-    });
+    const idPatrullajeObjetivo = idPatrullajeParam || patrullaje?.id_patrullaje;
+    const idProyectoObjetivo = id_proyecto || patrullaje?.id_proyecto;
+
+    if (!idProyectoObjetivo || !idPatrullajeObjetivo) {
+      mandarToast({
+        message: 'No se encontró un patrullaje activo para reportar el incidente.',
+        duration: 2500,
+        position: 'bottom',
+        color: 'warning'
+      });
+      return;
+    }
+
+    router.push(
+      `/patrullero/proyecto/${idProyectoObjetivo}/patrullaje-activo/reportar?id_patrullaje=${idPatrullajeObjetivo}`,
+      'forward'
+    );
   };
 
   const ejecutarFinalizacion = async () => {
