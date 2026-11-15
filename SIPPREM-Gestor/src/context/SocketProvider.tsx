@@ -235,6 +235,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               ...(prev[idProyecto] || {}),
               [rutClave]: {
                 ...datos,
+                id_vehiculo: datos.id_vehiculo || prev[idProyecto]?.[rutClave]?.id_vehiculo || null,
                 id_proyecto: idProyecto,
                 rut: rutClave,
                 latitud: lat,

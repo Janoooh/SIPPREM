@@ -64,7 +64,7 @@ const AgregarUsuario: React.FC = () => {
 
             <IonContent fullscreen style={{ '--background': '#3b5066' } as React.CSSProperties}>
                 <FormularioUsuario 
-                    modo="modificar" 
+                    modo="agregar" 
                     onSubmit={handleCrearUsuario} 
                     cargando={cargando}
                 />

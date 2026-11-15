@@ -104,7 +104,8 @@ export const SeguimientoProvider: React.FC<{ children: React.ReactNode }> = ({ c
           if (
             prev?.id_patrullaje === enCurso?.id_patrullaje &&
             prev?.id_proyecto === enCurso?.id_proyecto &&
-            prev?.estado === enCurso?.estado
+            prev?.estado === enCurso?.estado &&
+            prev?.id_vehiculo === enCurso?.id_vehiculo
           ) {
             return prev;
           }
@@ -304,7 +305,7 @@ export const SeguimientoProvider: React.FC<{ children: React.ReactNode }> = ({ c
     patrullajeSocketService.enviarUbicacion(socket, {
       id_proyecto: Number(patrullajeEnCurso.id_proyecto),
       id_patrullaje: patrullajeEnCurso.id_patrullaje ?? null,
-      id_vehiculo: null,
+      id_vehiculo: patrullajeEnCurso.id_vehiculo ?? null,
       hora_inicio: patrullajeEnCurso.hora_inicio ?? null,
       hora_termino: patrullajeEnCurso.hora_termino ?? null,
       latitud: ubicacion.latitud,

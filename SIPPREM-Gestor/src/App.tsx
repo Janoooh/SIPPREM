@@ -23,6 +23,7 @@ import AgregarVehiculo from './pages/AgregarVehiculo';
 import AgregarArticulo from './pages/AgregarArticulo';
 import Personal from './pages/Personal';
 import MapaGPS from './pages/MapaGPS';
+import HistorialIncidentes from './pages/HistorialIncidentes';
 import { SocketProvider } from './context/SocketProvider';
 
 /* Core CSS required for Ionic components to work properly */
@@ -191,6 +192,12 @@ const App: React.FC = () => {
           } />
 
 
+          <Route path="/admin/proyecto/:id_proyecto/historial" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+              <HistorialIncidentes />
+            </RutaProtegida>
+          } />
+
           {/*Rutas de supervisor*/}
 
           <Route path="/supervisor/inicio" element={
@@ -265,6 +272,12 @@ const App: React.FC = () => {
           } />
 
           
+
+          <Route path="/supervisor/proyecto/:id_proyecto/historial" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+              <HistorialIncidentes />
+            </RutaProtegida>
+          } />
 
           {/*Ruta de seguridad, reedirige al login cuando tratan de acceder a la raiz.*/}
           <Route path="/" element={<Navigate to="/login" replace />} />

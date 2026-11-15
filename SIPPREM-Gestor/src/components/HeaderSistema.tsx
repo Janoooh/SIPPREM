@@ -36,9 +36,6 @@ const HeaderSistema: React.FC<HeaderSistemaProps> = ({rol}) => {
           <IonButtons slot="end" className="header-nav-buttons">
             
             {rol === 'admin' && (
-              <IonButton fill="clear" className="nav-btn-clear" onClick={() => {}}>Historial de Proyectos</IonButton>
-            )}
-            {rol === 'admin' && (
               <IonButton 
                 fill="clear" 
                 className={esUsuariosActivo ? "nav-btn" : "nav-btn-clear"} 

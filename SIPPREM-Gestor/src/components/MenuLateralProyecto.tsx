@@ -117,8 +117,9 @@ const MenuLateralProyecto: React.FC<MenuLateralProyectoProps> = ({
           className={`menu-btn ${seccionActiva === 'historial' ? 'menu-btn-activo' : ''}`}
           expand="block"
           fill={seccionActiva === 'historial' ? 'solid' : 'clear'}
+          onClick={() => irARuta('/historial')}
         >
-          Historial de Patrullajes
+          Historial de incidentes
         </IonButton>
         <IonRow className="menu-divider"></IonRow>
 

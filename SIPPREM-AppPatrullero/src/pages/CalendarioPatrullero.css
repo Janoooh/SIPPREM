@@ -1,0 +1,270 @@
+.calendario-patrullero-content {
+  --background: #2c3e50;
+}
+
+.calendario-patrullero-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 18px 14px 32px 14px;
+  max-width: 540px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  gap: 16px;
+}
+
+.calendario-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.calendario-titulo-bloque h1 {
+  color: #ffffff;
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.calendario-titulo-bloque p {
+  color: #cbd5e1;
+  font-size: 0.84rem;
+  margin: 3px 0 0 0;
+}
+
+.btn-ir-hoy {
+  background-color: #1e293b;
+  color: #38bdf8;
+  border: 1.5px solid #38bdf8;
+  border-radius: 9999px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.btn-ir-hoy:active {
+  transform: scale(0.96);
+}
+
+/* Bloque del calendario estilo Gestor (Cronograma) adaptado a móvil */
+.calendario-bloque-gestor {
+  width: 100%;
+}
+
+.calendario-top-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: #ffffff;
+  padding: 12px 14px;
+  border-radius: 12px 12px 0 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.fila-navegacion-mes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.titulo-mes-anio {
+  font-weight: 800;
+  font-size: 1rem;
+  color: #1e293b;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.btn-nav-mes {
+  --padding-start: 6px;
+  --padding-end: 6px;
+  --color: #1e293b;
+  margin: 0;
+}
+
+.leyenda-calendario {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-top: 2px;
+}
+
+.leyenda-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+
+.leyenda-en-curso {
+  color: #16a34a;
+}
+
+.leyenda-planificado {
+  color: #0ea5e9;
+}
+
+.leyenda-finalizado {
+  color: #64748b;
+}
+
+.punto-leyenda {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.punto-verde {
+  background-color: #22c55e;
+}
+
+.punto-azul {
+  background-color: #0ea5e9;
+}
+
+.punto-gris {
+  background-color: #64748b;
+}
+
+/* Grilla de días idéntica al Gestor */
+.calendario-wrapper {
+  background-color: #ffffff;
+  border-radius: 0 0 12px 12px;
+  padding: 0 10px 12px 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+.calendario-dias-semana {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  padding: 8px 0 6px 0;
+  border-bottom: 2px solid #cbd5e1;
+}
+
+.dia-semana-header {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.calendario-grilla {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-left: 1px solid #e2e8f0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.celda-dia {
+  min-height: 54px;
+  border-right: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  background-color: #ffffff;
+  transition: background-color 0.15s ease;
+  position: relative;
+}
+
+.celda-dia:active {
+  background-color: #f1f5f9;
+}
+
+.celda-otro-mes {
+  background-color: #f8fafc;
+}
+
+.celda-otro-mes .numero-dia {
+  color: #94a3b8;
+}
+
+.celda-dia-hoy {
+  background-color: #f0f9ff;
+}
+
+.celda-dia-hoy .numero-dia {
+  color: #0284c7;
+  font-weight: 800;
+}
+
+/* Borde destacado de día seleccionado igual al Gestor */
+.celda-dia-seleccionada {
+  outline: 3px solid #ef4444;
+  outline-offset: -3px;
+  background-color: #fef2f2 !important;
+  z-index: 2;
+}
+
+.numero-dia {
+  align-self: flex-end;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.puntos-eventos-dia {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+  align-items: center;
+}
+
+.punto-evento {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Panel inferior del día seleccionado con el mismo estilo de tarjeta del Gestor */
+.panel-detalle-dia-gestor {
+  background-color: #ffffff;
+  border: 3px solid #1e293b;
+  border-radius: 22px;
+  padding: 16px 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.titulo-dia-seleccionado {
+  font-weight: 800;
+  font-size: 1.02rem;
+  color: #0f172a;
+  text-align: center;
+  text-transform: uppercase;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e2e8f0;
+  display: block;
+}
+
+.sin-eventos-texto {
+  color: #64748b;
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 14px 0;
+  font-style: italic;
+}
+
+.lista-tarjetas-dia {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

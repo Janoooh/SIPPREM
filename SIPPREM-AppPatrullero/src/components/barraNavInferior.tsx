@@ -39,14 +39,22 @@ const BarraNavInferior: React.FC<BarraNavInferiorProps> = ({ id_proyecto }) => {
       </IonTabButton>
       <IonTabButton
         tab="calendar"
-        href={rutaCalendario}
+        onClick={() => {
+          if (!esCalendario) {
+            router.push(rutaCalendario, 'forward');
+          }
+        }}
         className={esCalendario ? 'tab-selected' : undefined}
       >
         <IonIcon icon={calendarOutline} />
       </IonTabButton>
       <IonTabButton
         tab="profile"
-        href={rutaPerfil}
+        onClick={() => {
+          if (!esPerfil) {
+            router.push(rutaPerfil, 'forward');
+          }
+        }}
         className={esPerfil ? 'tab-selected' : undefined}
       >
         <IonIcon icon={personOutline} />

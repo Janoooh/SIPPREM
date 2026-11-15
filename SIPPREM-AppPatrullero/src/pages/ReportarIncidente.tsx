@@ -586,9 +586,9 @@ const ReportarIncidente: React.FC = () => {
             </div>
           </div>
         </div>
-
-        <BarraNavInferior id_proyecto={id_proyecto} />
       </IonContent>
+
+      <BarraNavInferior id_proyecto={id_proyecto} />
     </IonPage>
   );
 };

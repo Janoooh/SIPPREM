@@ -6,4 +6,5 @@ export interface PatrullajeUsuario {
   hora_termino: string;
   zona: any;
   estado: 'Planificado' | 'En curso' | 'Finalizado' | string;
+  id_vehiculo?: string | null;
 }
