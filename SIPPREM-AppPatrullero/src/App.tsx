@@ -5,7 +5,12 @@ import { RutaProtegida } from './routes/rutaProtegida';
 import Login from './pages/Login';                       
 import CambiarClaveInicial from './pages/CambiarClaveInicial'; 
 import PatrullajeInicio from './pages/PatrullajeInicio'; 
-import PreparacionPatrullaje from './pages/PreparacionPatrullaje';  
+import PreparacionPatrullaje from './pages/PreparacionPatrullaje';
+import PatrullajeActivo from './pages/PatrullajeActivo';
+import ReportarIncidente from './pages/ReportarIncidente';
+import CalendarioPatrullero from './pages/CalendarioPatrullero';
+import MiPerfil from './pages/MiPerfil';
+import { SeguimientoProvider } from './context/SeguimientoProvider';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -30,6 +35,7 @@ const App: React.FC = () => {
   return (
     <IonApp>
       <IonReactRouter>
+        <SeguimientoProvider>
         <IonRouterOutlet>
           
           {/* Ruta pública del login */}
@@ -59,12 +65,53 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
+          {/* Gestión del patrullaje en curso */}
+          <Route path="/patrullero/proyecto/:id_proyecto/patrullaje-activo" element={
+            <RutaProtegida rolesPermitidos={["patrullero"]}>
+              <PatrullajeActivo />
+            </RutaProtegida>
+          } />
+
+
+          {/* Reporte de incidente durante un patrullaje en curso */}
+          <Route path="/patrullero/proyecto/:id_proyecto/patrullaje-activo/reportar" element={
+            <RutaProtegida rolesPermitidos={["patrullero"]}>
+              <ReportarIncidente />
+            </RutaProtegida>
+          } />
+
+          {/* Calendario de turnos del patrullero */}
+          <Route path="/patrullero/calendario" element={
+            <RutaProtegida rolesPermitidos={["patrullero"]}>
+              <CalendarioPatrullero />
+            </RutaProtegida>
+          } />
+
+          <Route path="/patrullero/proyecto/:id_proyecto/calendario" element={
+            <RutaProtegida rolesPermitidos={["patrullero"]}>
+              <CalendarioPatrullero />
+            </RutaProtegida>
+          } />
+
+          {/* Perfil del patrullero */}
+          <Route path="/patrullero/perfil" element={
+            <RutaProtegida rolesPermitidos={["patrullero"]}>
+              <MiPerfil />
+            </RutaProtegida>
+          } />
+
+          <Route path="/patrullero/proyecto/:id_proyecto/perfil" element={
+            <RutaProtegida rolesPermitidos={["patrullero"]}>
+              <MiPerfil />
+            </RutaProtegida>
+          } />
 
           {/* Rutas de seguridad */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path='*' element={<Navigate to="/login" replace />} />
 
         </IonRouterOutlet>
+      </SeguimientoProvider>
       </IonReactRouter>
     </IonApp>
   );

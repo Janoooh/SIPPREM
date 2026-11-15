@@ -1,0 +1,20 @@
+.actividad-pagina-grid {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.actividad-pagina-contenido-col {
+  padding-left: 20px;
+}
+
+.actividad-spinner-row {
+  min-height: 240px;
+  align-items: center;
+}
+
+@media (max-width: 992px) {
+  .actividad-pagina-contenido-col {
+    padding-left: 0;
+    margin-top: 16px;
+  }
+}

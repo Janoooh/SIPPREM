@@ -31,10 +31,11 @@
     - [Justificación Técnica](#Justificación-Técnica)
 8. [Prototipo de UI/UX de la aplicación](#Prototipo-de-UIUX-de-la-aplicación)
 9. [Librerías principales utilizadas](#Librerías-principales-utilizadas)
-10. [Como clonar el repositorio (EP1)](#Como-clonar-el-repositorio-EP1)
-11. [Como acceder al sistema (EP1)](#Como-acceder-al-sistema-EP1)
-12. [Distribucion de responsabilidades en el equipo (EP1)](#Distribucion-de-responsabilidades-en-el-equipo-EP1)
-13. [Uso de herramientas de IA (EP1)](#Uso-de-herramientas-IA-EP1)
+10. [API Externa utilizada](#API-Externa-utilizada)
+11. [Como clonar el repositorio (EP1)](#Como-clonar-el-repositorio-EP1)
+12. [Como acceder al sistema (EP1)](#Como-acceder-al-sistema-EP1)
+13. [Distribucion de responsabilidades en el equipo (EP1)](#Distribucion-de-responsabilidades-en-el-equipo-EP1)
+14. [Uso de herramientas de IA (EP1)](#Uso-de-herramientas-IA-EP1)
 
 ---
 ## **Justificación del problema**
@@ -241,10 +242,10 @@ A continuacion, se detallan los requerimientos del sistema planteado, con la int
 ### Requerimientos funcionales (RF)
 
 * **RF01**: El sistema debe permitir gestionar proyectos de patrullaje preventivo por medio de un CRUD, implementando cada opción de la siguiente manera:
-    * Crear proyecto: Se debe contar con un formulario para agregar proyectos de patrullaje preventivo, que registre: Nombre del proyecto (Campos de texto), fecha de inicio y de término (2 Campos de fecha respectivamente), presupuesto asignado (Campo numérico), supervisor encargado (Lista desplegable que muestra los supervisores existentes en el sistema) y patrulleros que trabajarán en él (Lista con patrulleros agregables, en base a los patrulleros existentes en el sistema). Además, debe contar con un mapa interactivo, dando la opción de marcar vértices para formar un polígono, y así indicar el área seleccionada para el proyecto. El formulario tendrá un botón para enviar los datos, de modo que al presionarlo valide que todos los campos están completos, y cree el proyecto.
+    * Crear proyecto: Se debe contar con un formulario para agregar proyectos de patrullaje preventivo, que registre: Nombre del proyecto (Campos de texto), fecha de inicio y de término (2 Campos de fecha respectivamente) y presupuesto asignado (Campo numérico). Además, debe contar con un mapa interactivo, dando la opción de marcar vértices para formar un polígono, y así indicar el área seleccionada para el proyecto. El formulario tendrá un botón para enviar los datos, de modo que al presionarlo valide que todos los campos están completos, y cree el proyecto.
     * Visualizar proyecto: Se podrá observar un resumen de los datos ingresados en la creación del proyecto de patrullaje preventivo en una lista de tarjetas.
     * Actualizar datos de proyecto: En las tarjetas donde se visualiza el resumen de los datos del proyecto se dispondrá de un botón para editar los registros ingresados en la creación del proyecto, mostrando un formulario con los mismos campos que tiene el de creación.
-    * Borrar proyecto: En cada tarjeta de visualización de proyecto se dispondrá de un botón para eliminar el respectivo proyecto de patrullaje preventivo. Al presionar el botón, se mandan dos mensajes para confirmar si realmente quiere borrar el proyecto, teniendo que confirmar dos veces para borrarlo.
+    * Borrar proyecto: En cada tarjeta de visualización de proyecto se dispondrá de un botón para eliminar el respectivo proyecto de patrullaje preventivo. Al presionar el botón, se mandan un mensajes para confirmar si realmente quiere borrar el proyecto, teniendo que confirmar para borrarlo.
 
 * **RF02**: El sistema debe permitir gestionar los patrullajes para cada proyecto de patrullaje preventivo. Lo anterior se cumple por medio de las siguientes opciones:
     * Planificar patrullaje: Para un día seleccionado, podremos planificar un patrullaje por medio de un formulario que solicite: el encargado del patrullaje (Lista desplegable con los patrulleros que trabajan en ese proyecto), el acompañante de dicho patrullaje (lista desplegable igual a la anterior, pero agregando la opción de "ninguno"), la hora de inicio y de término (2 Campos de fecha respectivamente). Además, se cuenta con un mapa interactivo que permite marcar vértices para formar un polígono que delimite el área a patrullar. Se tiene un botón para registrar la planificación del patrullaje, al presionarlo valida que los patrulleros seleccionados tengan disponible su horario en la hora acordada para el patrullaje, y también valida que el área marcada por el polígono esté dentro del área del proyecto. Tras eso, planifica el patrullaje.
@@ -253,11 +254,9 @@ A continuacion, se detallan los requerimientos del sistema planteado, con la int
 * **RF03**: El sistema debe permitir gestionar el inventario de un proyecto de patrullaje preventivo, permitiendo almacenar la información de los vehículos y artículos disponibles para los patrullajes. Lo anterior se cumple con las siguientes opciones:
     * Registrar vehículo: Se dispone un formulario para agregar un vehículo para patrullajes, el cual solicita: el tipo de vehículo (Lista desplegable, con las opciones definidas en el archivo CatalogoDeVehiculos), el nombre del vehículo (Campo de texto), su patente o identificador (Campo de texto), y equipamiento para el vehículo (Lista con artículos de categoría "EquipamientoVehicular" que estén registrados en el inventario). Se tiene un botón para registrar el vehículo al tocarse.
     * Visualizar vehículos: Se cuenta con una lista de tarjetas que muestran el nombre del vehículo, su tipo y la patente o identificador correspondiente.
-    * Modificar vehículo: Junto a la visualización de cada vehículo se cuenta con un botón para editar los datos registrados. Para lo anterior se tiene el mismo formulario que se usó para crear el vehículo.
     * Eliminar vehículo: En la tarjeta de visualización del vehículo se cuenta con un botón para eliminar un registro de vehículo. Al apretarlo, nos mostrará un mensaje que pide confirmar si realmente queremos borrar el registro.
     * Registrar artículo: Se cuenta con un formulario que permite registrar artículos, solicitando: la categoria de artículo (Selección entre "EquipamientoPersonal" o "EquipamientoVehicular"), el artículo a registrar (Lista desplegable, con las opciones definidas en los archivos "CatalogoDeEquipamientoVehicular" o "CatalogoDeEquipamientoPersonal"), el identificador del artículo (Campo de texto), y talla (si corresponde, campo de texto). Existe un botón para registrar el artículo.
     * Visualizar artículo: Se muestra la cantidad existente de cada artículo de los archivos de equipamiento, siempre y cuando se tenga más de 1 en el inventario. Además, se tiene una lista de tarjetas que por cada una de ellas muestra la información obtenida en el registro de artículo.
-    * Modificar artículo: En las tarjetas de visualización de los artículos se tiene un botón para modificar los datos registrados, usando un formulario igual al de creación de artículo.
     * Eliminar artículo: Se tiene un botón para quitar un artículo específico registrado en el sistema. Tras presionarlo, pedirá confirmación para eliminarlo. 
 
 * **RF04**: El sistema tendrá integrado un calendario por cada proyecto de patrullaje preventivo, el cual permitirá planificar y visualizar la coordinación de patrullajes y actividades. El calendario muestra los días por mes, y al seleccionar uno de esos días uno puede coordinar un patrullaje, o una actividad. 
@@ -281,13 +280,13 @@ A continuacion, se detallan los requerimientos del sistema planteado, con la int
 
 * **RF09**: La aplicación debe mostrar el calendario de patrullajes que se le han asignado a un patrullero. Dicho calendario tiene un formato de días por mes, y marca las planificaciones de patrullaje que nos han asignado con puntos de color. El presente calendario es global para el patrullero, de forma que si está en varios proyectos de patrullaje preventivo, él podrá ver todos los patrullajes juntos en este mismo calendario. Se le puede hacer click a un día específico del calendario para ver a más detalle el o los patrullajes que se tienen planificados para ese día, informando del proyecto al que pertenecen, el área seleccionada para patrullar, y la hora de inicio y término.
 
-* **RF10**: El sistema debe mostrar una lista con tarjetas de información de los distintos incidentes que han reportado los patrulleros en sus actividades de patrullaje. Dichas tarjetas deben mostrar: la categoría del incidente, la fecha en que se registró, quién lo reportó, las observaciones escritas, las fotos adjuntadas, y la gravedad del suceso asignada por el patrullero. Para una visualización más ordenada, se cuenta con opciones para ordenar los incidentes registrados por categoría, fecha, o patrullero, de esa manera podemos agrupar la información de manera más flexible.
+* **RF10**: El sistema debe mostrar una lista con tarjetas de información de los distintos incidentes que han reportado los patrulleros en sus actividades de patrullaje. Dichas tarjetas deben mostrar: la categoría del incidente, la fecha en que se registró, el patrullaje donde fue reportado, las observaciones escritas, las fotos adjuntadas, y la gravedad del suceso asignada por el patrullero. Ademas, se dispondra de un filtro por fecha, que permitira mostrar solo los incidentes ocurridos en una fecha ingresada por el usuario.
 
 * **RF11**: El sistema debe permitir gestionar los usuarios que existen en el sistema, pudiendo agregar, visualizar y eliminar registros de usuario según sea necesario. Las anteriores funciones se cumplen de la siguiente manera:
     * Agregar usuario: Se cuenta con un formulario donde se solicita: el nombre completo de la persona, su rut, correo, teléfono, y el rol que le asignaremos en el sistema (Supervisor o patrullero). Además, también se puede subir una foto de dicha persona para que le quede guardada en su perfil. Para registrar al usuario, se cuenta con un botón que al presionarlo valida que el RUT sea válido, o que no exista otro usuario con el mismo RUT, tras ello, se crea el usuario nuevo. Al crear un usuario, se genera una contraseña aleatoria que es informada por el sistema al creador, de modo que la primera vez que el nuevo usuario inicie sesión deberá usar esa clave para entrar.
     * Visualizar usuarios: Se visualiza una lista de tarjetas, donde cada una de ellas muestra un resumen de la información de un usuario registrado en el sistema.
     * Eliminar usuario: En la tarjeta donde se visualiza cada usuario, se dispone también de un botón para eliminar su registro. Al apretar dicho botón, el sistema nos pedirá confirmar 2 veces para efectivamente eliminarlo.
-    * Además, cada usuario cuando acceda al sistema podrá visualizar sus datos personales registrados en el sistema, pudiendo modificar dicha información con un formulario similar al de creación de usuario que tiene el administrador.
+    * Además, cada usuario cuando acceda al sistema podrá visualizar sus datos personales registrados en el sistema.
 
 * **RF12**: El sistema debe permitir gestionar los trabajadores asignados a cada proyecto, permitiendo visualizar, agregar o eliminar usuarios. Las funciones anteriores se cumplen de la siguiente manera:
     * Visualizar trabajadores: Se muestra una lista con tarjetas, donde cada una de ellas indica el nombre y rol de cada usuario relacionado con el proyecto.
@@ -736,6 +735,20 @@ La arquitectura de navegación se definió considerando criterios de usabilidad,
 | `ionicons` | Colección oficial de iconos utilizada por los componentes de Ionic.|
 |  `leaflet`     | Biblioteca motor para la renderización, manipulación e interacción con mapas interactivos de código abierto.|
 |  `react-leaflet` | Wrapper de React que expone los elementos de Leaflet como componentes declarativos.|
+|  `axios` | Cliente HTTP utilizado para realizar las peticiones a la API REST del backend y gestionar el envío automático del token JWT.|
+|  `socket.io-client` | Cliente de comunicación en tiempo real utilizado para transmitir la ubicación GPS de los patrulleros y las alertas del botón de pánico.|
+|  `@capacitor/preferences` | Almacenamiento local utilizado para guardar la sesión del usuario y el token de autenticación en el dispositivo o navegador.|
+|  `@capacitor/geolocation` | Plugin de Capacitor (en SIPPREM-AppPatrullero) que obtiene las coordenadas GPS en vivo del dispositivo móvil durante el patrullaje.|
+
+Existen otros modulos de capacitor, pero en esta tabla se colocaron las principales utilizadas.
+
+## API Externa utilizada
+
+En este sistema se decidió utilizar el servicio de mapas de OpenStreetMap para poder trabajar con las ubicaciones. Se necesitaba gestionar las zonas de los proyectos y de los patrullajes, y para hacerlo se muestra el mapa de OpenStreetMap con la librería de Leaflet. Además, es útil tanto en el gestor del sistema (para delimitar las zonas y mostrar en vivo la ubicación de los patrulleros en patrullaje) como en la aplicación móvil del patrullero (para ver el área asignada y guiarse durante su ronda). Se justifica esta API debido a que el problema al que responde necesita una mejor gestión de las localizaciones que se tratan en el proceso de patrullajes, por lo que consideramos que era la forma más adecuada de solventar aquello, dando una solución que sigue consistencia y estándares en UI/UX.
+
+Para conectar este servicio sin dejar direcciones fijas escritas en el código, la dirección desde donde se cargan las imágenes del mapa (`https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`) se configura mediante la variable de entorno `VITE_MAP_TILE_URL` en el archivo `.env` de cada aplicación frontend. Al iniciar la aplicación, el sistema verifica que esta variable esté presente y bien configurada antes de ejecutarse.
+
+Además, los mapas cuentan con manejo de errores: si falla la conexión a internet o el servicio de OpenStreetMap presenta algún problema al cargar el mapa, la aplicación detecta el fallo y muestra un aviso en pantalla indicando que no se pudo cargar el mapa base, pero sin bloquear la vista. De esta manera, el usuario puede seguir viendo las zonas dibujadas y la ubicación de los patrulleros en todo momento, y cuando la conexión vuelve a funcionar, el aviso desaparece automáticamente.
 
 ## Como clonar el repositorio (EP1)
 
@@ -750,6 +763,12 @@ npm install
 Si no tiene instalado Ionic, entonces debe ejecutar:
 ```
 npm install -g @ionic/cli
+```
+
+Antes de ejecutar la aplicación, debemos crear un archivo llamado `.env` dentro de la carpeta del proyecto (`SIPPREM-Gestor` o `SIPPREM-AppPatrullero`), guiándonos por el archivo `.env.prueba` incluido en la carpeta. En este archivo `.env` se deben definir las siguientes variables con la dirección del backend y la del servicio de mapas:
+```env
+VITE_BACKEND_URL=http://localhost:3000
+VITE_MAP_TILE_URL=https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png
 ```
 
 Tras todo esto, podremos ejecutar el proyecto con un servidor de desarrollo usando:

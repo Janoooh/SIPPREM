@@ -37,6 +37,13 @@
   border-color: #38bdf8;
 }
 
+.select-patrullero:disabled,
+.select-tiempo-unidad:disabled,
+.chip-turno:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 /* Contenedor del selector de horario */
 .bloque-tiempo-patrullaje {
   background-color: rgba(255, 255, 255, 0.08);
@@ -169,7 +176,7 @@
   transition: all 0.15s ease;
 }
 
-.chip-turno:hover {
+.chip-turno:hover:not(:disabled) {
   background-color: #f1f5f9;
   border-color: #0ea5e9;
 }

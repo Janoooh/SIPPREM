@@ -307,3 +307,48 @@
   --background-hover: #16a34a;
   --color: #ffffff;
 }
+
+/* Indicador visual del día actual en el calendario (RF04) */
+.celda-dia-hoy {
+  background-color: #e0f2fe;
+}
+
+.celda-dia-hoy .numero-dia {
+  background-color: #0284c7;
+  color: #ffffff;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Acciones compactas (editar y eliminar) dentro de la tarjeta de actividad */
+.actividad-acciones-card {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.btn-card-actividad {
+  --padding-start: 4px;
+  --padding-end: 4px;
+  margin: 0;
+  height: 26px;
+  min-height: 26px;
+}
+
+.btn-card-editar {
+  --color: #0284c7;
+}
+
+.btn-card-eliminar {
+  --color: #dc2626;
+}
+
+.patrullaje-estado-acciones {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

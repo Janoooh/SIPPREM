@@ -1,6 +1,7 @@
 import { apiClient } from './apiClient';
 import { Preferences } from '@capacitor/preferences';
 import type { dataUsuario } from '../interfaces/dataUsuario';
+import { EVENTO_SESION_PATRULLERO } from '../context/seguimientoContext';
 
 export interface CredencialesLogin {
   identificador: string;
@@ -40,6 +41,7 @@ export const authService = {
 
     await Preferences.set({ key: "token", value: token });
     await Preferences.set({ key: "usuario", value: JSON.stringify(datosUsuarioLower) });
+    window.dispatchEvent(new Event(EVENTO_SESION_PATRULLERO));
 
     return {
       token,
@@ -48,15 +50,14 @@ export const authService = {
   },
 
   /*Funcion cambiarClave: Encargada de modificar la clave de un usuario que tiene una
-  clave aleatoria asignada.*/
-  cambiarClave: async ({identificador, clave}: CredencialesLogin): Promise<void> => {
-    
-    const datosPeticion = { 
-      idIngresado: identificador.trim(),
-      claveNuevaIng: clave.trim() 
+  clave aleatoria asignada. El backend identifica al usuario mediante el token JWT.*/
+  cambiarClave: async (claveNueva: string): Promise<void> => {
+
+    const datosPeticion = {
+      claveNuevaIng: claveNueva.trim()
     };
 
-    const resCambiarClaveInicial = await apiClient.patch("/auth",datosPeticion);
+    await apiClient.patch("/auth", datosPeticion);
 
     return;
   }

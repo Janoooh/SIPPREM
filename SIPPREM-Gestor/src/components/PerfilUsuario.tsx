@@ -11,14 +11,17 @@ import {
   IonItem,
   IonIcon,
   IonSpinner,
-  useIonAlert
+  useIonAlert,
+  useIonRouter
 } from '@ionic/react';
 import {
   idCardOutline,
   mailOutline,
   callOutline,
-  calendarOutline
+  calendarOutline,
+  logOutOutline
 } from 'ionicons/icons';
+import { Preferences } from '@capacitor/preferences';
 import {
   usuariosService,
   UsuarioPerfil,
@@ -38,6 +41,27 @@ export interface PerfilUsuarioProps {
 
 const PerfilUsuario: React.FC<PerfilUsuarioProps> = ({ idUsuario, onErrorVolver }) => {
   const [mandarAlerta] = useIonAlert();
+  const router = useIonRouter();
+
+  const handleCerrarSesion = () => {
+    mandarAlerta({
+      header: 'Cerrar sesión',
+      message: '¿Deseas cerrar tu sesión actual?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Cerrar sesión',
+          role: 'destructive',
+          handler: async () => {
+            await Preferences.remove({ key: 'token' });
+            await Preferences.remove({ key: 'usuario' });
+            window.dispatchEvent(new Event('sipprem-sesion-actualizada'));
+            router.push('/login', 'root', 'replace');
+          }
+        }
+      ]
+    });
+  };
 
   const [perfil, setPerfil] = useState<UsuarioPerfil | null>(null);
   const [proyectos, setProyectos] = useState<ProyectoUsuario[]>([]);
@@ -184,6 +208,19 @@ const PerfilUsuario: React.FC<PerfilUsuarioProps> = ({ idUsuario, onErrorVolver 
               </IonText>
             </IonRow>
           </IonGrid>
+
+          {!esDetalleOtroUsuario && (
+            <div className="perfil-acciones-sesion">
+              <button
+                type="button"
+                className="btn-cerrar-sesion-gestor"
+                onClick={handleCerrarSesion}
+              >
+                <IonIcon icon={logOutOutline} />
+                <span>Cerrar sesión</span>
+              </button>
+            </div>
+          )}
 
           {mostrarProyectos && (
             <>

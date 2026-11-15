@@ -12,9 +12,10 @@ import {
   IonSpinner,
   useIonAlert,
   useIonRouter,
+  useIonToast,
   useIonViewWillEnter
 } from '@ionic/react';
-import { chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
+import { chevronBackOutline, chevronForwardOutline, createOutline, trashOutline } from 'ionicons/icons';
 import { useParams } from 'react-router-dom';
 import HeaderSistema from '../components/HeaderSistema';
 import MenuLateralProyecto from '../components/MenuLateralProyecto';
@@ -65,6 +66,7 @@ const Cronograma: React.FC = () => {
   const { id_proyecto } = useParams<{ id_proyecto: string }>();
   const router = useIonRouter();
   const [mandarAlerta] = useIonAlert();
+  const [mandarToast] = useIonToast();
 
   // Estados de datos traídos desde el backend
   const [actividades, setActividades] = useState<ActividadFutura[]>([]);
@@ -73,6 +75,7 @@ const Cronograma: React.FC = () => {
 
   // Estado del mes/año visible en el calendario y del día seleccionado (YYYY-MM-DD)
   const fechaInicial = new Date();
+  const fechaHoy = `${fechaInicial.getFullYear()}-${String(fechaInicial.getMonth() + 1).padStart(2, '0')}-${String(fechaInicial.getDate()).padStart(2, '0')}`;
   const [anioActual, setAnioActual] = useState<number>(fechaInicial.getFullYear());
   const [mesActual, setMesActual] = useState<number>(fechaInicial.getMonth());
   const [fechaSeleccionada, setFechaSeleccionada] = useState<string>(() => {
@@ -97,6 +100,19 @@ const Cronograma: React.FC = () => {
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;
+  };
+
+  // Normaliza un timestamp ISO (patrullaje) respetando la zona horaria local
+  const obtenerClaveFechaTimestamp = (valor?: string | Date): string => {
+    if (!valor) return '';
+    const d = new Date(valor);
+    if (!isNaN(d.getTime())) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+    return obtenerClaveFecha(valor);
   };
 
   // Carga las actividades y los patrullajes del proyecto desde el backend
@@ -231,7 +247,7 @@ const Cronograma: React.FC = () => {
     > = {};
 
     patrullajes.forEach((p) => {
-      const clave = obtenerClaveFecha(p.hora_inicio);
+      const clave = obtenerClaveFechaTimestamp(p.hora_inicio);
       if (!clave) return;
       if (!mapa[clave]) mapa[clave] = { patrullajes: [], actividades: [] };
       mapa[clave].patrullajes.push(p);
@@ -279,6 +295,116 @@ const Cronograma: React.FC = () => {
   const eventosDiaSeleccionado = eventosPorFecha[fechaSeleccionada] || {
     patrullajes: [],
     actividades: []
+  };
+
+  // Navegar al formulario de edición para un patrullaje planificado
+  const handleEditarPatrullaje = (patrullaje: PatrullajeProyecto) => {
+    if (patrullaje.estado?.trim().toLowerCase() !== 'planificado') return;
+    router.push(
+      `/${rolRuta}/proyecto/${id_proyecto}/cronograma/patrullajes/editar/${patrullaje.id_patrullaje}`,
+      'forward'
+    );
+  };
+
+  // Confirmar y ejecutar la eliminación de un patrullaje planificado
+  const handleEliminarPatrullaje = (patrullaje: PatrullajeProyecto) => {
+    if (
+      patrullaje.estado?.trim().toLowerCase() !== 'planificado' ||
+      !id_proyecto
+    ) {
+      return;
+    }
+
+    mandarAlerta({
+      header: 'Confirmar eliminación',
+      subHeader: `Patrullaje #${patrullaje.id_patrullaje}`,
+      message: '¿Está seguro de que desea eliminar este patrullaje planificado?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          handler: async () => {
+            try {
+              await patrullajesService.eliminarPatrullaje(
+                String(id_proyecto),
+                String(patrullaje.id_patrullaje)
+              );
+              setPatrullajes((prev) =>
+                prev.filter(
+                  (item) => item.id_patrullaje !== patrullaje.id_patrullaje
+                )
+              );
+              mandarToast({
+                message: 'Patrullaje eliminado correctamente.',
+                duration: 2500,
+                color: 'success',
+                position: 'bottom'
+              });
+            } catch (error: any) {
+              console.error('Error al eliminar patrullaje:', error);
+              mandarAlerta({
+                header: 'Error al eliminar',
+                message:
+                  error.response?.data?.message ||
+                  'No fue posible eliminar el patrullaje seleccionado.',
+                buttons: ['Aceptar']
+              });
+            }
+          }
+        }
+      ]
+    });
+  };
+
+  // Navegar al formulario de edición para una actividad seleccionada
+  const handleEditarActividad = (actividad: ActividadFutura) => {
+    const idAct = actividad.id_actividad ?? actividad.id;
+    if (!idAct) return;
+    router.push(
+      `/${rolRuta}/proyecto/${id_proyecto}/cronograma/actividades/editar/${idAct}`,
+      'forward'
+    );
+  };
+
+  // Confirmar y ejecutar la eliminación lógica de una actividad
+  const handleEliminarActividad = (actividad: ActividadFutura) => {
+    const idAct = actividad.id_actividad ?? actividad.id;
+    if (!idAct || !id_proyecto) return;
+
+    mandarAlerta({
+      header: 'Confirmar eliminación',
+      subHeader: actividad.titulo || actividad.tipoActividad || 'Actividad',
+      message: '¿Está seguro de que desea eliminar esta actividad del cronograma?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          handler: async () => {
+            try {
+              await actividadesService.eliminarActividad(String(id_proyecto), String(idAct));
+              setActividades((prev) =>
+                prev.filter((item) => (item.id_actividad ?? item.id) !== idAct)
+              );
+              mandarToast({
+                message: 'Actividad eliminada correctamente.',
+                duration: 2500,
+                color: 'success',
+                position: 'bottom'
+              });
+            } catch (error: any) {
+              console.error('Error al eliminar actividad:', error);
+              mandarAlerta({
+                header: 'Error al eliminar',
+                message:
+                  error.response?.data?.message ||
+                  'No fue posible eliminar la actividad seleccionada.',
+                buttons: ['Aceptar']
+              });
+            }
+          }
+        }
+      ]
+    });
   };
 
   return (
@@ -367,12 +493,14 @@ const Cronograma: React.FC = () => {
                           const cantActividades = eventosCelda?.actividades.length || 0;
                           const estaSeleccionada = celda.fechaClave === fechaSeleccionada;
 
+                          const esHoy = celda.fechaClave === fechaHoy;
+
                           return (
                             <div
                               key={celda.fechaClave}
                               className={`celda-dia ${
                                 !celda.esMesActual ? 'celda-otro-mes' : ''
-                              } ${estaSeleccionada ? 'celda-dia-seleccionada' : ''}`}
+                              } ${esHoy ? 'celda-dia-hoy' : ''} ${estaSeleccionada ? 'celda-dia-seleccionada' : ''}`}
                               onClick={() => handleSeleccionarDia(celda)}
                             >
                               <span className="numero-dia">{celda.dia}</span>
@@ -428,7 +556,31 @@ const Cronograma: React.FC = () => {
                                     <span className="evento-tipo-badge badge-patrullaje">
                                       ● Patrullaje #{pat.id_patrullaje}
                                     </span>
-                                    <span className="evento-hora-estado">{pat.estado}</span>
+                                    <div className="patrullaje-estado-acciones">
+                                      <span className="evento-hora-estado">{pat.estado}</span>
+                                      {pat.estado?.trim().toLowerCase() === 'planificado' && (
+                                        <>
+                                          <IonButton
+                                            fill="clear"
+                                            size="small"
+                                            className="btn-card-actividad btn-card-editar"
+                                            title="Modificar patrullaje"
+                                            onClick={() => handleEditarPatrullaje(pat)}
+                                          >
+                                            <IonIcon slot="icon-only" icon={createOutline} />
+                                          </IonButton>
+                                          <IonButton
+                                            fill="clear"
+                                            size="small"
+                                            className="btn-card-actividad btn-card-eliminar"
+                                            title="Eliminar patrullaje"
+                                            onClick={() => handleEliminarPatrullaje(pat)}
+                                          >
+                                            <IonIcon slot="icon-only" icon={trashOutline} />
+                                          </IonButton>
+                                        </>
+                                      )}
+                                    </div>
                                   </div>
                                   <p className="evento-titulo">
                                     Horario: {formatearHora(pat.hora_inicio)} -{' '}
@@ -453,6 +605,28 @@ const Cronograma: React.FC = () => {
                                     <span className="evento-tipo-badge badge-actividad">
                                       ● Actividad
                                     </span>
+                                    {(act.id_actividad ?? act.id) !== undefined && (
+                                      <IonRow className="actividad-acciones-card">
+                                        <IonButton
+                                          fill="clear"
+                                          size="small"
+                                          className="btn-card-actividad btn-card-editar"
+                                          onClick={() => handleEditarActividad(act)}
+                                          title="Editar actividad"
+                                        >
+                                          <IonIcon slot="icon-only" icon={createOutline} />
+                                        </IonButton>
+                                        <IonButton
+                                          fill="clear"
+                                          size="small"
+                                          className="btn-card-actividad btn-card-eliminar"
+                                          onClick={() => handleEliminarActividad(act)}
+                                          title="Eliminar actividad"
+                                        >
+                                          <IonIcon slot="icon-only" icon={trashOutline} />
+                                        </IonButton>
+                                      </IonRow>
+                                    )}
                                   </div>
                                   <p className="evento-titulo">
                                     {act.titulo || act.tipoActividad}

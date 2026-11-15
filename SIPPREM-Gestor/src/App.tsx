@@ -9,6 +9,9 @@ import ModificarProyecto from './pages/ModificarProyecto';
 import InicioProyecto from './pages/InicioProyecto';
 import Cronograma from './pages/Cronograma';
 import AgregarPatrullaje from './pages/AgregarPatrullaje';
+import ModificarPatrullaje from './pages/ModificarPatrullaje';
+import AgregarActividad from './pages/AgregarActividad';
+import ModificarActividad from './pages/ModificarActividad';
 import CambiarClaveInicial from './pages/CambiarClaveInicial';
 import Usuarios from './pages/Usuarios';
 import AgregarUsuario from './pages/AgregarUsuario';
@@ -19,6 +22,10 @@ import Inventario from './pages/Inventario';
 import AgregarVehiculo from './pages/AgregarVehiculo';
 import AgregarArticulo from './pages/AgregarArticulo';
 import Personal from './pages/Personal';
+import MapaGPS from './pages/MapaGPS';
+import HistorialIncidentes from './pages/HistorialIncidentes';
+import DetalleIncidente from './pages/DetalleIncidente';
+import { SocketProvider } from './context/SocketProvider';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -54,6 +61,7 @@ const App: React.FC = () => {
   return (
     <IonApp>
       <IonReactRouter>
+        <SocketProvider>
         <IonRouterOutlet>
           
           {/*Ruta publica del login.*/}
@@ -107,9 +115,26 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
+          <Route path="/admin/proyecto/:id_proyecto/cronograma/patrullajes/editar/:id_patrullaje" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <ModificarPatrullaje />
+            </RutaProtegida>
+          } />
           <Route path="/admin/proyecto/:id_proyecto/cronograma/registrar-patrullaje" element={
             <RutaProtegida rolesPermitidos={["admin"]}>
                 <AgregarPatrullaje />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto/cronograma/actividades/agregar" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <AgregarActividad />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto/cronograma/actividades/editar/:id_actividad" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+                <ModificarActividad />
             </RutaProtegida>
           } />
 
@@ -161,6 +186,24 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
+          <Route path="/admin/proyecto/:id_proyecto/mapa" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+              <MapaGPS />
+            </RutaProtegida>
+          } />
+
+
+          <Route path="/admin/proyecto/:id_proyecto/historial" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+              <HistorialIncidentes />
+            </RutaProtegida>
+          } />
+
+          <Route path="/admin/proyecto/:id_proyecto/historial/:id_incidente" element={
+            <RutaProtegida rolesPermitidos={["admin"]}>
+              <DetalleIncidente />
+            </RutaProtegida>
+          } />
 
           {/*Rutas de supervisor*/}
 
@@ -182,9 +225,26 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
+          <Route path="/supervisor/proyecto/:id_proyecto/cronograma/patrullajes/editar/:id_patrullaje" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <ModificarPatrullaje />
+            </RutaProtegida>
+          } />
           <Route path="/supervisor/proyecto/:id_proyecto/cronograma/registrar-patrullaje" element={
             <RutaProtegida rolesPermitidos={["supervisor"]}>
                 <AgregarPatrullaje />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/cronograma/actividades/agregar" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <AgregarActividad />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/cronograma/actividades/editar/:id_actividad" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+                <ModificarActividad />
             </RutaProtegida>
           } />
 
@@ -212,7 +272,25 @@ const App: React.FC = () => {
             </RutaProtegida>
           } />
 
+          <Route path="/supervisor/proyecto/:id_proyecto/mapa" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+              <MapaGPS />
+            </RutaProtegida>
+          } />
+
           
+
+          <Route path="/supervisor/proyecto/:id_proyecto/historial" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+              <HistorialIncidentes />
+            </RutaProtegida>
+          } />
+
+          <Route path="/supervisor/proyecto/:id_proyecto/historial/:id_incidente" element={
+            <RutaProtegida rolesPermitidos={["supervisor"]}>
+              <DetalleIncidente />
+            </RutaProtegida>
+          } />
 
           {/*Ruta de seguridad, reedirige al login cuando tratan de acceder a la raiz.*/}
           <Route path="/" element={<Navigate to="/login" replace />} />
@@ -220,6 +298,7 @@ const App: React.FC = () => {
           {/*Ruta de seguridad, reedirige al login cuando ingresan una ruta inexistente.*/}
           <Route path='*' element={<Navigate to="/login" replace />}></Route>
         </IonRouterOutlet>
+        </SocketProvider>
       </IonReactRouter>
     </IonApp>
 )};

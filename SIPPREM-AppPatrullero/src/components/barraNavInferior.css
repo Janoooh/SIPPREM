@@ -1,0 +1,14 @@
+/* Barra de navegación inferior */
+.custom-tab-bar {
+  --background: #1b2631;
+  border-top: 1px solid #2c3e50;
+}
+
+.custom-tab-bar ion-tab-button {
+  --color: #8c9ba5;
+  --color-selected: #34b5f8;
+}
+
+.custom-tab-bar ion-icon {
+  font-size: 26px;
+}

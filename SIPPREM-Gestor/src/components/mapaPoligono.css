@@ -9,6 +9,7 @@
 
 /* Contenedor del mapa Leaflet */
 .mapa-poligono-lienzo {
+  position: relative;
   flex: 1;
   border: 2px solid #48D1E6;
   border-radius: 8px;

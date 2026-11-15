@@ -1,0 +1,173 @@
+.formulario-actividad-grid {
+  max-width: 760px;
+  margin: 0;
+  padding: 28px;
+  background-color: #3b5066;
+  border: 2px solid #121c27;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.actividad-form-header-row {
+  margin-bottom: 18px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.actividad-form-titulo {
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.55rem;
+  letter-spacing: 0.4px;
+  display: block;
+}
+
+.actividad-form-label {
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  margin-top: 14px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.actividad-asterisco {
+  color: #48D1E6;
+  font-weight: 800;
+  margin-left: 3px;
+}
+
+.actividad-form-input {
+  --background: #D9D9D9;
+  --color: #121c27;
+  --placeholder-color: #555555;
+  --placeholder-opacity: 0.85;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  --border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  min-height: 42px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.actividad-fecha-input {
+  max-width: 240px;
+}
+
+.actividad-form-textarea {
+  --background: #D9D9D9;
+  --color: #121c27;
+  --placeholder-color: #555555;
+  --placeholder-opacity: 0.85;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  --border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+
+.actividad-contador-texto {
+  color: #a9c3dd;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.8rem;
+  display: block;
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+.actividad-nota-obligatorios {
+  color: #a9c3dd;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-style: italic;
+  display: block;
+  margin-top: 6px;
+}
+
+.actividad-acciones-row {
+  margin-top: 26px;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-actividad-submit {
+  --background: #121c27;
+  --border-color: #48D1E6;
+  --border-width: 1.5px;
+  --border-style: solid;
+  --border-radius: 20px;
+  --color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: none;
+  min-width: 190px;
+  height: 44px;
+  margin: 0;
+  transition: transform 0.2s ease, --border-color 0.2s ease;
+}
+
+.btn-actividad-submit:hover {
+  transform: translateY(-2px);
+  --border-color: #ffffff;
+}
+
+.btn-actividad-submit[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-actividad-cancelar {
+  --background: transparent;
+  --color: #ffffff;
+  --border-color: #a9c3dd;
+  --border-width: 1.5px;
+  --border-style: solid;
+  --border-radius: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-transform: none;
+  min-width: 130px;
+  height: 44px;
+  margin: 0;
+}
+
+.btn-actividad-cancelar:hover {
+  --background: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+  .formulario-actividad-grid {
+    padding: 18px;
+  }
+
+  .actividad-form-titulo {
+    font-size: 1.3rem;
+  }
+
+  .actividad-fecha-input {
+    max-width: 100%;
+  }
+
+  .actividad-acciones-row {
+    flex-direction: column-reverse;
+  }
+
+  .btn-actividad-submit,
+  .btn-actividad-cancelar {
+    width: 100%;
+  }
+}
