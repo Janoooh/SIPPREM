@@ -750,7 +750,137 @@ Para conectar este servicio sin dejar direcciones fijas escritas en el código, 
 
 Además, los mapas cuentan con manejo de errores: si falla la conexión a internet o el servicio de OpenStreetMap presenta algún problema al cargar el mapa, la aplicación detecta el fallo y muestra un aviso en pantalla indicando que no se pudo cargar el mapa base, pero sin bloquear la vista. De esta manera, el usuario puede seguir viendo las zonas dibujadas y la ubicación de los patrulleros en todo momento, y cuando la conexión vuelve a funcionar, el aviso desaparece automáticamente.
 
-## Como clonar el repositorio (EP1)
+## Pruebas para validar integracion de Requerimientos Funcionales (RF)
+
+A continuación se presentan las instrucciones paso a paso para que cualquier evaluador o usuario pueda comprobar visualmente en la aplicación (Web o Móvil) el correcto funcionamiento de cada uno de los 13 requerimientos del sistema:
+
+**RF01: Gestión de proyectos de patrullaje preventivo (CRUD)**
+*Plataforma y Rol:* SIPPREM Gestor (Web) – Rol: Supervisor / Administrador.
+*Instrucciones de prueba:*
+Iniciar sesión en la plataforma web y entrar al panel de Inicio.
+Hacer clic en el botón "Agregar Proyecto".
+En el formulario, ingresar el nombre del sector, fechas de inicio/término, presupuesto asignado y trazar el cuadrante en el mapa.
+Presionar el botón "Guardar Proyecto".
+Cómo comprobar que funcionó (Resultado en pantalla):
+Aparece un mensaje flotante  de confirmación exitosa.
+Al volver al inicio, se visualiza la nueva tarjeta del proyecto con su información y presupuesto actualizado.
+
+**RF02: Planificación y gestión de patrullajes por proyecto**
+*Plataforma y Rol:* SIPPREM Gestor (Web) – Rol: Supervisor.
+*Instrucciones de prueba:*
+Hacer clic en "Ver Proyecto" sobre cualquier cuadrante activo.
+En el menú lateral de opciones, seleccionar "Patrullajes".
+Presionar "Planificar Nuevo Patrullaje", seleccionar la fecha, el vehículo municipal a usar y el patrullero responsable.
+Presionar "Confirmar Planificación".
+Cómo comprobar que funcionó (Resultado en pantalla):
+El nuevo turno se suma a la lista de patrullajes con una etiqueta que indica estado "Planificado".
+
+**RF03: Gestión del inventario de recursos (Vehículos y Equipamiento)**
+*Plataforma y Rol:* SIPPREM Gestor (Web) – Rol: Supervisor.
+*Instrucciones de prueba:*
+Dentro de un proyecto, ir a la opción "Vehículos" o "Equipamiento".
+Presionar "Registrar Vehículo", ingresar patente y tipo de móvil.
+En la tarjeta de un vehículo ya existente, presionar el botón de editar y cambiar su estado a "En Mantención".
+Cómo comprobar que funcionó (Resultado en pantalla):
+La patente queda guardada en el catálogo; al cambiar su estado a "Mantención", el vehículo cambia de color y queda bloqueado (no permite asignarlo a nuevos turnos).
+
+**RF04: Calendario operativo del proyecto**
+*Plataforma y Rol:* SIPPREM Gestor (Web) – Rol: Supervisor.
+*Instrucciones de prueba:*
+En el menú del proyecto, seleccionar "Calendario de Actividades".
+Navegar entre los meses y hacer clic sobre un día específico del calendario.
+Cómo comprobar que funcionó (Resultado en pantalla):
+Los días con eventos tienen puntos indicadores de color. Al presionar un día, se despliegan abajo las tarjetas con los patrullajes y actividades comunitarias programadas para esa fecha.
+
+**RF05: Monitoreo GPS en tiempo real de patrulleros**
+*Plataforma y Rol:* SIPPREM Gestor (Web) – Rol: Supervisor.
+*Instrucciones de prueba:*
+En el menú lateral, seleccionar la opción "Mapa en Vivo / Monitoreo".
+Asegurarse de que haya un patrullero con turno activo en terreno.
+Cómo comprobar que funcionó (Resultado en pantalla):
+Se visualiza el mapa interactivo (Leaflet) con el icono del móvil/patrullero moviéndose sobre el cuadrante en tiempo real y sin necesidad de recargar la página.
+
+**RF06: Inicio y finalización de patrullaje en terreno**
+*Plataforma y Rol:* SIPPREM AppPatrullero (Móvil) – Rol: Patrullero.
+*Instrucciones de prueba:*
+Abrir la app móvil e iniciar sesión como Patrullero.
+En la pantalla principal, presionar el botón "Iniciar Patrullaje" en la tarjeta de turno e ingresar el kilometraje inicial del móvil (ej: 10.000 km).
+Al terminar la ronda, presionar el botón "Finalizar Patrullaje", ingresar el kilometraje final (ej: 10.050 km) y escribir observaciones.
+Cómo comprobar que funcionó (Resultado en pantalla):
+Al iniciar, la interfaz cambia al modo de patrullaje activo mostrando el mapa del cuadrante. Al finalizar, valida que el kilometraje final no sea menor al inicial, muestra alerta de turno cerrado y libera el vehículo.
+
+**RF07: Registro de incidentes en terreno**
+*Plataforma y Rol:* SIPPREM AppPatrullero (Móvil) – Rol: Patrullero.
+*Instrucciones de prueba:*
+Durante un patrullaje activo, presionar el botón flotante "Reportar Incidente".
+Seleccionar la categoría (Delito o Incivilidad), nivel de gravedad (Baja/Media/Alta/Crítica), escribir las observaciones y adjuntar fotos del suceso.
+Presionar "Enviar Reporte".
+Cómo comprobar que funcionó (Resultado en pantalla):
+Aparece una notificación Toast de "Incidente reportado exitosamente" y la pantalla regresa limpiamente al mapa de patrullaje activo.
+
+**RF08: Botón de pánico para emergencias**
+*Plataforma y Rol:* App Móvil (Patrullero) y Plataforma Web (Supervisor).
+*Instrucciones de prueba:*
+En la app móvil del patrullero, presionar el Botón de Pánico rojo ubicado en la pantalla principal.
+Observar al mismo tiempo la pantalla web del Supervisor.
+Cómo comprobar que funcionó (Resultado en pantalla):
+En la web del Supervisor salta instantáneamente una ventana modal de emergencia con alerta sonora/visual y un marcador rojo en el mapa indicando las coordenadas exactas del patrullero en peligro.
+
+**RF09: Calendario personal de turnos del Patrullero**
+*Plataforma y Rol:* SIPPREM AppPatrullero (Móvil) – Rol: Patrullero.
+*Instrucciones de prueba:*
+En la barra de navegación inferior de la app móvil, presionar la pestaña "Mis Turnos / Calendario".
+Pulsar sobre cualquier fecha marcada.
+Cómo comprobar que funcionó (Resultado en pantalla):
+Se abre una vista detallada con el horario asignado, el sector a patrullar y el vehículo que le corresponde conducir ese día.
+
+**RF10: Muro y tarjetas de seguimiento de incidentes**
+*Plataforma y Rol:* SIPPREM Gestor (Web) – Rol: Supervisor.
+*Instrucciones de prueba:*
+Entrar al proyecto y presionar la opción "Muro de Incidentes".
+Utilizar los botones o selectores superiores para filtrar por gravedad (ej: "Alta") o por categoría.
+Cómo comprobar que funcionó (Resultado en pantalla):
+La lista de tarjetas se actualiza dinámicamente mostrando la fecha, patrullero que reportó, observaciones detalladas y la galería de fotos adjuntas.
+
+**RF11: Gestión de usuarios del sistema**
+*Plataforma y Rol:* SIPPREM Gestor (Web) – Rol: Administrador.
+*Instrucciones de prueba:*
+En la barra de navegación principal, acceder al módulo "Usuarios".
+Presionar "Nuevo Usuario", ingresar RUT, nombre, correo y seleccionar el rol (Supervisor o Patrullero).
+Para eliminar, presionar el botón con icono de basura en una tarjeta de usuario.
+Cómo comprobar que funcionó (Resultado en pantalla):
+Al guardar, el sistema muestra una ventana emergente informando la contraseña provisoria generada para ese usuario. Al eliminar, solicita confirmación antes de dar de baja la tarjeta.
+
+**RF12: Asignación de trabajadores a proyectos**
+*Plataforma y Rol:* SIPPREM Gestor (Web) – Rol: Supervisor.
+*Instrucciones de prueba:*
+Dentro de un proyecto de patrullaje, hacer clic en "Equipo de Trabajo / Personal".
+Desplegar la lista de patrulleros disponibles, seleccionar uno y presionar "Asignar al Proyecto".
+Cómo comprobar que funcionó (Resultado en pantalla):
+El funcionario se suma a la lista visual de miembros del cuadrante y a partir de ese momento queda habilitado para que se le asignen turnos en ese sector.
+
+**RF13: Inicio de sesión (Login) y cambio de contraseña inicial**
+*Plataforma y Rol:* Ambas plataformas (Web y Móvil) – Cualquier usuario.
+*Instrucciones de prueba:*
+En la pantalla de login, ingresar correo/RUT y contraseña provisoria.
+Presionar el botón "INICIAR".
+Cómo comprobar que funcionó (Resultado en pantalla):
+Si las credenciales son incorrectas, salta una alerta de "Acceso Denegado".
+Si es la primera vez que ingresa, el sistema bloquea el paso y lo redirige automáticamente a la pantalla "Cambiar Clave Inicial", exigiendo definir una clave personal antes de acceder al sistema.
+
+## Cambios tras EP1 y EP2
+
+En la presente seccion se procede a explicar los cambios que se realizaron en el proyecto tras cada retroalimentacion entregada por entrega parcial de la tarea.
+
+### Tras EP1:
+
+Se resolvieron los problemas planteados en la retroalimentacion. Actualmente el sistema esta desarrollado completamente, por lo que las rutas ya estan protegidas, y se puede navegar libremente por todas las ventanas que dispone el sistema. Los requerimientos tuvieron ciertos ajustes por cambios en la logica de negocio, como la eliminacion de ciertas opciones para ciertos recursos. En general, el frontend permite completar las 13 pruebas para validar que cada uno de los requerimientos estan correctamente integrados en los sistemas Gestor y AppPatrullero.
+
+### Tras EP2:
+
+Tambien se resolvieron los problemas planteados en el feedback de EP2. La seguridad del backend se volvio mucho mas robusta, gracias a que se implemento el uso de la libreria Helmet, el limitador de intentos de login, y una funcion middleware para evitar mandar scripts o codigo HTML en los bodys de las request que llegan por la API REST. Ademas, se integro una API WebSocket, la cual permite cumplir los requerimientos relacionados a manejar el boton de panico, y las ubicaciones de los patrulleros en patrullaje. Se arreglaron las pruebas de Postman. Se incluyeron indices en la base de datos, y ademas se eliminaron consultas redundantes en los service, ambos con la intencion de optimizar la base de datos y evitar una gran cantidad de request a el servidor donde se aloja.
+
+## Como clonar el repositorio
 
 Para clonar el repositorio se tienen que ejecutar los siguientes comandos por CMD:
 ```
@@ -787,7 +917,7 @@ El proceso es el mismo si queremos correr el SIPPREM-AppPatrullero, solo que cam
 **IMPORTANTE**
 El sistema actualmente gestor cuenta actualmente con conexión al backend, pues se puede cumplir los flujos principales de tarea de manera exitosa. Para poder utilizar correctamente el sistema tendremos que tener activado el backend en el puerto 3000, usando en la carpeta SIPPREM el comando cmd: node SIPPREM-Backend/dist/app.js
 
-## Como acceder al sistema (EP1)
+## Como acceder al sistema
 
 Para acceder al sistema necesitamos utilizar las credenciales validas de algun usuario.
 A continuacion, se detallan las credenciales de los usuarios registrados en el sistema:
@@ -806,7 +936,7 @@ A continuacion, se detallan las credenciales de los usuarios registrados en el s
 
 Se puede utilizar cualquiera de esas credenciales para tener acceso al sistema, y a sus respectivas funciones segun corresponda por el rol.
 
-## Distribucion de responsabilidades en el equipo (EP1)
+## Distribucion de responsabilidades en el equipo
 
 * Alejandro Orellana: Especificacion de requerimientos, y desarrollo de codigo.
 
@@ -816,7 +946,7 @@ Se puede utilizar cualquiera de esas credenciales para tener acceso al sistema, 
 
 * Jorge Ramirez: Reconocimiento del arquetipo de usuario.
 
-## Uso de herramientas de IA (EP1)
+## Uso de herramientas de IA
 
-Se utilizaron herramientas IA LLMs para generacion de codigo, el cual fue implementado en ciertas interfaces de SIPPREM-Gestor. Todo codigo implementado fue revisado a detalle, linea por linea, evitando posibles errores o detalles que pudiera tener el originado inicialmente.
+Se utilizaron herramientas IA LLMs para generacion de codigo, el cual fue implementado en ciertas interfaces de SIPPREM-Gestor y SIPPREM-AppPatrullero. Todo codigo implementado fue revisado a detalle, linea por linea, evitando posibles errores o detalles que pudiera tener el originado inicialmente.
 
