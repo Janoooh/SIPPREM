@@ -938,13 +938,13 @@ Se puede utilizar cualquiera de esas credenciales para tener acceso al sistema, 
 
 ## Distribucion de responsabilidades en el equipo
 
-* Alejandro Orellana: Especificacion de requerimientos, y desarrollo de codigo.
+* Alejandro Orellana: Especificacion de requerimientos, desarrollo de recursos en el backend (Auth, usuarios, patrullajes), integracion de los diferentes sistemas y metodologias de seguridad, implementacion del API externo, desarrollo del WebSocket, y del frontend.
 
-* Fernanda Barraza: Desarrollo de arquitectura de navegacion y experiencia de usuario.
+* Fernanda Barraza: Desarrollo de arquitectura de navegacion, experiencia de usuario, implementacion de recursos en el backend (Proyectos e incidentes), creacion de pruebas a la API REST en postman y desarrollo del Docker.
 
-* Edgar De La Cruz: Diseño de prototipos en Figma, y desarrollo de codigo.
+* Edgar De La Cruz: Diseño de prototipos en Figma, desarrollo de recursos en el backend (Actividad y Trabajadores), creacion de pruebas a la API REST, redaccion de pruebas para comprobar integracion de los RF y preparacion de la presentacion de proyecto.
 
-* Jorge Ramirez: Reconocimiento del arquetipo de usuario.
+* Jorge Ramirez: Reconocimiento del arquetipo de usuario, modelamiento y creacion de la base de datos del sistema, desarrollo de recursos del backend (Vehiculos, EquipamientoPersonal, EquipamientoVehicular, y tipos), optimizacion de la base de datos con creacion de indices y redaccion del readme del backend.
 
 ## Uso de herramientas de IA
 
